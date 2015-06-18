@@ -11,6 +11,7 @@ This project is getting ```JSON``` feeds from https://yts.to/api
 * Using ```Toolbar```.
 * Using ```Ripple Effect``` on pre-```Lollipop``` devices.
 * Implementing ```AdMob``` in your project.
+* Adding ```Notifications```.
 
 ## Testing
 [A full running signed ```APK```](app/app-release.apk) can be found in ```app/app-release.apk```.
