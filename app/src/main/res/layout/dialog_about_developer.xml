@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2015.
+  ~
+  ~ Dear maintainer:
+  ~ When I wrote this, only God and I understood what I was doing
+  ~ Now, God only knows
+  ~ So, good luck maintaining the code :D
+  ~
+  ~ Eslam El-Meniawy
+  ~ 05-Jun-2015 13:06
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/primaryColorDark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialog_height"
+        android:orientation="horizontal"
+        android:background="@color/darkBackground">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_about"
+            style="@style/DialogAboutHeaderImage"/>
+        <CheckedTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/developer_about"
+            style="@style/DialogAboutHeaderText"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/accentColor" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_image_height"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:padding="@dimen/activity_horizontal_margin">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:src="@drawable/developer" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <CheckedTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/normalText"
+                android:padding="@dimen/drawer_image_padding"
+                android:text="@string/developer_about_details" />
+        </ScrollView>
+    </LinearLayout>
+
+</LinearLayout>

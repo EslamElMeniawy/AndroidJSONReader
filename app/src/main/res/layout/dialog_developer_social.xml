@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2015.
+  ~
+  ~ Dear maintainer:
+  ~ When I wrote this, only God and I understood what I was doing
+  ~ Now, God only knows
+  ~ So, good luck maintaining the code :D
+  ~
+  ~ Eslam El-Meniawy
+  ~ 05-Jun-2015 14:32
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/primaryColorDark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialog_height"
+        android:orientation="horizontal"
+        android:background="@color/darkBackground">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_person"
+            style="@style/DialogAboutHeaderImage"/>
+        <CheckedTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/developer_social"
+            style="@style/DialogAboutHeaderText"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/accentColor" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.andexert.library.RippleView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/developerLinkedin"
+                app:rv_color="@color/accentColor"
+                app:rv_rippleDuration="150">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogRippleViewLayout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_action_linkedin"
+                        style="@style/DrawerRippleViewImageView"/>
+                    <CheckedTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/linkedin"
+                        style="@style/DrawerRippleViewTextView"/>
+                </LinearLayout>
+            </com.andexert.library.RippleView>
+            <com.andexert.library.RippleView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/developerGithub"
+                app:rv_color="@color/accentColor"
+                app:rv_rippleDuration="150">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogRippleViewLayout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_action_github"
+                        style="@style/DrawerRippleViewImageView"/>
+                    <CheckedTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/github"
+                        style="@style/DrawerRippleViewTextView"/>
+                </LinearLayout>
+            </com.andexert.library.RippleView>
+            <com.andexert.library.RippleView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/developerTwitter"
+                app:rv_color="@color/accentColor"
+                app:rv_rippleDuration="150">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogRippleViewLayout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_action_twitter"
+                        style="@style/DrawerRippleViewImageView"/>
+                    <CheckedTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/twitter"
+                        style="@style/DrawerRippleViewTextView"/>
+                </LinearLayout>
+            </com.andexert.library.RippleView>
+            <com.andexert.library.RippleView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/developerFacebook"
+                app:rv_color="@color/accentColor"
+                app:rv_rippleDuration="150">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogRippleViewLayout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_action_facebook"
+                        style="@style/DrawerRippleViewImageView"/>
+                    <CheckedTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/facebook"
+                        style="@style/DrawerRippleViewTextView"/>
+                </LinearLayout>
+            </com.andexert.library.RippleView>
+            <com.andexert.library.RippleView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/developerGooglePlus"
+                app:rv_color="@color/accentColor"
+                app:rv_rippleDuration="150">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/DialogRippleViewLayout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_action_google_plus"
+                        style="@style/DrawerRippleViewImageView"/>
+                    <CheckedTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/google_plus"
+                        style="@style/DrawerRippleViewTextView"/>
+                </LinearLayout>
+            </com.andexert.library.RippleView>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

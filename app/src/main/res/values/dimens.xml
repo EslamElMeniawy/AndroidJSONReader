@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2015.
+  ~
+  ~ Dear maintainer:
+  ~ When I wrote this, only God and I understood what I was doing
+  ~ Now, God only knows
+  ~ So, good luck maintaining the code :D
+  ~
+  ~ Eslam El-Meniawy
+  ~ 04-Jun-2015 21:02
+  -->
+
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">10dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_drawer_width">280dp</dimen>
+    <dimen name="drawer_image_height">140dp</dimen>
+    <dimen name="drawer_image_margin">40dp</dimen>
+    <dimen name="drawer_image_padding">8dp</dimen>
+    <dimen name="drawer_divider_margin">20dp</dimen>
+    <dimen name="dialog_height">64dp</dimen>
+    <dimen name="recycler_image_width">50dp</dimen>
+    <dimen name="recycler_image_height">70dp</dimen>
+</resources>

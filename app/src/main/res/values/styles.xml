@@ -1,0 +1,82 @@
+<!--
+  ~ Copyright (c) 2015.
+  ~
+  ~ Dear maintainer:
+  ~ When I wrote this, only God and I understood what I was doing
+  ~ Now, God only knows
+  ~ So, good luck maintaining the code :D
+  ~
+  ~ Eslam El-Meniawy
+  ~ 04-Jun-2015 20:01
+  -->
+
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+
+    <!-- Toolbar theme -->
+    <style name="CustomToolbarTheme" parent="ThemeOverlay.AppCompat">
+        <item name="android:textColorPrimary">@color/headingsText</item>
+        <item name="android:textColorSecondary">@color/normalText</item>
+    </style>
+
+    <!-- Medium Text -->
+    <style name="MediumText">
+        <item name="android:textColor">@color/headingsText</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+
+    <!-- Large Text -->
+    <style name="LargeText">
+        <item name="android:textColor">@color/headingsText</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <!-- Drawer TextView -->
+    <style name="DrawerTextView" parent="MediumText">
+        <item name="android:paddingLeft">@dimen/activity_vertical_margin</item>
+    </style>
+
+    <!-- Drawer RippleView Layout -->
+    <style name="DrawerRippleViewLayout">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingLeft">@dimen/activity_vertical_margin</item>
+    </style>
+
+    <!-- Drawer RippleView ImageView -->
+    <style name="DrawerRippleViewImageView">
+        <item name="android:padding">@dimen/drawer_image_padding</item>
+        <item name="android:layout_marginRight">@dimen/activity_vertical_margin</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <!-- Drawer RippleView TextView -->
+    <style name="DrawerRippleViewTextView" parent="MediumText">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <!-- Dialog About Header Image -->
+    <style name="DialogAboutHeaderImage" parent="DrawerRippleViewImageView">
+        <item name="android:layout_marginLeft">@dimen/activity_vertical_margin</item>
+    </style>
+
+    <!-- Dialog About Header Text -->
+    <style name="DialogAboutHeaderText" parent="LargeText">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <!-- Dialog RippleView Layout -->
+    <style name="DialogRippleViewLayout" parent="DrawerRippleViewLayout">
+        <item name="android:paddingRight">@dimen/activity_vertical_margin</item>
+    </style>
+
+</resources>

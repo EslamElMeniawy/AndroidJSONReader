@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015.
+  ~
+  ~ Dear maintainer:
+  ~ When I wrote this, only God and I understood what I was doing
+  ~ Now, God only knows
+  ~ So, good luck maintaining the code :D
+  ~
+  ~ Eslam El-Meniawy
+  ~ 04-Jun-2015 20:03
+  -->
+
+<resources>
+    <color name="headingsText">#FFFFFF</color>
+    <color name="normalText">#919191</color>
+    <color name="primaryColor">#1D1D1D</color>
+    <color name="primaryColorDark">#171717</color>
+    <color name="darkBackground">#111111</color>
+    <color name="accentColor">#6AC045</color>
+</resources>
