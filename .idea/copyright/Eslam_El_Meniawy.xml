@@ -1,9 +1,0 @@
-<component name="CopyrightManager">
-  <copyright>
-    <option name="notice" value="Copyright (c) &amp;#36;today.year.&#10;&#10;Dear maintainer:&#10;When I wrote this, only God and I understood what I was doing&#10;Now, God only knows&#10;So, good luck maintaining the code :D&#10;&#10;Eslam El-Meniawy&#10;&amp;#36;today.format(&quot;dd-MMM-yyyy HH:mm&quot;)" />
-    <option name="keyword" value="Copyright" />
-    <option name="allowReplaceKeyword" value="" />
-    <option name="myName" value="Eslam El-Meniawy" />
-    <option name="myLocal" value="true" />
-  </copyright>
-</component>
