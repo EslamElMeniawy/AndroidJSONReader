@@ -4,7 +4,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
 
     <string name="notifications">Notifications</string>
     <string name="about">About</string>
@@ -33,4 +33,5 @@
 
     <string name="banner_ad_unit_id">ca-app-pub-3911224529986415/5640802486</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3911224529986415/6977934885</string>
+    <string name="title_activity_search">Search Results</string>
 </resources>

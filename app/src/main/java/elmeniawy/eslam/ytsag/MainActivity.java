@@ -1,12 +1,12 @@
 package elmeniawy.eslam.ytsag;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -17,10 +17,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +32,6 @@ import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.ads.AdRequest;
@@ -45,12 +44,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
     public static final String PREF_FILE_NAME = "YTSPref";
     private SharedPreferences sharedPreferences;
     private SwitchCompat notifications;
     private boolean notificationsEnabled;
-    private VolleySingleton volleySingleton;
     private RequestQueue requestQueue;
     private ArrayList<Movie> listMovies = new ArrayList<>();
     private MoviesListAdapter moviesListAdapter;
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     private GridLayoutManager gridLayoutManager;
     private boolean mLoadingItems = true, stop = false;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity
         listMoviesRecycler.setLayoutManager(gridLayoutManager);
         moviesListAdapter = new MoviesListAdapter(MainActivity.this);
         listMoviesRecycler.setAdapter(moviesListAdapter);
-        volleySingleton = VolleySingleton.getInstance();
+        VolleySingleton volleySingleton = VolleySingleton.getInstance();
         requestQueue = volleySingleton.getRequestQueue();
         moviesSwipe.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         moviesSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -170,6 +169,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         return true;
     }
 
@@ -177,7 +178,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
+            mSearchView.setIconified(false);
             return true;
         }
 
@@ -407,5 +409,20 @@ public class MainActivity extends AppCompatActivity
             }
         }
         return listMovies;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("movie", query);
+        intent.putExtras(bundle);
+        MainActivity.this.startActivity(intent);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }
