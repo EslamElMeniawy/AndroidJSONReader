@@ -1,52 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015.
-  ~
-  ~ Dear maintainer:
-  ~ When I wrote this, only God and I understood what I was doing
-  ~ Now, God only knows
-  ~ So, good luck maintaining the code :D
-  ~
-  ~ Eslam El-Meniawy
-  ~ 05-Jun-2015 01:20
-  -->
-
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/primaryColorDark">
+    android:background="@color/colorPrimaryDark"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/dialog_height"
-        android:orientation="horizontal"
-        android:background="@color/darkBackground">
+        android:background="@color/darkBackground"
+        android:orientation="horizontal">
+
         <ImageView
+            style="@style/DialogAboutHeaderImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_about"
-            style="@style/DialogAboutHeaderImage"/>
-        <CheckedTextView
+            android:src="@drawable/ic_info_white_36dp" />
+
+        <TextView
+            style="@style/DialogAboutHeaderText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_about"
-            style="@style/DialogAboutHeaderText"/>
+            android:text="@string/app_about" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/accentColor" />
+        android:background="@color/colorAccent" />
 
-    <ScrollView
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <CheckedTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/normalText"
-            android:text="@string/app_about_details"
-            android:padding="@dimen/activity_horizontal_margin"/>
-    </ScrollView>
-
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:text="@string/app_about_details"
+        android:textColor="@color/normalText" />
 </LinearLayout>

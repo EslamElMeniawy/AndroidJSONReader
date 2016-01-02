@@ -9,7 +9,7 @@ This project is getting ```JSON``` feeds from https://yts.ag/api
 * Cashing online images.
 * Supportting ```Material Design``` for pre-```Lollipop``` devices.
 * Using ```Toolbar```.
-* Using ```Ripple Effect``` on pre-```Lollipop``` devices.
+* Using ```SwipeRefreshLayout```.
 * Implementing ```AdMob``` in your project.
 * Adding ```Notifications```.
 

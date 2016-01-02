@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/developerLinkedin"
+            style="@style/DialogRippleViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                style="@style/DrawerRippleViewImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_linkedin_white_36dp" />
+
+            <TextView
+                style="@style/DrawerRippleViewTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/linkedin" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/developerGithub"
+            style="@style/DialogRippleViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                style="@style/DrawerRippleViewImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_github_white_36dp" />
+
+            <CheckedTextView
+                style="@style/DrawerRippleViewTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/github" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/developerTwitter"
+            style="@style/DialogRippleViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                style="@style/DrawerRippleViewImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_twitter_white_36dp" />
+
+            <CheckedTextView
+                style="@style/DrawerRippleViewTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/twitter" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/developerFacebook"
+            style="@style/DialogRippleViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                style="@style/DrawerRippleViewImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_facebook_white_36dp" />
+
+            <CheckedTextView
+                style="@style/DrawerRippleViewTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/facebook" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/developerGooglePlus"
+            style="@style/DialogRippleViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                style="@style/DrawerRippleViewImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_google_plus_white_36dp" />
+
+            <CheckedTextView
+                style="@style/DrawerRippleViewTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/google_plus" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
