@@ -88,9 +88,15 @@ public class MainActivity extends AppCompatActivity
         moviesSwipe = (SwipeRefreshLayout) findViewById(R.id.MoviesSwipeRefresh);
         listMoviesRecycler = (RecyclerView) findViewById(R.id.MoviesRecycler);
         errorView = (TextView) findViewById(R.id.error_view);
+        errorView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendJSONRequest();
+            }
+        });
 
         DisplayMetrics displayMetrics = MainActivity.this.getResources().getDisplayMetrics();
-        int spanCount = Math.max(1, displayMetrics.widthPixels / 230);
+        int spanCount = Math.max(1, (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi) / 230);
         gridLayoutManager = new GridLayoutManager(MainActivity.this, spanCount);
         listMoviesRecycler.setLayoutManager(gridLayoutManager);
         moviesListAdapter = new MoviesListAdapter(MainActivity.this);
@@ -101,6 +107,7 @@ public class MainActivity extends AppCompatActivity
         moviesSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                moviesSwipe.setRefreshing(true);
                 sendJSONRequest();
             }
         });
