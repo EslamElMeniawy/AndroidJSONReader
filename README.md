@@ -13,6 +13,7 @@ This project is getting ```JSON``` feeds from https://yts.ag/api
 * Using ```Toolbar```.
 * Implementing ```AdMob``` in your project.
 * Adding ```Notifications```.
+* Using ```SearchView```.
 
 ## Testing
 [A full running signed ```APK```](app/app-release.apk) can be found in ```app/app-release.apk```.

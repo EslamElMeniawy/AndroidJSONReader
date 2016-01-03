@@ -1,7 +1,7 @@
 package elmeniawy.eslam.ytsag;
 
+import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -24,6 +24,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -44,7 +45,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
     public static final String PREF_FILE_NAME = "YTSPref";
     private SharedPreferences sharedPreferences;
     private SwitchCompat notifications;
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity
     private GridLayoutManager gridLayoutManager;
     private boolean mLoadingItems = true, stop = false;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
-    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity
         errorView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                moviesSwipe.setVisibility(View.VISIBLE);
+                moviesSwipe.setRefreshing(true);
                 sendJSONRequest();
             }
         });
@@ -157,6 +159,7 @@ public class MainActivity extends AppCompatActivity
         });
         moviesSwipe.setProgressViewOffset(false, 0, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         moviesSwipe.setRefreshing(true);
+
         sendJSONRequest();
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -175,22 +178,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_search) {
-            mSearchView.setIconified(false);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -416,20 +410,5 @@ public class MainActivity extends AppCompatActivity
             }
         }
         return listMovies;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("movie", query);
-        intent.putExtras(bundle);
-        MainActivity.this.startActivity(intent);
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
     }
 }
