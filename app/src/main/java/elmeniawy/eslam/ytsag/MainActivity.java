@@ -238,8 +238,11 @@ public class MainActivity extends AppCompatActivity
         try {
             listMovies.clear();
             moviesListAdapter.notifyDataSetChanged();
-            listMovies = parseJSONResponse(new JSONObject(sharedPreferences.getString("moviesList", "")), true);
-            moviesListAdapter.setMoviesList(listMovies);
+            String savedMovies = sharedPreferences.getString("moviesList", "");
+            if (!savedMovies.equals("")) {
+                listMovies = parseJSONResponse(new JSONObject(savedMovies), true);
+                moviesListAdapter.setMoviesList(listMovies);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
