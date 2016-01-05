@@ -26,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity {
@@ -39,7 +41,7 @@ public class SearchActivity extends AppCompatActivity {
     private AdView mAdView;
     private int getPage = 1;
     private GridLayoutManager gridLayoutManager;
-    private boolean mLoadingItems = true, stop = false;
+    private boolean mLoadingItems = true;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
 
     @Override
@@ -102,26 +104,30 @@ public class SearchActivity extends AppCompatActivity {
                 if (!mLoadingItems && (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
                     moviesSwipe.setRefreshing(true);
                     getPage++;
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&query_term=" + query + "&page=" + getPage, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            ArrayList<Movie> listMoreMovies = parseJSONResponse(response, false);
-                            for (int i = 0; i < listMoreMovies.size(); i++) {
-                                Movie movie = listMoreMovies.get(i);
-                                listMovies.add(movie);
-                                moviesListAdapter.notifyItemInserted(listMovies.size());
+                    try {
+                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&query_term=" + URLEncoder.encode(query, "UTF-8") + "&page=" + getPage, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                ArrayList<Movie> listMoreMovies = parseJSONResponse(response, false);
+                                for (int i = 0; i < listMoreMovies.size(); i++) {
+                                    Movie movie = listMoreMovies.get(i);
+                                    listMovies.add(movie);
+                                    moviesListAdapter.notifyItemInserted(listMovies.size());
+                                }
+                                moviesSwipe.setRefreshing(false);
                             }
-                            moviesSwipe.setRefreshing(false);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            getPage--;
-                            moviesSwipe.setRefreshing(false);
-                        }
-                    });
-                    requestQueue.add(request);
-                    mLoadingItems = true;
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                getPage--;
+                                moviesSwipe.setRefreshing(false);
+                            }
+                        });
+                        requestQueue.add(request);
+                        mLoadingItems = true;
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -149,7 +155,6 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        stop = true;
         if (mAdView != null) {
             mAdView.pause();
         }
@@ -166,6 +171,8 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        listMovies.clear();
+        moviesListAdapter.notifyDataSetChanged();
         if (mAdView != null) {
             mAdView.destroy();
         }
@@ -176,10 +183,10 @@ public class SearchActivity extends AppCompatActivity {
         getPage = 1;
         mPreviousTotal = 0;
         errorView.setVisibility(View.GONE);
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&query_term=" + query + "&page=1", new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                if (!stop) {
+        try {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&query_term=" + URLEncoder.encode(query, "UTF-8") + "&page=1", new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
                     listMovies = parseJSONResponse(response, true);
                     if (listMovies.isEmpty()) {
                         noResultsView.setVisibility(View.VISIBLE);
@@ -188,14 +195,13 @@ public class SearchActivity extends AppCompatActivity {
                     } else {
                         moviesSwipe.setVisibility(View.VISIBLE);
                         moviesListAdapter.setMoviesList(listMovies);
+                        listMoviesRecycler.setVisibility(View.VISIBLE);
                     }
                     moviesSwipe.setRefreshing(false);
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (!stop) {
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
                     moviesSwipe.setRefreshing(false);
                     if (error instanceof NoConnectionError) {
                         errorView.setText(R.string.no_internet_error);
@@ -205,9 +211,11 @@ public class SearchActivity extends AppCompatActivity {
                     errorView.setVisibility(View.VISIBLE);
                     moviesSwipe.setVisibility(View.GONE);
                 }
-            }
-        });
-        requestQueue.add(request);
+            });
+            requestQueue.add(request);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private ArrayList<Movie> parseJSONResponse(JSONObject response, boolean firstLoad) {

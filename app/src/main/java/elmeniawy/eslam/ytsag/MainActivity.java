@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity
     private AdView mAdView;
     private int getPage = 1;
     private GridLayoutManager gridLayoutManager;
-    private boolean mLoadingItems = true, stop = false;
+    private boolean mLoadingItems = true;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
 
     @Override
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 if (!mLoadingItems && (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
                     moviesSwipe.setRefreshing(true);
-                    getPage ++;
+                    getPage++;
                     JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&page=" + getPage, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            getPage --;
+                            getPage--;
                             moviesSwipe.setRefreshing(false);
                         }
                     });
@@ -226,7 +226,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        stop = true;
         if (mAdView != null) {
             mAdView.pause();
         }
@@ -236,6 +235,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        try {
+            listMovies.clear();
+            moviesListAdapter.notifyDataSetChanged();
+            listMovies = parseJSONResponse(new JSONObject(sharedPreferences.getString("moviesList", "")), true);
+            moviesListAdapter.setMoviesList(listMovies);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         if (mAdView != null) {
             mAdView.resume();
         }
@@ -243,6 +250,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
+        listMovies.clear();
+        moviesListAdapter.notifyDataSetChanged();
         if (mAdView != null) {
             mAdView.destroy();
         }
@@ -256,46 +265,42 @@ public class MainActivity extends AppCompatActivity
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&page=1", new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                if (!stop) {
-                    moviesSwipe.setVisibility(View.VISIBLE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("moviesList", response.toString());
-                    editor.apply();
-                    listMovies = parseJSONResponse(response, true);
-                    editor.putLong("firstId", listMovies.get(0).getId());
-                    editor.apply();
-                    moviesListAdapter.setMoviesList(listMovies);
-                    moviesSwipe.setRefreshing(false);
-                }
+                moviesSwipe.setVisibility(View.VISIBLE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("moviesList", response.toString());
+                editor.apply();
+                listMovies = parseJSONResponse(response, true);
+                editor.putLong("firstId", listMovies.get(0).getId());
+                editor.apply();
+                moviesListAdapter.setMoviesList(listMovies);
+                moviesSwipe.setRefreshing(false);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (!stop) {
-                    moviesSwipe.setRefreshing(false);
-                    String strJson = sharedPreferences.getString("moviesList", "");
+                moviesSwipe.setRefreshing(false);
+                String strJson = sharedPreferences.getString("moviesList", "");
+                if (error instanceof NoConnectionError) {
+                    errorView.setText(R.string.no_internet_error);
+                } else {
+                    errorView.setText(R.string.get_movies_json_error);
+                }
+                if (strJson.equals("")) {
+                    errorView.setVisibility(View.VISIBLE);
+                    moviesSwipe.setVisibility(View.GONE);
+                } else {
                     if (error instanceof NoConnectionError) {
-                        errorView.setText(R.string.no_internet_error);
+                        Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.no_internet), Snackbar.LENGTH_LONG).show();
                     } else {
-                        errorView.setText(R.string.get_movies_json_error);
+                        Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.get_movies_error), Snackbar.LENGTH_LONG).show();
                     }
-                    if (strJson.equals("")) {
+                    try {
+                        JSONObject jsonData = new JSONObject(strJson);
+                        listMovies = parseJSONResponse(jsonData, true);
+                        moviesListAdapter.setMoviesList(listMovies);
+                    } catch (JSONException e) {
                         errorView.setVisibility(View.VISIBLE);
                         moviesSwipe.setVisibility(View.GONE);
-                    } else {
-                        if (error instanceof NoConnectionError) {
-                            Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.no_internet), Snackbar.LENGTH_LONG).show();
-                        } else {
-                            Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.get_movies_error), Snackbar.LENGTH_LONG).show();
-                        }
-                        try {
-                            JSONObject jsonData = new JSONObject(strJson);
-                            listMovies = parseJSONResponse(jsonData, true);
-                            moviesListAdapter.setMoviesList(listMovies);
-                        } catch (JSONException e) {
-                            errorView.setVisibility(View.VISIBLE);
-                            moviesSwipe.setVisibility(View.GONE);
-                        }
                     }
                 }
             }
@@ -351,7 +356,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         float rating = -1;
                         if (currentMovie.has("rating") && !currentMovie.isNull("rating")) {
-                            rating = (float)currentMovie.getDouble("rating");
+                            rating = (float) currentMovie.getDouble("rating");
                         }
                         String[] url = new String[0];
                         if (currentMovie.has("torrents") && !currentMovie.isNull("torrents")) {

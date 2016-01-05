@@ -2,18 +2,12 @@ package elmeniawy.eslam.ytsag;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -29,19 +23,19 @@ import java.util.ArrayList;
  */
 public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static ArrayList<Movie> listMovies = new ArrayList<>();
+    private static Context context;
     private LayoutInflater layoutInflater;
     private ImageLoader imageLoader;
-    private static Context context;
 
     public MoviesListAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
         VolleySingleton volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
-        this.context = context;
+        MoviesListAdapter.context = context;
     }
 
     public void setMoviesList(ArrayList<Movie> listMovies) {
-        this.listMovies = listMovies;
+        MoviesListAdapter.listMovies = listMovies;
         notifyItemRangeChanged(0, listMovies.size());
     }
 
@@ -73,16 +67,6 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 holder.movieQuality3.setText(currentMovie.getTorrentsQuality()[2]);
             }
         }
-        /*if ((int) currentMovie.getRating() == -1) {
-            holder.movieRating.setRating(0.0F);
-            AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-            alpha.setDuration(0);
-            alpha.setFillAfter(true);
-            holder.movieRating.startAnimation(alpha);
-        } else {
-            //holder.movieRating.setRating((float) currentMovie.getRating());
-            holder.movieRating.setRating(currentMovie.getRating());
-        }*/
         holder.movieRating.setText(String.valueOf(currentMovie.getRating()) + "/10");
         String movieImageUrl = currentMovie.getMediumCoverImage();
         if (movieImageUrl != null && !movieImageUrl.equals("")) {
@@ -109,7 +93,6 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         private ImageView movieImage;
         private TextView movieTitle, movieYear, movieRating, movieQuality1, movieQuality2, movieQuality3;
-        //private RatingBar movieRating;
         private InterstitialAd mInterstitialAd;
 
         public ViewHolderMoviesList(View itemView) {
@@ -118,9 +101,6 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             movieTitle = (TextView) itemView.findViewById(R.id.movie_tittle);
             movieYear = (TextView) itemView.findViewById(R.id.movie_year);
             movieRating = (TextView) itemView.findViewById(R.id.movie_rating);
-            /*LayerDrawable stars = (LayerDrawable) movieRating.getProgressDrawable();
-            stars.getDrawable(2).setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
-            DrawableCompat.setTint(stars, ContextCompat.getColor(context, R.color.colorAccent));*/
             movieQuality1 = (TextView) itemView.findViewById(R.id.movie_quality_1);
             movieQuality2 = (TextView) itemView.findViewById(R.id.movie_quality_2);
             movieQuality3 = (TextView) itemView.findViewById(R.id.movie_quality_3);
