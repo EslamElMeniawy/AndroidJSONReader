@@ -1,14 +1,6 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'YTS'
-            keyPassword 'YTSKeyP@ssw0rd'
-            storeFile file('D:/Development/Work Files/YTS/key/YTS Key.jks')
-            storePassword 'YTSKeyP@ssw0rd'
-        }
-    }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {
@@ -17,15 +9,12 @@ android {
         targetSdkVersion 23
         versionCode 1014202
         versionName '2.0.2'
-        signingConfig signingConfigs.config
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    productFlavors {
     }
 }
 
