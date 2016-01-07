@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -143,6 +144,21 @@ public class DetailsActivity extends AppCompatActivity {
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                if (mAdView.getVisibility() == View.VISIBLE) {
+                    mAdView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onAdLoaded() {
+                if (mAdView.getVisibility() == View.GONE) {
+                    mAdView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override
