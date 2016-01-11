@@ -291,6 +291,7 @@ public class MainActivity extends AppCompatActivity
                 listMovies = parseJSONResponse(response, true);
                 editor.putLong("firstId", listMovies.get(0).getId());
                 editor.apply();
+                moviesListAdapter.notifyDataSetChanged();
                 moviesListAdapter.setMoviesList(listMovies);
                 moviesSwipe.setRefreshing(false);
             }

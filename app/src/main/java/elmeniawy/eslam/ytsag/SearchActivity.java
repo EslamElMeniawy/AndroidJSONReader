@@ -210,6 +210,7 @@ public class SearchActivity extends AppCompatActivity {
                         errorView.setVisibility(View.GONE);
                     } else {
                         moviesSwipe.setVisibility(View.VISIBLE);
+                        moviesListAdapter.notifyDataSetChanged();
                         moviesListAdapter.setMoviesList(listMovies);
                         listMoviesRecycler.setVisibility(View.VISIBLE);
                     }
