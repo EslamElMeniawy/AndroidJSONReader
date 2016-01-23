@@ -32,6 +32,8 @@
 
     <string name="notification_alert_title">New movies available</string>
     <string name="notification_alert_msg">New movies available for download.\nClick to view them.</string>
+    <string name="update_notification_alert_title">Update available</string>
+    <string name="update_notification_alert_msg">New version available.\nClick to download.</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-3911224529986415/5640802486</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3911224529986415/6977934885</string>

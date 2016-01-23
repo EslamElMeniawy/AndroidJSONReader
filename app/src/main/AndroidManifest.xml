@@ -48,6 +48,7 @@
             android:theme="@android:style/Theme.Translucent" />
 
         <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".UpdateReceiver" />
         <receiver
             android:name=".BootReceiver"
             android:enabled="false">
@@ -55,8 +56,16 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".UpdateBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".SchedulingService" />
+        <service android:name=".UpdateService" />
 
         <activity
             android:name=".SearchActivity"
