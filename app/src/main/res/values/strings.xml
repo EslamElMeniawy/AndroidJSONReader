@@ -24,6 +24,8 @@
     <string name="update">Update</string>
     <string name="auto_update">Auto Check</string>
     <string name="check_update">Check for update</string>
+    <string name="no_update">No update available!</string>
+    <string name="update_error">Error fetching update!</string>
     <string name="no_internet_error">No Internet connection!\n\n\nTab to refresh</string>
     <string name="no_internet">No Internet connection!</string>
     <string name="get_movies_json_error">Oops, something went wrong while getting movies list!\n\n\nTab to refresh</string>

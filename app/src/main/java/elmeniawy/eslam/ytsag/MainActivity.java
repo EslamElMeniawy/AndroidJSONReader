@@ -3,6 +3,8 @@ package elmeniawy.eslam.ytsag;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -49,8 +51,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String PREF_FILE_NAME = "YTSPref";
     private SharedPreferences sharedPreferences;
-    private SwitchCompat notifications;
-    private boolean notificationsEnabled;
+    private SharedPreferences.Editor editor;
+    private SwitchCompat notifications, update;
+    private boolean notificationsEnabled, updateEnabled;
     private RequestQueue requestQueue;
     private ArrayList<Movie> listMovies = new ArrayList<>();
     private MoviesListAdapter moviesListAdapter;
@@ -80,17 +83,26 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         sharedPreferences = MainActivity.this.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor = sharedPreferences.edit();
 
         notificationsEnabled = sharedPreferences.getBoolean("notificationsEnabled", true);
+        updateEnabled = sharedPreferences.getBoolean("updateEnabled", true);
 
         final AlarmReceiver alarm = new AlarmReceiver();
+        final UpdateReceiver receiver = new UpdateReceiver();
 
         notifications = (SwitchCompat) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_notifications)).findViewById(R.id.notifications_switch);
         notifications.setChecked(notificationsEnabled);
         if (notificationsEnabled) {
             alarm.cancelAlarm(MainActivity.this);
             alarm.setAlarm(MainActivity.this);
+        }
+
+        update = (SwitchCompat) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_auto_update)).findViewById(R.id.update_switch);
+        update.setChecked(updateEnabled);
+        if (updateEnabled) {
+            receiver.cancelAlarm(MainActivity.this);
+            receiver.setAlarm(MainActivity.this);
         }
 
         moviesSwipe = (SwipeRefreshLayout) findViewById(R.id.MoviesSwipeRefresh);
@@ -179,10 +191,24 @@ public class MainActivity extends AppCompatActivity
                 notifications.setChecked(notificationsEnabled);
                 if (notificationsEnabled) {
                     alarm.setAlarm(MainActivity.this);
-                    Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.notifications_enabled), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.notifications_enabled), Snackbar.LENGTH_LONG).show();
                 } else {
                     alarm.cancelAlarm(MainActivity.this);
-                    Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.notifications_disabled), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.notifications_disabled), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateEnabled = !updateEnabled;
+                editor.putBoolean("updateEnabled", updateEnabled);
+                editor.apply();
+                update.setChecked(updateEnabled);
+                if (updateEnabled) {
+                    receiver.setAlarm(MainActivity.this);
+                } else {
+                    receiver.cancelAlarm(MainActivity.this);
                 }
             }
         });
@@ -243,6 +269,34 @@ public class MainActivity extends AppCompatActivity
             FragmentManager fm = getSupportFragmentManager();
             DialogFragment overlay = new FragmentDialogDeveloper();
             overlay.show(fm, "FragmentDialog");
+        } else if (id == R.id.nav_check_update) {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    if (response != null && response.length() > 0) {
+                        try {
+                            if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version") && response.has("url") && !response.isNull("url")) {
+                                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                                int verCode = pInfo.versionCode;
+                                if (response.getInt("version") > verCode) {
+                                    editor.putBoolean("updateAvailable", true);
+                                    // Complete update
+                                } else {
+                                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.no_update), Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+                        } catch (JSONException | PackageManager.NameNotFoundException e) {
+                            Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
+                }
+            });
+            requestQueue.add(request);
         }
 
         return true;

@@ -34,8 +34,8 @@ public class UpdateService extends IntentService {
     @Override
     protected void onHandleIntent(final Intent intent) {
         VolleySingleton volleySingleton = VolleySingleton.getInstance();
-        final RequestQueue requestQueue = volleySingleton.getRequestQueue();
-        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=1&page=1", new Response.Listener<JSONObject>() {
+        RequestQueue requestQueue = volleySingleton.getRequestQueue();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 if (response != null && response.length() > 0) {
