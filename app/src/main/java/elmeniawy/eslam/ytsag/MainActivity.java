@@ -80,11 +80,18 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         sharedPreferences = MainActivity.this.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
         notificationsEnabled = sharedPreferences.getBoolean("notificationsEnabled", true);
 
+        final AlarmReceiver alarm = new AlarmReceiver();
+
         notifications = (SwitchCompat) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_notifications)).findViewById(R.id.notifications_switch);
         notifications.setChecked(notificationsEnabled);
+        if (notificationsEnabled) {
+            alarm.cancelAlarm(MainActivity.this);
+            alarm.setAlarm(MainActivity.this);
+        }
 
         moviesSwipe = (SwipeRefreshLayout) findViewById(R.id.MoviesSwipeRefresh);
         listMoviesRecycler = (RecyclerView) findViewById(R.id.MoviesRecycler);
@@ -162,6 +169,24 @@ public class MainActivity extends AppCompatActivity
         moviesSwipe.setRefreshing(true);
 
         sendJSONRequest();
+
+        notifications.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                notificationsEnabled = !notificationsEnabled;
+                editor.putBoolean("notificationsEnabled", notificationsEnabled);
+                editor.apply();
+                notifications.setChecked(notificationsEnabled);
+                if (notificationsEnabled) {
+                    alarm.setAlarm(MainActivity.this);
+                    Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.notifications_enabled), Snackbar.LENGTH_LONG).show();
+                } else {
+                    alarm.cancelAlarm(MainActivity.this);
+                    Snackbar.make(MainActivity.this.findViewById(R.id.MainCoordinatorLayout), getResources().getText(R.string.notifications_disabled), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -208,24 +233,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_notifications) {
-            final SharedPreferences.Editor editor = sharedPreferences.edit();
-            notificationsEnabled = !notificationsEnabled;
-            editor.putBoolean("notificationsEnabled", notificationsEnabled);
-            editor.apply();
-            notifications.setChecked(notificationsEnabled);
-
-            View actionView = MenuItemCompat.getActionView(item);
-            actionView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    notificationsEnabled = !notificationsEnabled;
-                    editor.putBoolean("notificationsEnabled", notificationsEnabled);
-                    editor.apply();
-                    notifications.setChecked(notificationsEnabled);
-                }
-            });
-        } else if (id == R.id.nav_about) {
+        if (id == R.id.nav_about) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             LayoutInflater inflater = MainActivity.this.getLayoutInflater();
             builder.setView(inflater.inflate(R.layout.dialog_about_app, null));
