@@ -43,16 +43,19 @@ public class UpdateService extends IntentService {
                         if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version") && response.has("url") && !response.isNull("url")) {
                             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                             int verCode = pInfo.versionCode;
+                            SharedPreferences sharedPreferences = MyApplication.getAppContext().getSharedPreferences("YTSPref", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
                             if (response.getInt("version") > verCode) {
-                                SharedPreferences sharedPreferences = MyApplication.getAppContext().getSharedPreferences("YTSPref", Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putBoolean("updateAvailable", true);
+                                editor.apply();
                                 sendNotification();
                                 AlarmReceiver.completeWakefulIntent(intent);
+                            } else {
+                                editor.putBoolean("updateAvailable", false);
+                                editor.apply();
                             }
                         }
-                    } catch (JSONException e) {
-                    } catch (PackageManager.NameNotFoundException e) {
+                    } catch (JSONException | PackageManager.NameNotFoundException e) {
                     }
                 }
             }
@@ -66,8 +69,9 @@ public class UpdateService extends IntentService {
 
     private void sendNotification() {
         NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, SplashActivity.class), 0);
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.putExtra("fromNotification", true);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)

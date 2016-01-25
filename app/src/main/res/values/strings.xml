@@ -21,11 +21,6 @@
     <string name="twitter">Twitter</string>
     <string name="facebook">Facebook</string>
     <string name="google_plus">Google Plus</string>
-    <string name="update">Update</string>
-    <string name="auto_update">Auto Check</string>
-    <string name="check_update">Check for update</string>
-    <string name="no_update">No update available!</string>
-    <string name="update_error">Error fetching update!</string>
     <string name="no_internet_error">No Internet connection!\n\n\nTab to refresh</string>
     <string name="no_internet">No Internet connection!</string>
     <string name="get_movies_json_error">Oops, something went wrong while getting movies list!\n\n\nTab to refresh</string>
@@ -46,4 +41,14 @@
     <string name="title_activity_search">Search Results</string>
     <string name="search_hint">Search movies</string>
     <string name="no_results">No results were found</string>
+
+    <string name="update">Update</string>
+    <string name="auto_update">Auto Check</string>
+    <string name="check_update">Check for update</string>
+    <string name="no_update">No update available!</string>
+    <string name="update_error">Error fetching update!</string>
+    <string name="checking_update">Checking for update&#8230;</string>
+    <string name="download">Download now</string>
+    <string name="remind_later">Remind me later</string>
+    <string name="downloading">Downloading new version&#8230;</string>
 </resources>

@@ -1,11 +1,19 @@
 package elmeniawy.eslam.ytsag;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -45,7 +53,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -231,6 +245,10 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+        if (sharedPreferences.getBoolean("updateAvailable", false) && isOnline() && ((new Date().getTime() - sharedPreferences.getLong("lastCheck", new Date().getTime()) >= (24 * 60 * 60)) || sharedPreferences.getBoolean("fromNotification", false))) {
+            downloadUpdate();
+        }
     }
 
     @Override
@@ -270,33 +288,43 @@ public class MainActivity extends AppCompatActivity
             DialogFragment overlay = new FragmentDialogDeveloper();
             overlay.show(fm, "FragmentDialog");
         } else if (id == R.id.nav_check_update) {
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    if (response != null && response.length() > 0) {
-                        try {
-                            if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version") && response.has("url") && !response.isNull("url")) {
-                                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                                int verCode = pInfo.versionCode;
-                                if (response.getInt("version") > verCode) {
-                                    editor.putBoolean("updateAvailable", true);
-                                    // Complete update
-                                } else {
-                                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.no_update), Snackbar.LENGTH_LONG).show();
+            if (sharedPreferences.getBoolean("updateAvailable", false)) {
+                downloadUpdate();
+            } else {
+                final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, getString(R.string.update), getString(R.string.checking_update), true);
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        if (response != null && response.length() > 0) {
+                            try {
+                                if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version") && response.has("url") && !response.isNull("url")) {
+                                    PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                                    int verCode = pInfo.versionCode;
+                                    if (response.getInt("version") > verCode) {
+                                        editor.putBoolean("updateAvailable", true);
+                                        editor.apply();
+                                        downloadUpdate();
+                                    } else {
+                                        editor.putBoolean("updateAvailable", false);
+                                        editor.apply();
+                                        Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.no_update), Snackbar.LENGTH_LONG).show();
+                                    }
                                 }
+                            } catch (JSONException | PackageManager.NameNotFoundException e) {
+                                Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
                             }
-                        } catch (JSONException | PackageManager.NameNotFoundException e) {
-                            Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
                         }
                     }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
-                }
-            });
-            requestQueue.add(request);
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
+                    }
+                });
+                requestQueue.add(request);
+            }
         }
 
         return true;
@@ -497,5 +525,94 @@ public class MainActivity extends AppCompatActivity
             }
         }
         return listMovies;
+    }
+
+    private void downloadUpdate() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage(R.string.update_notification_alert_title)
+                .setTitle(R.string.update);
+        builder.setPositiveButton(R.string.download, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                UpdateApp updateApp = new UpdateApp();
+                updateApp.setContext(getApplicationContext());
+                updateApp.execute("https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/app/app-release.apk");
+            }
+        });
+        builder.setNegativeButton(R.string.remind_later, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                editor.putLong("lastCheck", new Date().getTime());
+                editor.apply();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnected();
+    }
+
+    public class UpdateApp extends AsyncTask<String, Void, Void> {
+        private Context context;
+        private ProgressDialog progressDialog;
+
+        public void setContext(Context contextf) {
+            context = contextf;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(MainActivity.this, getString(R.string.update), getString(R.string.downloading), true);
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                c.setRequestMethod("GET");
+                c.setDoOutput(true);
+                c.connect();
+
+                String PATH = Environment.getExternalStorageDirectory() + "/YTS/";
+                File file = new File(PATH);
+                file.mkdirs();
+                File outputFile = new File(file, "YTS.apk");
+                if (outputFile.exists()) {
+                    outputFile.delete();
+                }
+                FileOutputStream fos = new FileOutputStream(outputFile);
+
+                InputStream is = c.getInputStream();
+
+                byte[] buffer = new byte[1024];
+                int len1 = 0;
+                while ((len1 = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len1);
+                }
+                fos.close();
+                is.close();
+
+                editor.putBoolean("updateAvailable", false);
+                editor.apply();
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/YTS/YTS.apk")), "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            } catch (Exception e) {
+                Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
     }
 }

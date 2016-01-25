@@ -14,6 +14,7 @@ This project is getting ```JSON``` feeds from https://yts.ag/api
 * Implementing ```AdMob``` in your project.
 * Adding ```Notifications```.
 * Using ```SearchView```.
+* Adding update functionality.
 
 ## Testing
 [A full running signed ```APK```](app/app-release.apk) can be found in ```app/app-release.apk```.
