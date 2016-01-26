@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        if (sharedPreferences.getBoolean("updateAvailable", false) && isOnline() && ((new Date().getTime() - sharedPreferences.getLong("lastCheck", new Date().getTime()) >= (24 * 60 * 60)) || sharedPreferences.getBoolean("fromNotification", false))) {
+        if (sharedPreferences.getBoolean("updateAvailable", false) && isOnline() && ((new Date().getTime() - sharedPreferences.getLong("lastCheck", new Date().getTime()) >= (24 * 60 * 60 * 1000)) || sharedPreferences.getBoolean("fromNotification", false))) {
             downloadUpdate();
         }
     }
