@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity
                         progressDialog.dismiss();
                         if (response != null && response.length() > 0) {
                             try {
-                                if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version") && response.has("url") && !response.isNull("url")) {
+                                if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version")) {
                                     PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                                     int verCode = pInfo.versionCode;
                                     if (response.getInt("version") > verCode) {
@@ -310,6 +310,8 @@ public class MainActivity extends AppCompatActivity
                                         editor.apply();
                                         Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.no_update), Snackbar.LENGTH_LONG).show();
                                     }
+                                } else {
+                                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
                                 }
                             } catch (JSONException | PackageManager.NameNotFoundException e) {
                                 Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();

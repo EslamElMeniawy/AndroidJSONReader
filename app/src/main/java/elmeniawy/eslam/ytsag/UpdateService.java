@@ -40,7 +40,7 @@ public class UpdateService extends IntentService {
             public void onResponse(JSONObject response) {
                 if (response != null && response.length() > 0) {
                     try {
-                        if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version") && response.has("url") && !response.isNull("url")) {
+                        if (response.has("success") && response.getBoolean("success") && response.has("version") && !response.isNull("version")) {
                             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                             int verCode = pInfo.versionCode;
                             SharedPreferences sharedPreferences = MyApplication.getAppContext().getSharedPreferences("YTSPref", Context.MODE_PRIVATE);
