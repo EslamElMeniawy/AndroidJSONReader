@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity
             if (sharedPreferences.getBoolean("updateAvailable", false)) {
                 downloadUpdate();
             } else {
-                final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, getString(R.string.update), getString(R.string.checking_update), true);
+                final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, null, getString(R.string.checking_update), true);
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -567,7 +567,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(MainActivity.this, getString(R.string.update), getString(R.string.downloading), true);
+            progressDialog = ProgressDialog.show(MainActivity.this, null, getString(R.string.downloading), true);
         }
 
         @Override
