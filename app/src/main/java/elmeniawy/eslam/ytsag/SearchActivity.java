@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.NoConnectionError;
@@ -44,6 +45,7 @@ public class SearchActivity extends AppCompatActivity {
     private GridLayoutManager gridLayoutManager;
     private boolean mLoadingItems = true;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
+    private RelativeLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +138,8 @@ public class SearchActivity extends AppCompatActivity {
 
         handleIntent(getIntent());
 
+        main = (RelativeLayout) findViewById(R.id.main);
+
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -144,6 +148,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onAdFailedToLoad(int errorCode) {
                 if (mAdView.getVisibility() == View.VISIBLE) {
                     mAdView.setVisibility(View.GONE);
+                    main.setPadding(0, 16, 0, 16);
                 }
             }
 
@@ -151,6 +156,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onAdLoaded() {
                 if (mAdView.getVisibility() == View.GONE) {
                     mAdView.setVisibility(View.VISIBLE);
+                    main.setPadding(0, 16, 0, 0);
                 }
             }
         });

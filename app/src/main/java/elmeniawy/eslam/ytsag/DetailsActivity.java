@@ -21,6 +21,7 @@ import com.google.android.gms.ads.AdView;
 
 public class DetailsActivity extends AppCompatActivity {
     private AdView mAdView;
+    private RelativeLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +142,9 @@ public class DetailsActivity extends AppCompatActivity {
             scrollView.setVisibility(View.GONE);
             error.setVisibility(View.VISIBLE);
         }
+
+        main = (RelativeLayout) findViewById(R.id.main);
+
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -149,6 +153,7 @@ public class DetailsActivity extends AppCompatActivity {
             public void onAdFailedToLoad(int errorCode) {
                 if (mAdView.getVisibility() == View.VISIBLE) {
                     mAdView.setVisibility(View.GONE);
+                    main.setPadding(0, 16, 0, 16);
                 }
             }
 
@@ -156,6 +161,7 @@ public class DetailsActivity extends AppCompatActivity {
             public void onAdLoaded() {
                 if (mAdView.getVisibility() == View.GONE) {
                     mAdView.setVisibility(View.VISIBLE);
+                    main.setPadding(0, 16, 0, 0);
                 }
             }
         });

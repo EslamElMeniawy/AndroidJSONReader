@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.NoConnectionError;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity
     private GridLayoutManager gridLayoutManager;
     private boolean mLoadingItems = true;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
+    private RelativeLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +229,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        main = (RelativeLayout) findViewById(R.id.main);
+
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -235,6 +239,7 @@ public class MainActivity extends AppCompatActivity
             public void onAdFailedToLoad(int errorCode) {
                 if (mAdView.getVisibility() == View.VISIBLE) {
                     mAdView.setVisibility(View.GONE);
+                    main.setPadding(0, 16, 0, 16);
                 }
             }
 
@@ -242,6 +247,7 @@ public class MainActivity extends AppCompatActivity
             public void onAdLoaded() {
                 if (mAdView.getVisibility() == View.GONE) {
                     mAdView.setVisibility(View.VISIBLE);
+                    main.setPadding(0, 16, 0, 0);
                 }
             }
         });

@@ -27,14 +27,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/movie_tittle"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="3">
 
         <TextView
             android:id="@+id/movie_year"
             style="@style/MediumText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:padding="@dimen/drawer_image_padding" />
 
         <RelativeLayout
