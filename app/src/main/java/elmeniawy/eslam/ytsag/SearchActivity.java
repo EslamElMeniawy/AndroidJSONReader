@@ -14,10 +14,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.ads.AdListener;
@@ -33,6 +35,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity {
+    private static final String TAG = SearchActivity.class.getName();
     String query = "";
     private RequestQueue requestQueue;
     private ArrayList<Movie> listMovies = new ArrayList<>();
@@ -127,6 +130,9 @@ public class SearchActivity extends AppCompatActivity {
                                 moviesSwipe.setRefreshing(false);
                             }
                         });
+                        RetryPolicy policy = new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                        request.setRetryPolicy(policy);
+                        request.setTag(TAG);
                         requestQueue.add(request);
                         mLoadingItems = true;
                     } catch (UnsupportedEncodingException e) {
@@ -202,6 +208,14 @@ public class SearchActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (requestQueue != null) {
+            requestQueue.cancelAll(TAG);
+        }
+    }
+
     private void sendJSONRequest() {
         getPage = 1;
         mPreviousTotal = 0;
@@ -236,6 +250,9 @@ public class SearchActivity extends AppCompatActivity {
                     moviesSwipe.setVisibility(View.GONE);
                 }
             });
+            RetryPolicy policy = new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            request.setRetryPolicy(policy);
+            request.setTag(TAG);
             requestQueue.add(request);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

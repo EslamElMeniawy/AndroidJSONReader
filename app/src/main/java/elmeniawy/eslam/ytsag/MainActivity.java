@@ -41,10 +41,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.ads.AdListener;
@@ -66,6 +68,7 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String PREF_FILE_NAME = "YTSPref";
+    private static final String TAG = MainActivity.class.getName();
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private SwitchCompat notifications, update;
@@ -191,6 +194,9 @@ public class MainActivity extends AppCompatActivity
                             moviesSwipe.setRefreshing(false);
                         }
                     });
+                    RetryPolicy policy = new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                    request.setRetryPolicy(policy);
+                    request.setTag(TAG);
                     requestQueue.add(request);
                     mLoadingItems = true;
                 }
@@ -339,6 +345,9 @@ public class MainActivity extends AppCompatActivity
                         Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
                     }
                 });
+                RetryPolicy policy = new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                request.setRetryPolicy(policy);
+                request.setTag(TAG);
                 requestQueue.add(request);
             }
         }
@@ -381,6 +390,14 @@ public class MainActivity extends AppCompatActivity
             mAdView.destroy();
         }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (requestQueue != null) {
+            requestQueue.cancelAll(TAG);
+        }
     }
 
     private void sendJSONRequest() {
@@ -432,6 +449,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+        RetryPolicy policy = new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        request.setRetryPolicy(policy);
+        request.setTag(TAG);
         requestQueue.add(request);
     }
 
