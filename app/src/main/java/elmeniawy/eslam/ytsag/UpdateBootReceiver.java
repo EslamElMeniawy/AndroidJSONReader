@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 /**
  * Created by Eslam El-Meniawy on 23-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class UpdateBootReceiver extends BroadcastReceiver {
     UpdateReceiver receiver = new UpdateReceiver();
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 /**
  * Created by Eslam El-Meniawy on 01-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class TabFragmentAbout extends Fragment {
     @Nullable
     @Override

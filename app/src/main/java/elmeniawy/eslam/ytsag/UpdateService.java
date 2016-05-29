@@ -24,6 +24,7 @@ import org.json.JSONObject;
 /**
  * Created by Eslam El-Meniawy on 23-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class UpdateService extends IntentService {
     public static final int NOTIFICATION_ID = 2;
 
@@ -55,7 +56,7 @@ public class UpdateService extends IntentService {
                                 editor.apply();
                             }
                         }
-                    } catch (JSONException | PackageManager.NameNotFoundException e) {
+                    } catch (JSONException | PackageManager.NameNotFoundException ignored) {
                     }
                 }
             }

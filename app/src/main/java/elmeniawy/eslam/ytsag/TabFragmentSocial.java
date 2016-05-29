@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 /**
  * Created by Eslam El-Meniawy on 01-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class TabFragmentSocial extends Fragment {
     @Nullable
     @Override

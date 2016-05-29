@@ -18,8 +18,8 @@ import android.view.Window;
 /**
  * Created by Eslam El-Meniawy on 01-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class FragmentDialogDeveloper extends DialogFragment {
-    private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
     public FragmentDialogDeveloper() {
@@ -38,7 +38,7 @@ public class FragmentDialogDeveloper extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_developer, container);
-        sectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         viewPager = (ViewPager) view.findViewById(R.id.developerPager);
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.developerTabLayout);

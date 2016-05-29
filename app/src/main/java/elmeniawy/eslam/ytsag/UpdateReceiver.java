@@ -11,6 +11,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 /**
  * Created by Eslam El-Meniawy on 23-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class UpdateReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

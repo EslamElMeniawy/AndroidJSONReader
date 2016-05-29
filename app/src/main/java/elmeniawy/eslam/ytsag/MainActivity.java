@@ -1,5 +1,6 @@
 package elmeniawy.eslam.ytsag;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -92,10 +93,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        assert drawer != null;
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 
         sharedPreferences = MainActivity.this.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
@@ -199,6 +202,7 @@ public class MainActivity extends AppCompatActivity
         sendJSONRequest();
 
         notifications.setOnClickListener(new View.OnClickListener() {
+            @SuppressWarnings("ConstantConditions")
             @Override
             public void onClick(View v) {
                 notificationsEnabled = !notificationsEnabled;
@@ -260,6 +264,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -278,6 +283,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @SuppressLint("InflateParams")
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -299,6 +305,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, null, getString(R.string.checking_update), true);
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
+                    @SuppressWarnings("ConstantConditions")
                     @Override
                     public void onResponse(JSONObject response) {
                         progressDialog.dismiss();
@@ -325,6 +332,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 }, new Response.ErrorListener() {
+                    @SuppressWarnings("ConstantConditions")
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
@@ -394,6 +402,7 @@ public class MainActivity extends AppCompatActivity
                 moviesSwipe.setRefreshing(false);
             }
         }, new Response.ErrorListener() {
+            @SuppressWarnings("ConstantConditions")
             @Override
             public void onErrorResponse(VolleyError error) {
                 moviesSwipe.setRefreshing(false);
@@ -576,6 +585,7 @@ public class MainActivity extends AppCompatActivity
             progressDialog = ProgressDialog.show(MainActivity.this, null, getString(R.string.downloading), true);
         }
 
+        @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
         @Override
         protected Void doInBackground(String... params) {
             try {
@@ -597,7 +607,7 @@ public class MainActivity extends AppCompatActivity
                 InputStream is = c.getInputStream();
 
                 byte[] buffer = new byte[1024];
-                int len1 = 0;
+                int len1;
                 while ((len1 = is.read(buffer)) != -1) {
                     fos.write(buffer, 0, len1);
                 }

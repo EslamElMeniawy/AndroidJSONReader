@@ -23,6 +23,7 @@ public class DetailsActivity extends AppCompatActivity {
     private AdView mAdView;
     private RelativeLayout main;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +75,7 @@ public class DetailsActivity extends AppCompatActivity {
                 }
             });
             imageLoader.get(movie.getBackgroundImage(), new ImageLoader.ImageListener() {
+                @SuppressWarnings("deprecation")
                 @Override
                 public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
                     if (android.os.Build.VERSION.SDK_INT >= 16) {

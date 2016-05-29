@@ -6,6 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class Movie implements Parcelable {
     private long id;
     private String imdbCode, title, year, genres, backgroundImage, mediumCoverImage, synopsis;
@@ -13,21 +14,6 @@ public class Movie implements Parcelable {
     private String[] torrentsUrl, torrentsQuality, torrentsSize;
 
     public Movie() {
-    }
-
-    public Movie(long id, String imdbCode, String title, String year, String genres, String backgroundImage, String mediumCoverImage, String synopsis, float rating, String[] torrentsUrl, String[] torrentsQuality, String[] torrentsSize) {
-        this.id = id;
-        this.imdbCode = imdbCode;
-        this.title = title;
-        this.year = year;
-        this.genres = genres;
-        this.backgroundImage = backgroundImage;
-        this.mediumCoverImage = mediumCoverImage;
-        this.synopsis = synopsis;
-        this.rating = rating;
-        this.torrentsUrl = torrentsUrl;
-        this.torrentsQuality = torrentsQuality;
-        this.torrentsSize = torrentsSize;
     }
 
     public Movie(Parcel parcel) {

@@ -1,5 +1,6 @@
 package elmeniawy.eslam.ytsag;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 /**
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static ArrayList<Movie> listMovies = new ArrayList<>();
     private static Context context;
@@ -47,6 +49,7 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return viewHolder;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder hold, int position) {
         Movie currentMovie = listMovies.get(position);

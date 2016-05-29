@@ -22,6 +22,7 @@ import org.json.JSONObject;
 /**
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class SchedulingService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
 
@@ -57,7 +58,7 @@ public class SchedulingService extends IntentService {
                                 }
                             }
                         }
-                    } catch (JSONException e) {
+                    } catch (JSONException ignored) {
                     }
                 }
             }
