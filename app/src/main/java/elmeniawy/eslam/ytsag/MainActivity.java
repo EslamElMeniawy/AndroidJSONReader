@@ -1,5 +1,6 @@
 package elmeniawy.eslam.ytsag;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -15,10 +16,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity
     private boolean mLoadingItems = true;
     private int mOnScreenItems, mTotalItemsInList, mFirstVisibleItem, mPreviousTotal = 0, mVisibleThreshold = 1;
     private RelativeLayout main;
+    private UpdateReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity
         updateEnabled = sharedPreferences.getBoolean("updateEnabled", true);
 
         final AlarmReceiver alarm = new AlarmReceiver();
-        final UpdateReceiver receiver = new UpdateReceiver();
+        receiver = new UpdateReceiver();
 
         notifications = (SwitchCompat) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_notifications)).findViewById(R.id.notifications_switch);
         notifications.setChecked(notificationsEnabled);
@@ -121,11 +126,20 @@ public class MainActivity extends AppCompatActivity
         }
 
         update = (SwitchCompat) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_auto_update)).findViewById(R.id.update_switch);
-        update.setChecked(updateEnabled);
         if (updateEnabled) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                updateEnabled = false;
+                editor.putBoolean("updateEnabled", false);
+                editor.apply();
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+            } else {
+                receiver.cancelAlarm(MainActivity.this);
+                receiver.setAlarm(MainActivity.this);
+            }
+        } else {
             receiver.cancelAlarm(MainActivity.this);
-            receiver.setAlarm(MainActivity.this);
         }
+        update.setChecked(updateEnabled);
 
         moviesSwipe = (SwipeRefreshLayout) findViewById(R.id.MoviesSwipeRefresh);
         listMoviesRecycler = (RecyclerView) findViewById(R.id.MoviesRecycler);
@@ -227,14 +241,23 @@ public class MainActivity extends AppCompatActivity
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateEnabled = !updateEnabled;
-                editor.putBoolean("updateEnabled", updateEnabled);
-                editor.apply();
-                update.setChecked(updateEnabled);
                 if (updateEnabled) {
-                    receiver.setAlarm(MainActivity.this);
-                } else {
+                    updateEnabled = !updateEnabled;
+                    editor.putBoolean("updateEnabled", updateEnabled);
+                    editor.apply();
+                    update.setChecked(updateEnabled);
                     receiver.cancelAlarm(MainActivity.this);
+                } else {
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        update.setChecked(false);
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                    } else {
+                        updateEnabled = !updateEnabled;
+                        editor.putBoolean("updateEnabled", updateEnabled);
+                        editor.apply();
+                        update.setChecked(updateEnabled);
+                        receiver.setAlarm(MainActivity.this);
+                    }
                 }
             }
         });
@@ -397,6 +420,32 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
         if (requestQueue != null) {
             requestQueue.cancelAll(TAG);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 0:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    updateEnabled = true;
+                    editor.putBoolean("updateEnabled", true);
+                    editor.apply();
+                    receiver.cancelAlarm(MainActivity.this);
+                    receiver.setAlarm(MainActivity.this);
+                    update.setChecked(updateEnabled);
+                } else {
+                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), R.string.write_permission, Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.allow, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                                }
+                            })
+                            .show();
+                }
+                break;
         }
     }
 
