@@ -446,6 +446,12 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case 0:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(mAdView, "", Snackbar.LENGTH_SHORT).setCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onShown(Snackbar snackbar) {
+                            snackbar.dismiss();
+                        }
+                    }).show();
                     updateEnabled = true;
                     editor.putBoolean("updateEnabled", true);
                     editor.apply();
@@ -465,6 +471,12 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(mAdView, "", Snackbar.LENGTH_SHORT).setCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onShown(Snackbar snackbar) {
+                            snackbar.dismiss();
+                        }
+                    }).show();
                     downloadUpdate();
                 } else {
                     Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), R.string.write_permission, Snackbar.LENGTH_INDEFINITE)
@@ -585,6 +597,7 @@ public class MainActivity extends AppCompatActivity
         requestQueue.add(request);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private ArrayList<Movie> parseJSONResponse(JSONObject response, boolean firstLoad) {
         ArrayList<Movie> listMovies = new ArrayList<>();
         if (response != null && response.length() > 0) {

@@ -313,6 +313,7 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private ArrayList<Movie> parseJSONResponse(JSONObject response, boolean firstLoad) {
         ArrayList<Movie> listMovies = new ArrayList<>();
         if (response != null && response.length() > 0) {

@@ -12,7 +12,7 @@
     <string name="about">About</string>
     <string name="developer">Developer</string>
     <string name="app_about">About Application</string>
-    <string name="app_about_details">YTS version 4.0.1\n\nHere you will be able to browse and download movies in excellent 720p, 1080p and 3D quality, all at the smallest file size.\n\nGet notified about new movies available for download by enabling the notifications.\n\nSearch Movies.\n\nUpdate app within itself.\n\nNew in this version:\nSupport Android 6 "Marshmallow".</string>
+    <string name="app_about_details">YTS version 4.0.2\n\nHere you will be able to browse and download movies in excellent 720p, 1080p and 3D quality, all at the smallest file size.\n\nGet notified about new movies available for download by enabling the notifications.\n\nSearch Movies.\n\nUpdate app within itself.\n\nNew in this version:\nSupport Android 6 "Marshmallow".</string>
     <string name="developer_about">About Developer</string>
     <string name="developer_about_details">Hi\nMy name is Eslam El-Meniawy.\n\nI am an engineer who like to make the world more simpler with the help of technologies I know.</string>
     <string name="social">Social Accounts</string>
