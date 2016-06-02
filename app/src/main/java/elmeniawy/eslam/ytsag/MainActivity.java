@@ -45,13 +45,17 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -64,6 +68,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -286,7 +291,11 @@ public class MainActivity extends AppCompatActivity
         });
 
         if (sharedPreferences.getBoolean("updateAvailable", false) && isOnline() && ((new Date().getTime() - sharedPreferences.getLong("lastCheck", new Date().getTime()) >= (24 * 60 * 60 * 1000)) || sharedPreferences.getBoolean("fromNotification", false))) {
-            downloadUpdate();
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            } else {
+                downloadUpdate();
+            }
         }
     }
 
@@ -330,7 +339,11 @@ public class MainActivity extends AppCompatActivity
             overlay.show(fm, "FragmentDialog");
         } else if (id == R.id.nav_check_update) {
             if (sharedPreferences.getBoolean("updateAvailable", false)) {
-                downloadUpdate();
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                } else {
+                    downloadUpdate();
+                }
             } else {
                 final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, null, getString(R.string.checking_update), true);
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
@@ -346,7 +359,11 @@ public class MainActivity extends AppCompatActivity
                                     if (response.getInt("version") > verCode) {
                                         editor.putBoolean("updateAvailable", true);
                                         editor.apply();
-                                        downloadUpdate();
+                                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                                        } else {
+                                            downloadUpdate();
+                                        }
                                     } else {
                                         editor.putBoolean("updateAvailable", false);
                                         editor.apply();
@@ -446,6 +463,20 @@ public class MainActivity extends AppCompatActivity
                             .show();
                 }
                 break;
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    downloadUpdate();
+                } else {
+                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), R.string.write_permission, Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.allow, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                                }
+                            })
+                            .show();
+                }
+                break;
         }
     }
 
@@ -497,7 +528,57 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             }
-        });
+        }) {
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    Cache.Entry cacheEntry = HttpHeaderParser.parseCacheHeaders(response);
+                    if (cacheEntry == null) {
+                        cacheEntry = new Cache.Entry();
+                    }
+                    final long cacheHitButRefreshed = 3 * 60 * 1000;
+                    final long cacheExpired = 24 * 60 * 60 * 1000;
+                    long now = System.currentTimeMillis();
+                    final long softExpire = now + cacheHitButRefreshed;
+                    final long ttl = now + cacheExpired;
+                    cacheEntry.data = response.data;
+                    cacheEntry.softTtl = softExpire;
+                    cacheEntry.ttl = ttl;
+                    String headerValue;
+                    headerValue = response.headers.get("Date");
+                    if (headerValue != null) {
+                        cacheEntry.serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
+                    }
+                    headerValue = response.headers.get("Last-Modified");
+                    if (headerValue != null) {
+                        cacheEntry.lastModified = HttpHeaderParser.parseDateAsEpoch(headerValue);
+                    }
+                    cacheEntry.responseHeaders = response.headers;
+                    final String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers));
+                    return Response.success(new JSONObject(jsonString), cacheEntry);
+                } catch (UnsupportedEncodingException e) {
+                    return Response.error(new ParseError(e));
+                } catch (JSONException e) {
+                    return Response.error(new ParseError(e));
+                }
+            }
+
+            @Override
+            protected void deliverResponse(JSONObject response) {
+                super.deliverResponse(response);
+            }
+
+            @Override
+            public void deliverError(VolleyError error) {
+                super.deliverError(error);
+            }
+
+            @Override
+            protected VolleyError parseNetworkError(VolleyError volleyError) {
+                return super.parseNetworkError(volleyError);
+            }
+        };
         RetryPolicy policy = new DefaultRetryPolicy(60000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         request.setRetryPolicy(policy);
         request.setTag(TAG);
