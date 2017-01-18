@@ -11,7 +11,7 @@ import com.android.volley.toolbox.Volley;
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
 @SuppressWarnings("DefaultFileTemplate")
-public class VolleySingleton {
+class VolleySingleton {
     private static VolleySingleton sInstance = null;
     private ImageLoader mImageLoader;
     private RequestQueue mRequestQueue;
@@ -34,18 +34,18 @@ public class VolleySingleton {
         });
     }
 
-    public static VolleySingleton getInstance() {
+    static VolleySingleton getInstance() {
         if (sInstance == null) {
             sInstance = new VolleySingleton();
         }
         return sInstance;
     }
 
-    public RequestQueue getRequestQueue() {
+    RequestQueue getRequestQueue() {
         return mRequestQueue;
     }
 
-    public ImageLoader getImageLoader() {
+    ImageLoader getImageLoader() {
         return mImageLoader;
     }
 }

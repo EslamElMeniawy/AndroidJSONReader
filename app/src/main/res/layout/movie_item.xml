@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/image_width"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/drawer_image_padding"
     android:background="@drawable/movie_background"
@@ -8,22 +9,23 @@
 
     <ImageView
         android:id="@+id/movie_image"
-        android:layout_width="@dimen/image_width"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/movie_tittle"
         style="@style/LargeText"
-        android:layout_width="@dimen/image_width"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/movie_image"
         android:ellipsize="end"
-        android:padding="@dimen/drawer_image_padding"
-        android:singleLine="true" />
+        android:maxLines="1"
+        android:paddingTop="@dimen/drawer_image_padding" />
 
     <LinearLayout
         android:id="@+id/layout"
-        android:layout_width="@dimen/image_width"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/movie_tittle"
         android:orientation="horizontal"
@@ -35,12 +37,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:padding="@dimen/drawer_image_padding" />
+            android:gravity="start"
+            android:paddingBottom="@dimen/drawer_image_padding"
+            android:paddingTop="@dimen/drawer_image_padding" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="end">
 
             <ImageView
                 android:id="@+id/image"
@@ -48,7 +53,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/drawer_image_padding"
-                android:src="@drawable/ic_action_star" />
+                android:src="@drawable/ic_action_star"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/movie_rating"
@@ -57,12 +63,13 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/image"
                 android:layout_toRightOf="@+id/image"
-                android:padding="@dimen/drawer_image_padding" />
+                android:paddingBottom="@dimen/drawer_image_padding"
+                android:paddingTop="@dimen/drawer_image_padding" />
         </RelativeLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="@dimen/image_width"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout"
         android:orientation="horizontal">

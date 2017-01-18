@@ -7,16 +7,16 @@ import android.os.Parcelable;
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
 @SuppressWarnings("DefaultFileTemplate")
-public class Movie implements Parcelable {
+class Movie implements Parcelable {
     private long id;
     private String imdbCode, title, year, genres, backgroundImage, mediumCoverImage, synopsis;
     private float rating;
     private String[] torrentsUrl, torrentsQuality, torrentsSize;
 
-    public Movie() {
+    Movie() {
     }
 
-    public Movie(Parcel parcel) {
+    private Movie(Parcel parcel) {
         id = parcel.readLong();
         imdbCode = parcel.readString();
         title = parcel.readString();
@@ -35,7 +35,7 @@ public class Movie implements Parcelable {
         return id;
     }
 
-    public String getImdbCode() {
+    String getImdbCode() {
         return imdbCode;
     }
 
@@ -43,39 +43,39 @@ public class Movie implements Parcelable {
         return title;
     }
 
-    public String getYear() {
+    String getYear() {
         return year;
     }
 
-    public String getGenres() {
+    String getGenres() {
         return genres;
     }
 
-    public String getBackgroundImage() {
+    String getBackgroundImage() {
         return backgroundImage;
     }
 
-    public String getMediumCoverImage() {
+    String getMediumCoverImage() {
         return mediumCoverImage;
     }
 
-    public String getSynopsis() {
+    String getSynopsis() {
         return synopsis;
     }
 
-    public float getRating() {
+    float getRating() {
         return rating;
     }
 
-    public String[] getTorrentsUrl() {
+    String[] getTorrentsUrl() {
         return torrentsUrl;
     }
 
-    public String[] getTorrentsQuality() {
+    String[] getTorrentsQuality() {
         return torrentsQuality;
     }
 
-    public String[] getTorrentsSize() {
+    String[] getTorrentsSize() {
         return torrentsSize;
     }
 
@@ -83,7 +83,7 @@ public class Movie implements Parcelable {
         this.id = id;
     }
 
-    public void setImdbCode(String imdbCode) {
+    void setImdbCode(String imdbCode) {
         this.imdbCode = imdbCode;
     }
 
@@ -91,39 +91,39 @@ public class Movie implements Parcelable {
         this.title = title;
     }
 
-    public void setYear(String year) {
+    void setYear(String year) {
         this.year = year;
     }
 
-    public void setGenres(String genres) {
+    void setGenres(String genres) {
         this.genres = genres;
     }
 
-    public void setBackgroundImage(String backgroundImage) {
+    void setBackgroundImage(String backgroundImage) {
         this.backgroundImage = backgroundImage;
     }
 
-    public void setMediumCoverImage(String mediumCoverImage) {
+    void setMediumCoverImage(String mediumCoverImage) {
         this.mediumCoverImage = mediumCoverImage;
     }
 
-    public void setSynopsis(String synopsis) {
+    void setSynopsis(String synopsis) {
         this.synopsis = synopsis;
     }
 
-    public void setRating(float rating) {
+    void setRating(float rating) {
         this.rating = rating;
     }
 
-    public void setTorrentsUrl(String[] torrentsUrl) {
+    void setTorrentsUrl(String[] torrentsUrl) {
         this.torrentsUrl = torrentsUrl;
     }
 
-    public void setTorrentsQuality(String[] torrentsQuality) {
+    void setTorrentsQuality(String[] torrentsQuality) {
         this.torrentsQuality = torrentsQuality;
     }
 
-    public void setTorrentsSize(String[] torrentsSize) {
+    void setTorrentsSize(String[] torrentsSize) {
         this.torrentsSize = torrentsSize;
     }
 

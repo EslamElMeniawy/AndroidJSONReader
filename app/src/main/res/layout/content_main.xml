@@ -28,9 +28,7 @@
         android:id="@+id/MoviesSwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/adView"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
+        android:layout_above="@+id/adView">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/MoviesRecycler"

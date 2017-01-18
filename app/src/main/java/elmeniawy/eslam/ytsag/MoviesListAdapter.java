@@ -23,20 +23,21 @@ import java.util.ArrayList;
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
 @SuppressWarnings("DefaultFileTemplate")
-public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static ArrayList<Movie> listMovies = new ArrayList<>();
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
     private LayoutInflater layoutInflater;
     private ImageLoader imageLoader;
 
-    public MoviesListAdapter(Context context) {
+    MoviesListAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
         VolleySingleton volleySingleton = VolleySingleton.getInstance();
         imageLoader = volleySingleton.getImageLoader();
         MoviesListAdapter.context = context;
     }
 
-    public void setMoviesList(ArrayList<Movie> listMovies) {
+    void setMoviesList(ArrayList<Movie> listMovies) {
         MoviesListAdapter.listMovies = listMovies;
         notifyItemRangeChanged(0, listMovies.size());
     }
@@ -92,13 +93,13 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return listMovies.size();
     }
 
-    static class ViewHolderMoviesList extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private static class ViewHolderMoviesList extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView movieImage;
         private TextView movieTitle, movieYear, movieRating, movieQuality1, movieQuality2, movieQuality3;
         private InterstitialAd mInterstitialAd;
 
-        public ViewHolderMoviesList(View itemView) {
+        ViewHolderMoviesList(View itemView) {
             super(itemView);
             movieImage = (ImageView) itemView.findViewById(R.id.movie_image);
             movieTitle = (TextView) itemView.findViewById(R.id.movie_tittle);

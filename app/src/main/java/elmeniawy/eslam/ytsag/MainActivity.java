@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity
     private RelativeLayout main;
     private UpdateReceiver receiver;
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         DisplayMetrics displayMetrics = MainActivity.this.getResources().getDisplayMetrics();
-        int spanCount = Math.max(1, (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi) / 230);
+        int spanCount = Math.max(1, (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi) / 201);
         gridLayoutManager = new GridLayoutManager(MainActivity.this, spanCount);
         listMoviesRecycler.setLayoutManager(gridLayoutManager);
         moviesListAdapter = new MoviesListAdapter(MainActivity.this);
@@ -324,7 +325,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("InflateParams")
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.nav_about) {
@@ -446,7 +447,7 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case 0:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Snackbar.make(mAdView, "", Snackbar.LENGTH_SHORT).setCallback(new Snackbar.Callback() {
+                    Snackbar.make(mAdView, "", Snackbar.LENGTH_SHORT).addCallback(new Snackbar.Callback() {
                         @Override
                         public void onShown(Snackbar snackbar) {
                             snackbar.dismiss();
@@ -471,7 +472,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Snackbar.make(mAdView, "", Snackbar.LENGTH_SHORT).setCallback(new Snackbar.Callback() {
+                    Snackbar.make(mAdView, "", Snackbar.LENGTH_SHORT).addCallback(new Snackbar.Callback() {
                         @Override
                         public void onShown(Snackbar snackbar) {
                             snackbar.dismiss();

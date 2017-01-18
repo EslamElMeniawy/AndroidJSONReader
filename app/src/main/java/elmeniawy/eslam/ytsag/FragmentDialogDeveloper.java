@@ -25,6 +25,7 @@ public class FragmentDialogDeveloper extends DialogFragment {
     public FragmentDialogDeveloper() {
     }
 
+    @SuppressWarnings("ConstantConditions")
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class FragmentDialogDeveloper extends DialogFragment {
         tabLayout.addTab(tabLayout.newTab().setText(R.string.social));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -65,7 +66,7 @@ public class FragmentDialogDeveloper extends DialogFragment {
     }
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
