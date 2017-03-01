@@ -1,7 +1,9 @@
 package elmeniawy.eslam.ytsag;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,11 +15,11 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 public class DetailsActivity extends AppCompatActivity {
     private AdView mAdView;
@@ -61,35 +63,32 @@ public class DetailsActivity extends AppCompatActivity {
             LinearLayout qualityLayout3 = (LinearLayout) findViewById(R.id.movie_quality_3_layout);
             final RelativeLayout background = (RelativeLayout) findViewById(R.id.background);
 
-            VolleySingleton volleySingleton = VolleySingleton.getInstance();
-            ImageLoader imageLoader = volleySingleton.getImageLoader();
+            Picasso.with(DetailsActivity.this)
+                    .load(movie.getMediumCoverImage())
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    .into(image);
+            Picasso.with(DetailsActivity.this)
+                    .load(movie.getBackgroundImage())
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            if (android.os.Build.VERSION.SDK_INT >= 16) {
+                                background.setBackground(new BitmapDrawable(DetailsActivity.this.getResources(), bitmap));
+                            } else {
+                                //noinspection deprecation
+                                background.setBackgroundDrawable(new BitmapDrawable(bitmap));
+                            }
+                        }
 
-            imageLoader.get(movie.getMediumCoverImage(), new ImageLoader.ImageListener() {
-                @Override
-                public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                    image.setImageBitmap(response.getBitmap());
-                }
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                        }
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                }
-            });
-            imageLoader.get(movie.getBackgroundImage(), new ImageLoader.ImageListener() {
-                @SuppressWarnings("deprecation")
-                @Override
-                public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                    if (android.os.Build.VERSION.SDK_INT >= 16) {
-                        background.setBackground(new BitmapDrawable(DetailsActivity.this.getResources(), response.getBitmap()));
-                    } else {
-                        background.setBackgroundDrawable(new BitmapDrawable(response.getBitmap()));
-                    }
-                }
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            });
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        }
+                    });
             title.setText(movie.getTitle());
             year.setText(movie.getYear());
             genres.setText(movie.getGenres());

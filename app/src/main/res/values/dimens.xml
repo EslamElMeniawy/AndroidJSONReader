@@ -10,6 +10,7 @@
     <dimen name="drawer_image_padding">8dp</dimen>
     <dimen name="drawer_image_height">140dp</dimen>
     <dimen name="image_width">201dp</dimen>
+    <dimen name="image_height">345px</dimen>
 
     <dimen name="details_image_width">90dp</dimen>
     <dimen name="details_image_height">135dp</dimen>

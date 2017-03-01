@@ -36,7 +36,6 @@
                     android:layout_height="@dimen/details_image_height"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:src="@drawable/logo"
                     tools:ignore="ContentDescription,RtlSymmetry" />
 
                 <LinearLayout

@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/movie_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/image_height"
         tools:ignore="ContentDescription" />
 
     <TextView

@@ -11,11 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -28,12 +27,9 @@ class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @SuppressLint("StaticFieldLeak")
     private static Context context;
     private LayoutInflater layoutInflater;
-    private ImageLoader imageLoader;
 
     MoviesListAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
-        VolleySingleton volleySingleton = VolleySingleton.getInstance();
-        imageLoader = volleySingleton.getImageLoader();
         MoviesListAdapter.context = context;
     }
 
@@ -73,19 +69,11 @@ class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         holder.movieRating.setText(String.valueOf(currentMovie.getRating()) + "/10");
         String movieImageUrl = currentMovie.getMediumCoverImage();
-        if (movieImageUrl != null && !movieImageUrl.equals("")) {
-            imageLoader.get(movieImageUrl, new ImageLoader.ImageListener() {
-                @Override
-                public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                    holder.movieImage.setImageBitmap(response.getBitmap());
-                }
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            });
-        }
+        Picasso.with(context)
+                .load(movieImageUrl)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(holder.movieImage);
     }
 
     @Override
