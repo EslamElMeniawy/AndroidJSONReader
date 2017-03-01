@@ -79,8 +79,15 @@ public class SearchActivity extends AppCompatActivity {
         noResultsView = (TextView) findViewById(R.id.no_results_view);
 
         DisplayMetrics displayMetrics = SearchActivity.this.getResources().getDisplayMetrics();
-        int spanCount = Math.max(1, (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi) / 201);
+        int itemWithDp = 201;
+        int totalWidthDp = (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi);
+        int spanCount = Math.max(1, totalWidthDp / itemWithDp);
+        int totalSpacingDp = totalWidthDp - (spanCount * itemWithDp);
+        int spacingDp = totalSpacingDp / (spanCount * 2);
+        int spacingPx = spacingDp * (displayMetrics.densityDpi / 160);
+
         gridLayoutManager = new GridLayoutManager(SearchActivity.this, spanCount);
+        listMoviesRecycler.addItemDecoration(new SpacesItemDecoration(SearchActivity.this, spacingPx));
         listMoviesRecycler.setLayoutManager(gridLayoutManager);
         moviesListAdapter = new MoviesListAdapter(SearchActivity.this);
         listMoviesRecycler.setAdapter(moviesListAdapter);

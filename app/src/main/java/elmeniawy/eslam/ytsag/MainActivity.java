@@ -36,6 +36,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -160,8 +161,15 @@ public class MainActivity extends AppCompatActivity
         });
 
         DisplayMetrics displayMetrics = MainActivity.this.getResources().getDisplayMetrics();
-        int spanCount = Math.max(1, (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi) / 201);
+        int itemWithDp = 201;
+        int totalWidthDp = (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi);
+        int spanCount = Math.max(1, totalWidthDp / itemWithDp);
+        int totalSpacingDp = totalWidthDp - (spanCount * itemWithDp);
+        int spacingDp = totalSpacingDp / (spanCount * 2);
+        int spacingPx = spacingDp * (displayMetrics.densityDpi / 160);
+
         gridLayoutManager = new GridLayoutManager(MainActivity.this, spanCount);
+        listMoviesRecycler.addItemDecoration(new SpacesItemDecoration(MainActivity.this, spacingPx));
         listMoviesRecycler.setLayoutManager(gridLayoutManager);
         moviesListAdapter = new MoviesListAdapter(MainActivity.this);
         listMoviesRecycler.setAdapter(moviesListAdapter);
