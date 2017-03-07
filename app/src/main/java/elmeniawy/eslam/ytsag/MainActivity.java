@@ -13,7 +13,6 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -70,18 +69,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FetchListener {
     public static final String PREF_FILE_NAME = "YTSPref";
-    private static final String AUTHORITY = "elmeniawy.eslam.ytsag";
     private static final String TAG = MainActivity.class.getName();
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -355,8 +349,7 @@ public class MainActivity extends AppCompatActivity
             DialogFragment overlay = new FragmentDialogDeveloper();
             overlay.show(fm, "FragmentDialog");
         } else if (id == R.id.nav_check_update) {
-            downloadUpdate();
-            /*if (sharedPreferences.getBoolean("updateAvailable", false)) {
+            if (sharedPreferences.getBoolean("updateAvailable", false)) {
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 } else {
@@ -407,7 +400,7 @@ public class MainActivity extends AppCompatActivity
                 request.setRetryPolicy(policy);
                 request.setTag(TAG);
                 requestQueue.add(request);
-            }*/
+            }
         }
 
         return true;
