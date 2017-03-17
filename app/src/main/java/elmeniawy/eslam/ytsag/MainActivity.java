@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity
     private long downloadId = -1;
     private Fetch fetch;
     private ProgressDialog progressDialog;
+    private long downloadStartTime;
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -349,7 +350,8 @@ public class MainActivity extends AppCompatActivity
             DialogFragment overlay = new FragmentDialogDeveloper();
             overlay.show(fm, "FragmentDialog");
         } else if (id == R.id.nav_check_update) {
-            if (sharedPreferences.getBoolean("updateAvailable", false)) {
+            downloadUpdate();
+            /*if (sharedPreferences.getBoolean("updateAvailable", false)) {
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 } else {
@@ -400,7 +402,7 @@ public class MainActivity extends AppCompatActivity
                 request.setRetryPolicy(policy);
                 request.setTag(TAG);
                 requestQueue.add(request);
-            }
+            }*/
         }
 
         return true;
@@ -454,7 +456,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (downloadId != -1 && fetch != null) {
-            //fetch.removeAll();
             fetch.release();
         }
 
@@ -742,8 +743,10 @@ public class MainActivity extends AppCompatActivity
                 .setTitle(R.string.update);
         builder.setPositiveButton(R.string.download, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                downloadStartTime = System.currentTimeMillis();
+
                 String PATH = Environment.getExternalStorageDirectory() + "/YTS/";
-                String fileName = "YTS.apk";
+                String fileName = "YTS" + downloadStartTime + ".apk";
 
                 try {
                     File fetchDir = new File(PATH);
@@ -756,9 +759,7 @@ public class MainActivity extends AppCompatActivity
 
                 fetch = Fetch.getInstance(MainActivity.this);
 
-                fetch.removeAll();
-
-                String downloadUrl = "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/app/app-release.apk";
+                String downloadUrl = "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/app/app-release.apk#" + downloadStartTime;
                 com.tonyodev.fetch.request.Request request = new com.tonyodev.fetch.request.Request(downloadUrl,
                         PATH, fileName);
                 downloadId = fetch.enqueue(request);
@@ -775,7 +776,6 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
                         fetch.removeFetchListener(MainActivity.this);
-                        //fetch.removeAll();
                         fetch.release();
                         downloadId = -1;
                     }
@@ -808,7 +808,6 @@ public class MainActivity extends AppCompatActivity
                 progressDialog.dismiss();
 
                 fetch.removeFetchListener(MainActivity.this);
-                //fetch.removeAll();
                 fetch.release();
                 downloadId = -1;
 
@@ -817,19 +816,18 @@ public class MainActivity extends AppCompatActivity
                 progressDialog.dismiss();
 
                 fetch.removeFetchListener(MainActivity.this);
-                //fetch.removeAll();
                 fetch.release();
                 downloadId = -1;
 
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider",
-                            new File(Environment.getExternalStorageDirectory() + "/YTS/YTS.apk")));
+                            new File(Environment.getExternalStorageDirectory() + "/YTS/YTS" + downloadStartTime + ".apk")));
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/YTS/YTS.apk")),
+                    intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/YTS/YTS" + downloadStartTime + ".apk")),
                             "application/vnd.android.package-archive");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
