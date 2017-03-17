@@ -350,8 +350,7 @@ public class MainActivity extends AppCompatActivity
             DialogFragment overlay = new FragmentDialogDeveloper();
             overlay.show(fm, "FragmentDialog");
         } else if (id == R.id.nav_check_update) {
-            downloadUpdate();
-            /*if (sharedPreferences.getBoolean("updateAvailable", false)) {
+            if (sharedPreferences.getBoolean("updateAvailable", false)) {
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 } else {
@@ -402,7 +401,7 @@ public class MainActivity extends AppCompatActivity
                 request.setRetryPolicy(policy);
                 request.setTag(TAG);
                 requestQueue.add(request);
-            }*/
+            }
         }
 
         return true;
