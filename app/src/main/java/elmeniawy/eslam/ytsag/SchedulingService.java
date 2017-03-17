@@ -88,5 +88,7 @@ public class SchedulingService extends IntentService {
                 .setSound(alarmSound);
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        VolleySingleton.getInstance().getRequestQueue().getCache().clear();
     }
 }
