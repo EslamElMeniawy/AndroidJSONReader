@@ -454,7 +454,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (downloadId != -1 && fetch != null) {
-            fetch.removeAll();
+            //fetch.removeAll();
             fetch.release();
         }
 
@@ -756,6 +756,8 @@ public class MainActivity extends AppCompatActivity
 
                 fetch = Fetch.getInstance(MainActivity.this);
 
+                fetch.removeAll();
+
                 String downloadUrl = "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/app/app-release.apk";
                 com.tonyodev.fetch.request.Request request = new com.tonyodev.fetch.request.Request(downloadUrl,
                         PATH, fileName);
@@ -772,9 +774,8 @@ public class MainActivity extends AppCompatActivity
                 progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
-                        Log.e("Download", "Canceled");
                         fetch.removeFetchListener(MainActivity.this);
-                        fetch.removeAll();
+                        //fetch.removeAll();
                         fetch.release();
                         downloadId = -1;
                     }
@@ -804,21 +805,19 @@ public class MainActivity extends AppCompatActivity
     public void onUpdate(long id, int status, int progress, long downloadedBytes, long fileSize, int error) {
         if (downloadId == id) {
             if (status == Fetch.STATUS_ERROR) {
-                Log.e("Progress", "Error: " + error);
                 progressDialog.dismiss();
 
                 fetch.removeFetchListener(MainActivity.this);
-                fetch.removeAll();
+                //fetch.removeAll();
                 fetch.release();
                 downloadId = -1;
 
                 Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
             } else if (status == Fetch.STATUS_DONE) {
-                Log.e("Progress", "Done");
                 progressDialog.dismiss();
 
                 fetch.removeFetchListener(MainActivity.this);
-                fetch.removeAll();
+                //fetch.removeAll();
                 fetch.release();
                 downloadId = -1;
 
