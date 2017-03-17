@@ -8,8 +8,8 @@ android {
         applicationId "elmeniawy.eslam.ytsag"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 1414504
-        versionName '5.0.4'
+        versionCode 1414505
+        versionName '5.0.5'
     }
     buildTypes {
         release {

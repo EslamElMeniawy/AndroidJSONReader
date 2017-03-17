@@ -36,7 +36,6 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -358,7 +357,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else {
                 final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, null, getString(R.string.checking_update), true);
-                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json", new Response.Listener<JSONObject>() {
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/AppData.json#" + System.currentTimeMillis(), new Response.Listener<JSONObject>() {
                     @SuppressWarnings("ConstantConditions")
                     @Override
                     public void onResponse(JSONObject response) {

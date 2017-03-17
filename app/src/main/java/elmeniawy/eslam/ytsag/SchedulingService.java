@@ -36,7 +36,7 @@ public class SchedulingService extends IntentService {
     protected void onHandleIntent(final Intent intent) {
         VolleySingleton volleySingleton = VolleySingleton.getInstance();
         RequestQueue requestQueue = volleySingleton.getRequestQueue();
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=1&page=1", new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=1&page=1#" + System.currentTimeMillis(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 if (response != null && response.length() > 0) {
