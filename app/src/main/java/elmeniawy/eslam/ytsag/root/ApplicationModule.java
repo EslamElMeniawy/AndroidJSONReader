@@ -15,10 +15,16 @@ import dagger.Provides;
  */
 
 @Module
-public class ApplicationModule {
+class ApplicationModule {
+    private MyApplication application;
+
+    ApplicationModule(MyApplication application) {
+        this.application = application;
+    }
+
     @Provides
     @Singleton
-    public Context provideContext(MyApplication application) {
+    Context provideContext() {
         return application.getApplicationContext();
     }
 }

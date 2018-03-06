@@ -1,5 +1,9 @@
 package elmeniawy.eslam.ytsag.utils;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 /**
  * Network
  * <p>
@@ -8,4 +12,22 @@ package elmeniawy.eslam.ytsag.utils;
  */
 
 public class Network {
+    /**
+     * Check if device connected to Internet or not.
+     *
+     * @param context Context to use in getting connectivity service.
+     * @return Boolean value indicating whether user is connected or not.
+     */
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo netInfo = null;
+
+        if (cm != null) {
+            netInfo = cm.getActiveNetworkInfo();
+        }
+
+        return netInfo != null && netInfo.isConnected();
+    }
 }

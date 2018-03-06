@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.squareup.picasso.Picasso;
+//import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -71,11 +71,11 @@ class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         holder.movieRating.setText(String.valueOf(currentMovie.getRating()) + "/10");
         String movieImageUrl = currentMovie.getMediumCoverImage();
-        Picasso.with(context)
-                .load(movieImageUrl)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .into(holder.movieImage);
+//        Picasso.with(context)
+//                .load(movieImageUrl)
+//                .placeholder(R.drawable.placeholder)
+//                .error(R.drawable.placeholder)
+//                .into(holder.movieImage);
     }
 
     @Override
