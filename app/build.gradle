@@ -19,7 +19,7 @@ repositories {
 ext {
     supportVersion = "27.1.0"
     retrofitVersion = "2.3.0"
-    rxJavaVersion = "2.1.9"
+    rxJavaVersion = "2.1.10"
     rxAndroidVersion = "2.0.2"
     butterKnifeVersion = "8.8.1"
     crashlyticsVersion = "2.9.1"
@@ -131,7 +131,7 @@ dependencies {
     // Fetch.
     //
 
-    implementation "com.tonyodev.fetch2:fetch2:2.0.0-RC9"
+    implementation "com.tonyodev.fetch2rx:fetch2rx:2.0.0-RC9"
 
     //
     // Room.
