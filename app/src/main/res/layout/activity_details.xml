@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="elmeniawy.eslam.ytsag.DetailsActivity">
+    tools:context="elmeniawy.eslam.ytsag.screens.details.DetailsActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

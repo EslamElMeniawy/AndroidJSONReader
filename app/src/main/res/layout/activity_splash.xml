@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="elmeniawy.eslam.ytsag.SplashActivity"
+    tools:context="elmeniawy.eslam.ytsag.screens.splash.SplashActivity"
     android:background="@color/colorPrimaryDark">
     <ImageView
         android:layout_width="match_parent"

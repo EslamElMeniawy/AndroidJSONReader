@@ -1,4 +1,4 @@
-package elmeniawy.eslam.ytsag;
+package elmeniawy.eslam.ytsag.screens.search;
 
 import android.app.SearchManager;
 import android.content.Intent;
@@ -37,6 +37,12 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+
+import elmeniawy.eslam.ytsag.Movie;
+import elmeniawy.eslam.ytsag.MoviesListAdapter;
+import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.SpacesItemDecoration;
+import elmeniawy.eslam.ytsag.VolleySingleton;
 
 public class SearchActivity extends AppCompatActivity {
     private static final String TAG = SearchActivity.class.getName();

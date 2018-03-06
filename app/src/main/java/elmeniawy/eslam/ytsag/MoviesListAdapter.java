@@ -18,6 +18,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
+
 /**
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */

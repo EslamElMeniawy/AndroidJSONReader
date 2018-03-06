@@ -1,4 +1,4 @@
-package elmeniawy.eslam.ytsag;
+package elmeniawy.eslam.ytsag.screens.splash;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,9 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
+
+import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.screens.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
     public static final String PREF_FILE_NAME = "YTSPref";

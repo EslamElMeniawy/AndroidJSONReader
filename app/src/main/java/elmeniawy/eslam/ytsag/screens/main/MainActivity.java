@@ -1,4 +1,4 @@
-package elmeniawy.eslam.ytsag;
+package elmeniawy.eslam.ytsag.screens.main;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -71,6 +71,15 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+
+import elmeniawy.eslam.ytsag.AlarmReceiver;
+import elmeniawy.eslam.ytsag.FragmentDialogDeveloper;
+import elmeniawy.eslam.ytsag.Movie;
+import elmeniawy.eslam.ytsag.MoviesListAdapter;
+import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.SpacesItemDecoration;
+import elmeniawy.eslam.ytsag.UpdateReceiver;
+import elmeniawy.eslam.ytsag.VolleySingleton;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FetchListener {

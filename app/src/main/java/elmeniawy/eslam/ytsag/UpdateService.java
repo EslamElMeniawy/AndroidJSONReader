@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import elmeniawy.eslam.ytsag.root.MyApplication;
+import elmeniawy.eslam.ytsag.screens.splash.SplashActivity;
 
 /**
  * Created by Eslam El-Meniawy on 23-Jan-16.

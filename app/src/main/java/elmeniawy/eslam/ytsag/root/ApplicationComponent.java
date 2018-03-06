@@ -5,10 +5,10 @@ import javax.inject.Singleton;
 import dagger.Component;
 import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
-import elmeniawy.eslam.ytsag.DetailsActivity;
-import elmeniawy.eslam.ytsag.MainActivity;
-import elmeniawy.eslam.ytsag.SearchActivity;
-import elmeniawy.eslam.ytsag.SplashActivity;
+import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
+import elmeniawy.eslam.ytsag.screens.main.MainActivity;
+import elmeniawy.eslam.ytsag.screens.search.SearchActivity;
+import elmeniawy.eslam.ytsag.screens.splash.SplashActivity;
 
 /**
  * ApplicationComponent

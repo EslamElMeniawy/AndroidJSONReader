@@ -20,7 +20,7 @@
             android:name="io.fabric.ApiKey"
             android:value="ee9d644785031daaf44168d06b3f0e5af18095ff" />
 
-        <activity android:name=".SplashActivity">
+        <activity android:name=".screens.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -52,7 +52,7 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".screens.main.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -61,14 +61,14 @@
         </activity>
 
         <activity
-            android:name=".DetailsActivity"
+            android:name=".screens.details.DetailsActivity"
             android:label="@string/title_activity_details"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".screens.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="UnusedAttribute">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="elmeniawy.eslam.ytsag.MainActivity" />
+                android:value="elmeniawy.eslam.ytsag.screens.main.MainActivity" />
         </activity>
 
         <activity
@@ -99,14 +99,14 @@
         <service android:name=".UpdateService" />
 
         <activity
-            android:name=".SearchActivity"
+            android:name=".screens.search.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".screens.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="UnusedAttribute">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="elmeniawy.eslam.ytsag.MainActivity" />
+                android:value="elmeniawy.eslam.ytsag.screens.main.MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />

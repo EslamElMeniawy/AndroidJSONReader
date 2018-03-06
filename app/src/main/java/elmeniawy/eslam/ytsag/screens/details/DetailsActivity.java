@@ -1,4 +1,4 @@
-package elmeniawy.eslam.ytsag;
+package elmeniawy.eslam.ytsag.screens.details;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +20,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import elmeniawy.eslam.ytsag.Movie;
+import elmeniawy.eslam.ytsag.R;
 
 public class DetailsActivity extends AppCompatActivity {
     private AdView mAdView;
