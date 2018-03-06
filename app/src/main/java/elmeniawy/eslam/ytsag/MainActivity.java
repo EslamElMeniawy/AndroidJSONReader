@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity
                 if (!mLoadingItems && (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
                     moviesSwipe.setRefreshing(true);
                     getPage++;
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&page=" + getPage, new Response.Listener<JSONObject>() {
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.am/api/v2/list_movies.json?limit=20&page=" + getPage, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             ArrayList<Movie> listMoreMovies = parseJSONResponse(response, false);
@@ -524,7 +524,7 @@ public class MainActivity extends AppCompatActivity
         getPage = 1;
         mPreviousTotal = 0;
         errorView.setVisibility(View.GONE);
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&page=1", new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.am/api/v2/list_movies.json?limit=20&page=1", new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 moviesSwipe.setVisibility(View.VISIBLE);

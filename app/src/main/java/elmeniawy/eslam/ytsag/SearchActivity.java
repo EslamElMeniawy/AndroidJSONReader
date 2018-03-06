@@ -123,7 +123,7 @@ public class SearchActivity extends AppCompatActivity {
                     moviesSwipe.setRefreshing(true);
                     getPage++;
                     try {
-                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&query_term=" + URLEncoder.encode(query, "UTF-8") + "&page=" + getPage, new Response.Listener<JSONObject>() {
+                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.am/api/v2/list_movies.json?limit=20&query_term=" + URLEncoder.encode(query, "UTF-8") + "&page=" + getPage, new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 ArrayList<Movie> listMoreMovies = parseJSONResponse(response, false);
@@ -232,7 +232,7 @@ public class SearchActivity extends AppCompatActivity {
         mPreviousTotal = 0;
         errorView.setVisibility(View.GONE);
         try {
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.ag/api/v2/list_movies.json?limit=20&query_term=" + URLEncoder.encode(query, "UTF-8") + "&page=1", new Response.Listener<JSONObject>() {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://yts.am/api/v2/list_movies.json?limit=20&query_term=" + URLEncoder.encode(query, "UTF-8") + "&page=1", new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     listMovies = parseJSONResponse(response, true);
