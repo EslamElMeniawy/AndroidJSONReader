@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 
 /**
  * SharedPreferencesModule
@@ -22,7 +23,7 @@ public class SharedPreferencesModule {
     @Singleton
     @Inject
     SharedPreferences provideSharedPreferences(Context context) {
-        return context.getSharedPreferences("elmeniawy.eslam.ytsag.YTSPref",
+        return context.getSharedPreferences(PreferencesUtils.PREF_FILE_NAME,
                 Context.MODE_PRIVATE);
     }
 }

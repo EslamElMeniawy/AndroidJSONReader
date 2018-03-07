@@ -4,6 +4,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import elmeniawy.eslam.ytsag.utils.NetworkUtils;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -79,10 +80,8 @@ public class ApiModule {
 
     @Provides
     @Singleton
-    public ApiService provideApiService() {
-        String BASE_URL = "https://yts.am/api/v2/";
-
-        return provideRetrofit(BASE_URL, provideClient())
+    ApiService provideApiService() {
+        return provideRetrofit(NetworkUtils.BASE_URL, provideClient())
                 .create(ApiService.class);
     }
 }

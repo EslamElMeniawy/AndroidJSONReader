@@ -2,7 +2,6 @@ package elmeniawy.eslam.ytsag.screens.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -13,11 +12,15 @@ import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.screens.main.MainActivity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import timber.log.Timber;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements SplashMVP.View {
     @Inject
     MySharedPreferences mySharedPreferences;
+
+    @Inject
+    SplashMVP.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,35 +47,47 @@ public class SplashActivity extends AppCompatActivity {
         //
 
         Timber.tag(SplashActivity.class.getSimpleName());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         //
-        // Check if extras available.
-        // Then save "fromNotification" to preferences.
+        // Set view, check from notification & start wait;
         //
 
+        presenter.setView(this);
+        presenter.saveFromNotification();
+        presenter.startWait();
+    }
+
+    @Override
+    public MySharedPreferences getSharedPreferences() {
+        return mySharedPreferences;
+    }
+
+    @Override
+    public Boolean getFromNotification() {
         Bundle extras = getIntent().getExtras();
         Timber.i("extras: %s.", extras);
 
         if (extras != null) {
             Timber.i("Extras available.");
-
-            Timber.i("fromNotification: %s.",
-                    String.valueOf(extras.getBoolean("fromNotification")));
-
-            mySharedPreferences.putData("fromNotification",
-                    extras.getBoolean("fromNotification"));
+            Boolean fromNotification = extras.getBoolean(PreferencesUtils.KEY_FROM_NOTIFICATION);
+            Timber.i("fromNotification: %s.", String.valueOf(fromNotification));
+            return fromNotification;
         }
 
-        //
-        // Wait for 3 seconds and move to main activity.
-        //
+        return false;
+    }
 
-        new Handler().postDelayed(() -> {
-            Intent openMainActivity = new Intent(SplashActivity.this,
-                    MainActivity.class);
+    @Override
+    public void openMainActivity() {
+        Intent openMainActivity = new Intent(SplashActivity.this,
+                MainActivity.class);
 
-            startActivity(openMainActivity);
-            SplashActivity.this.finish();
-        }, 3000);
+        startActivity(openMainActivity);
+        SplashActivity.this.finish();
     }
 }

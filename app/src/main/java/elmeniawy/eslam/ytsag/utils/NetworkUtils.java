@@ -5,13 +5,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 /**
- * Network
+ * NetworkUtils
  * <p>
  * Created by Eslam El-Meniawy on 06-Mar-2018.
  * CITC - Mansoura University
  */
 
-public class Network {
+public class NetworkUtils {
+    public static final String BASE_URL = "https://yts.am/api/v2/";
+
     /**
      * Check if device connected to Internet or not.
      *
