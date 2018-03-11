@@ -26,6 +26,7 @@ ext {
     roomVersion = "1.0.0"
     picassoVersion = "2.5.2"
     daggerVersion = "2.14.1"
+    firebaseVersion = "11.8.0"
 }
 
 android {
@@ -122,10 +123,16 @@ dependencies {
     }
 
     //
+    // Firebase core.
+    //
+
+    implementation "com.google.firebase:firebase-core:$firebaseVersion"
+
+    //
     // Google Ads.
     //
 
-    implementation 'com.google.firebase:firebase-ads:11.8.0'
+    implementation "com.google.firebase:firebase-ads:$firebaseVersion"
 
     //
     // Fetch.
@@ -152,3 +159,5 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.6.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

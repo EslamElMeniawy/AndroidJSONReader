@@ -5,6 +5,7 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.google.firebase.FirebaseApp;
 
 import javax.inject.Inject;
 
@@ -65,6 +66,12 @@ public class MyApplication extends Application implements HasActivityInjector {
                             .build())
                     .build());
         }
+
+        //
+        // Initialize firebase
+        //
+
+        FirebaseApp.initializeApp(this);
     }
 
     public ApplicationComponent getComponent() {
