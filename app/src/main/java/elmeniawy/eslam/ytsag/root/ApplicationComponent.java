@@ -8,6 +8,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import elmeniawy.eslam.ytsag.api.ApiModule;
 import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
 import elmeniawy.eslam.ytsag.screens.main.MainActivity;
+import elmeniawy.eslam.ytsag.screens.main.MainModule;
 import elmeniawy.eslam.ytsag.screens.search.SearchActivity;
 import elmeniawy.eslam.ytsag.screens.splash.SplashActivity;
 import elmeniawy.eslam.ytsag.screens.splash.SplashModule;
@@ -24,7 +25,7 @@ import elmeniawy.eslam.ytsag.storage.preferences.SharedPreferencesModule;
 @Singleton
 @Component(modules = {AndroidSupportInjectionModule.class, ApplicationModule.class,
         SharedPreferencesModule.class, ApplicationDatabaseModule.class, ApiModule.class,
-        SplashModule.class})
+        SplashModule.class, MainModule.class})
 public interface ApplicationComponent extends AndroidInjector<MyApplication> {
     void inject(SplashActivity target);
 

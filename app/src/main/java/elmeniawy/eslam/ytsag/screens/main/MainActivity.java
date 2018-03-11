@@ -78,13 +78,24 @@ package elmeniawy.eslam.ytsag.screens.main;
 //import elmeniawy.eslam.ytsag.SpacesItemDecoration;
 //import elmeniawy.eslam.ytsag.UpdateReceiver;
 //import elmeniawy.eslam.ytsag.VolleySingleton;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import elmeniawy.eslam.ytsag.R;
 
-public class MainActivity extends AppCompatActivity {
-//        implements NavigationView.OnNavigationItemSelectedListener, FetchListener {
-//    public static final String PREF_FILE_NAME = "YTSPref";
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+
+import javax.inject.Inject;
+
+import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.root.MyApplication;
+import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
+import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import timber.log.Timber;
+
+public class MainActivity extends AppCompatActivity implements MainMVP.View,
+        NavigationView.OnNavigationItemSelectedListener {
+    //    public static final String PREF_FILE_NAME = "YTSPref";
 //    private static final String TAG = MainActivity.class.getName();
 //    private SharedPreferences sharedPreferences;
 //    private SharedPreferences.Editor editor;
@@ -110,10 +121,31 @@ public class MainActivity extends AppCompatActivity {
 //    private long downloadStartTime;
 //
 //    @SuppressLint("CommitPrefEdits")
+    @Inject
+    MySharedPreferences mySharedPreferences;
+
+    @Inject
+    ApplicationDatabase database;
+
+    @Inject
+    MainMVP.Presenter presenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //
+        // Inject activity.
+        //
+
+        ((MyApplication) getApplication()).getComponent().inject(this);
+
+        //
+        // Set timber tag.
+        //
+
+        Timber.tag(MainActivity.class.getSimpleName());
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 //
@@ -318,6 +350,181 @@ public class MainActivity extends AppCompatActivity {
 //                downloadUpdate();
 //            }
 //        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
+    @Override
+    public MySharedPreferences getSharedPreferences() {
+        return null;
+    }
+
+    @Override
+    public ApplicationDatabase getDatabase() {
+        return null;
+    }
+
+    @Override
+    public void enableNotificationsSwitch() {
+
+    }
+
+    @Override
+    public void disableNotificationsSwitch() {
+
+    }
+
+    @Override
+    public void enableUpdateSwitch() {
+
+    }
+
+    @Override
+    public void disableUpdateSwitch() {
+
+    }
+
+    @Override
+    public void showAboutDialog() {
+
+    }
+
+    @Override
+    public void showDeveloperDialog() {
+
+    }
+
+    @Override
+    public void setError(String error) {
+
+    }
+
+    @Override
+    public void clearError() {
+
+    }
+
+    @Override
+    public void showErrorTv() {
+
+    }
+
+    @Override
+    public void hideErrorTv() {
+
+    }
+
+    @Override
+    public void showSwipeLayout() {
+
+    }
+
+    @Override
+    public void hideSwipeLayout() {
+
+    }
+
+    @Override
+    public void showSwipeLoading() {
+
+    }
+
+    @Override
+    public void hideSwipeLoading() {
+
+    }
+
+    @Override
+    public void updateMovies(MovieViewModel movie) {
+
+    }
+
+    @Override
+    public void showSnackBar(String message) {
+
+    }
+
+    @Override
+    public void showAdView() {
+
+    }
+
+    @Override
+    public void hideAdView() {
+
+    }
+
+    @Override
+    public boolean getDrawerOpened() {
+        return false;
+    }
+
+    @Override
+    public void closeDrawer() {
+
+    }
+
+    @Override
+    public void requestStoragePermission() {
+
+    }
+
+    @Override
+    public void showCheckingUpdatesDialog() {
+
+    }
+
+    @Override
+    public void showDownloadConfirmDialog() {
+
+    }
+
+    @Override
+    public void showDownloadingDialog() {
+
+    }
+
+    @Override
+    public void setDownloadProgress(int progress) {
+
+    }
+
+    @Override
+    public void setDownloadMaxSize(int max) {
+
+    }
+
+    @Override
+    public void cancelDownloadDialog() {
+
+    }
+
+    @Override
+    public void showInstallDialog() {
+
+    }
+
+    @Override
+    public boolean getInterstitialLoaded() {
+        return false;
+    }
+
+    @Override
+    public void showInterstitialAd() {
+
+    }
+
+    @Override
+    public void openDetails(MovieViewModel movie) {
+
+    }
+
+    @Override
+    public void closeApp() {
+
     }
 
 //    @Override
