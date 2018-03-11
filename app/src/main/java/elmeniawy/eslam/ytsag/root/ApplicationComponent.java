@@ -11,6 +11,7 @@ import elmeniawy.eslam.ytsag.screens.main.MainActivity;
 import elmeniawy.eslam.ytsag.screens.search.SearchActivity;
 import elmeniawy.eslam.ytsag.screens.splash.SplashActivity;
 import elmeniawy.eslam.ytsag.screens.splash.SplashModule;
+import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabaseModule;
 import elmeniawy.eslam.ytsag.storage.preferences.SharedPreferencesModule;
 
 /**
@@ -22,7 +23,8 @@ import elmeniawy.eslam.ytsag.storage.preferences.SharedPreferencesModule;
 
 @Singleton
 @Component(modules = {AndroidSupportInjectionModule.class, ApplicationModule.class,
-        SharedPreferencesModule.class, ApiModule.class, SplashModule.class})
+        SharedPreferencesModule.class, ApplicationDatabaseModule.class, ApiModule.class,
+        SplashModule.class})
 public interface ApplicationComponent extends AndroidInjector<MyApplication> {
     void inject(SplashActivity target);
 

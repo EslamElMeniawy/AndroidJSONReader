@@ -14,6 +14,7 @@ import dagger.android.HasActivityInjector;
 import elmeniawy.eslam.ytsag.BuildConfig;
 import elmeniawy.eslam.ytsag.root.timber.CrashReportingTree;
 import elmeniawy.eslam.ytsag.screens.splash.SplashModule;
+import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabaseModule;
 import elmeniawy.eslam.ytsag.storage.preferences.SharedPreferencesModule;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
@@ -39,6 +40,7 @@ public class MyApplication extends Application implements HasActivityInjector {
         component = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .sharedPreferencesModule(new SharedPreferencesModule())
+                .applicationDatabaseModule(new ApplicationDatabaseModule())
                 .splashModule(new SplashModule())
                 .build();
 

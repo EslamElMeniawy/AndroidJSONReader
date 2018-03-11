@@ -23,7 +23,7 @@ public class Movie {
 
     @SerializedName("rating")
     @Expose
-    private Long rating;
+    private Double rating;
 
     @SerializedName("genres")
     @Expose
@@ -77,11 +77,11 @@ public class Movie {
         this.year = year;
     }
 
-    public Long getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Long rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
