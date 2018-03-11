@@ -21,6 +21,8 @@ public interface SplashMVP {
     interface Presenter {
         void setView(SplashMVP.View view);
 
+        void rxUnsubscribe();
+
         void saveFromNotification();
 
         void startWait();

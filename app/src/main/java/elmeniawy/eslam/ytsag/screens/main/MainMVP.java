@@ -19,6 +19,8 @@ public interface MainMVP {
 
     interface Presenter {
         void setView(MainMVP.View view);
+
+        void rxUnsubscribe();
     }
 
     interface Model {

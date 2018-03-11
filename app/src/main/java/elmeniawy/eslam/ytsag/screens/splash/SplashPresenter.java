@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -16,6 +17,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class SplashPresenter implements SplashMVP.Presenter {
+    private Disposable disposable = null;
+
     @Nullable
     private SplashMVP.View view;
 
@@ -31,6 +34,13 @@ public class SplashPresenter implements SplashMVP.Presenter {
     }
 
     @Override
+    public void rxUnsubscribe() {
+        if (disposable != null && disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
+
+    @Override
     public void saveFromNotification() {
         if (view != null) {
             model.saveFromNotification(view.getSharedPreferences(), view.getFromNotification());
@@ -40,7 +50,7 @@ public class SplashPresenter implements SplashMVP.Presenter {
     @Override
     public void startWait() {
         if (view != null) {
-            Observable
+            disposable = Observable
                     .timer(3, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

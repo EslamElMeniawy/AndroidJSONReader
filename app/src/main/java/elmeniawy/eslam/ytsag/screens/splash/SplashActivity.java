@@ -63,6 +63,12 @@ public class SplashActivity extends AppCompatActivity implements SplashMVP.View 
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.rxUnsubscribe();
+    }
+
+    @Override
     public MySharedPreferences getSharedPreferences() {
         return mySharedPreferences;
     }
