@@ -40,22 +40,22 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     @Override
-    public void setNotificationSchedular() {
+    public void setNotificationScheduler() {
 
     }
 
     @Override
-    public void stopNotificationSchedular() {
+    public void stopNotificationScheduler() {
 
     }
 
     @Override
-    public void setUpdateSchedular() {
+    public void setUpdateScheduler() {
 
     }
 
     @Override
-    public void stopUpdateSchedular() {
+    public void stopUpdateScheduler() {
 
     }
 
@@ -90,16 +90,6 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     @Override
-    public void loadBannerAd() {
-
-    }
-
-    @Override
-    public void loadIntersitialAd() {
-
-    }
-
-    @Override
     public void bannerAdLoaded() {
 
     }
@@ -115,12 +105,12 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     @Override
-    public void intersitialClicked() {
+    public void interstitialClicked() {
 
     }
 
     @Override
-    public void intersitialClosed() {
+    public void interstitialClosed() {
 
     }
 

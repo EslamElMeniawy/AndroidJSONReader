@@ -54,7 +54,7 @@ public class SplashActivity extends AppCompatActivity implements SplashMVP.View 
         super.onResume();
 
         //
-        // Set view, check from notification & start wait;
+        // Set view, check from notification & start wait.
         //
 
         presenter.setView(this);
@@ -65,6 +65,11 @@ public class SplashActivity extends AppCompatActivity implements SplashMVP.View 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        //
+        // Unsubscribe from rx callbacks.
+        //
+
         presenter.rxUnsubscribe();
     }
 

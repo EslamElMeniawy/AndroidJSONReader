@@ -82,11 +82,26 @@ package elmeniawy.eslam.ytsag.screens.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 import javax.inject.Inject;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
@@ -130,6 +145,45 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     @Inject
     MainMVP.Presenter presenter;
 
+    //
+    // Bind views.
+    //
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
+
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
+    @BindView(R.id.MoviesSwipeRefresh)
+    SwipeRefreshLayout swipeRefreshLayoutMovies;
+
+    @BindView(R.id.MoviesRecycler)
+    RecyclerView recyclerViewMovies;
+
+    @BindView(R.id.error_view)
+    TextView tvError;
+
+    @BindView(R.id.main)
+    RelativeLayout main;
+
+    @BindView(R.id.adView)
+    AdView adView;
+
+    private SwitchCompat switchNotifications, switchUpdate;
+
+    private InterstitialAd mInterstitialAd;
+
+    //
+    // Bind strings.
+    //
+
+    @BindString(R.string.interstitial_ad_unit_id)
+    String interstitialAdUnitId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +200,27 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         //
 
         Timber.tag(MainActivity.class.getSimpleName());
+
+        //
+        // Initialize butter knife.
+        //
+
+        ButterKnife.bind(this);
+
+        //
+        // Get drawer switches.
+        //
+
+        switchNotifications = (SwitchCompat) navigationView
+                .getMenu()
+                .findItem(R.id.notifications_switch)
+                .getActionView();
+
+        switchUpdate = (SwitchCompat) navigationView
+                .getMenu()
+                .findItem(R.id.update_switch)
+                .getActionView();
+
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 //
@@ -353,18 +428,46 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        //
+        // Set view.
+        //
+
+        presenter.setView(this);
+
+        //
+        // Load ads.
+        //
+
+        loadAds();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //
+        // Unsubscribe from rx callbacks.
+        //
+
+        presenter.rxUnsubscribe();
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
     }
 
     @Override
     public MySharedPreferences getSharedPreferences() {
-        return null;
+        return mySharedPreferences;
     }
 
     @Override
     public ApplicationDatabase getDatabase() {
-        return null;
+        return database;
     }
 
     @Override
@@ -448,6 +551,11 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
+    public void setMainPadding() {
+        main.setPadding(0, 16, 0, 0);
+    }
+
+    @Override
     public void showAdView() {
 
     }
@@ -509,12 +617,12 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @Override
     public boolean getInterstitialLoaded() {
-        return false;
+        return mInterstitialAd.isLoaded();
     }
 
     @Override
     public void showInterstitialAd() {
-
+        mInterstitialAd.show();
     }
 
     @Override
@@ -525,6 +633,53 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     @Override
     public void closeApp() {
 
+    }
+
+    private void loadAds() {
+        loadBannerAd();
+        loadInterstitialAd();
+    }
+
+    private void loadBannerAd() {
+        adView.loadAd(new AdRequest.Builder().build());
+
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                presenter.bannerAdFailed();
+            }
+
+            @Override
+            public void onAdLoaded() {
+                presenter.bannerAdLoaded();
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                presenter.bannerClicked();
+            }
+        });
+    }
+
+    private void loadInterstitialAd() {
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(interstitialAdUnitId);
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                presenter.interstitialClicked();
+            }
+
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                presenter.interstitialClosed();
+            }
+        });
     }
 
 //    @Override

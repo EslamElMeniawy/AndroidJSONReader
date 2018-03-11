@@ -52,6 +52,8 @@ public interface MainMVP {
 
         void showSnackBar(String message);
 
+        void setMainPadding();
+
         void showAdView();
 
         void hideAdView();
@@ -94,13 +96,13 @@ public interface MainMVP {
 
         void updateSwitchClicked();
 
-        void setNotificationSchedular();
+        void setNotificationScheduler();
 
-        void stopNotificationSchedular();
+        void stopNotificationScheduler();
 
-        void setUpdateSchedular();
+        void setUpdateScheduler();
 
-        void stopUpdateSchedular();
+        void stopUpdateScheduler();
 
         void aboutClicked();
 
@@ -114,19 +116,15 @@ public interface MainMVP {
 
         void refreshMovies();
 
-        void loadBannerAd();
-
-        void loadIntersitialAd();
-
         void bannerAdLoaded();
 
         void bannerAdFailed();
 
         void bannerClicked();
 
-        void intersitialClicked();
+        void interstitialClicked();
 
-        void intersitialClosed();
+        void interstitialClosed();
 
         void permissionCallback(boolean granted);
 
