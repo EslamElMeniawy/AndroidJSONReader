@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.List;
 import java.util.Locale;
 
 import elmeniawy.eslam.ytsag.utils.DatabaseUtils;
@@ -37,7 +38,7 @@ public class MovieEntity {
     private Double rating;
 
     @ColumnInfo(name = DatabaseUtils.COLUMN_GENRES)
-    private String genres;
+    private List<String> genres;
 
     @ColumnInfo(name = DatabaseUtils.COLUMN_SYNOPSIS)
     private String synopsis;
@@ -72,7 +73,7 @@ public class MovieEntity {
         this.rating = rating;
     }
 
-    public void setGenres(String genres) {
+    public void setGenres(List<String> genres) {
         this.genres = genres;
     }
 
@@ -108,7 +109,7 @@ public class MovieEntity {
         return rating;
     }
 
-    public String getGenres() {
+    public List<String> getGenres() {
         return genres;
     }
 
@@ -133,7 +134,7 @@ public class MovieEntity {
         return String.format(Locale.getDefault(),
                 "id: %d, imdbCode: %s, title: %s, year: %d, rating: %f, genres: %s," +
                         " synopsis: %s, backgroundImage: %s, mediumCoverImage: %s",
-                id, imdbCode, title, year, rating, genres, synopsis, backgroundImage,
+                id, imdbCode, title, year, rating, genres.toString(), synopsis, backgroundImage,
                 mediumCoverImage);
     }
 }

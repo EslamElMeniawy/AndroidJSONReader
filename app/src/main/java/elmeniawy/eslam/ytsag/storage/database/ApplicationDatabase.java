@@ -2,6 +2,7 @@ package elmeniawy.eslam.ytsag.storage.database;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 
 import elmeniawy.eslam.ytsag.storage.database.daos.MovieDao;
 import elmeniawy.eslam.ytsag.storage.database.daos.TorrentDao;
@@ -18,6 +19,8 @@ import elmeniawy.eslam.ytsag.utils.DatabaseUtils;
 
 @Database(entities = {MovieEntity.class, TorrentEntity.class},
         version = DatabaseUtils.DATABASE_VERSION)
+
+@TypeConverters({StringListConverter.class})
 public abstract class ApplicationDatabase extends RoomDatabase {
     //
     // Movies DAOs.
