@@ -1,7 +1,11 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import java.util.List;
+
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
+import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import io.reactivex.Observable;
 
 /**
  * MainMVP
@@ -15,12 +19,120 @@ public interface MainMVP {
         MySharedPreferences getSharedPreferences();
 
         ApplicationDatabase getDatabase();
+
+        void enableNotificationsSwitch();
+
+        void disableNotificationsSwitch();
+
+        void enableUpdateSwitch();
+
+        void disableUpdateSwitch();
+
+        void showAboutDialog();
+
+        void showDeveloperDialog();
+
+        void setError(String error);
+
+        void clearError();
+
+        void showErrorTv();
+
+        void hideErrorTv();
+
+        void showSwipeLayout();
+
+        void hideSwipeLayout();
+
+        void showSwipeLoading();
+
+        void hideSwipeLoading();
+
+        void updateMovies(MovieViewModel movie);
+
+        void showSnackBar(String message);
+
+        void showAdView();
+
+        void hideAdView();
+
+        boolean getDrawerOpened();
+
+        void closeDrawer();
+
+        void requestStoragePermission();
+
+        void showCheckingUpdatesDialog();
+
+        void showDownloadConfirmDialog();
+
+        void showDownloadingDialog();
+
+        void setDownloadProgress(int progress);
+
+        void setDownloadMaxSize(int max);
+
+        void cancelDownloadDialog();
+
+        void showInstallDialog();
+
+        boolean getInterstitialLoaded();
+
+        void showInterstitialAd();
+
+        void openDetails(MovieViewModel movie);
+
+        void closeApp();
     }
 
     interface Presenter {
         void setView(MainMVP.View view);
 
         void rxUnsubscribe();
+
+        void notificationSwitchClicked();
+
+        void updateSwitchClicked();
+
+        void setNotificationSchedular();
+
+        void stopNotificationSchedular();
+
+        void setUpdateSchedular();
+
+        void stopUpdateSchedular();
+
+        void aboutClicked();
+
+        void updateClicked();
+
+        void checkUpdateClicked();
+
+        void errorClicked();
+
+        void loadMovies();
+
+        void refreshMovies();
+
+        void loadBannerAd();
+
+        void loadIntersitialAd();
+
+        void bannerAdLoaded();
+
+        void bannerAdFailed();
+
+        void bannerClicked();
+
+        void intersitialClicked();
+
+        void intersitialClosed();
+
+        void permissionCallback(boolean granted);
+
+        void backClicked();
+
+        void movieClicked(MovieViewModel movie);
     }
 
     interface Model {
@@ -35,5 +147,11 @@ public interface MainMVP {
         void saveNotificationsEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
 
         void saveUpdateEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
+
+        Observable<MovieViewModel> getMovies();
+
+        void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList);
+
+        void downloadApk();
     }
 }
