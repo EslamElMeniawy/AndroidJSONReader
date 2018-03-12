@@ -71,7 +71,7 @@ package elmeniawy.eslam.ytsag.screens.main;
 //import java.util.Date;
 //
 //import elmeniawy.eslam.ytsag.AlarmReceiver;
-//import elmeniawy.eslam.ytsag.FragmentDialogDeveloper;
+//import elmeniawy.eslam.ytsag.screens.main.FragmentDialogDeveloper;
 //import elmeniawy.eslam.ytsag.Movie;
 //import elmeniawy.eslam.ytsag.MoviesListAdapter;
 //import elmeniawy.eslam.ytsag.R;
@@ -79,18 +79,37 @@ package elmeniawy.eslam.ytsag.screens.main;
 //import elmeniawy.eslam.ytsag.UpdateReceiver;
 //import elmeniawy.eslam.ytsag.VolleySingleton;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.RelativeLayout;
+import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
@@ -103,10 +122,12 @@ import javax.inject.Inject;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import elmeniawy.eslam.ytsag.utils.FabricEvents;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainMVP.View,
@@ -137,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 //    private long downloadStartTime;
 //
 //    @SuppressLint("CommitPrefEdits")
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     @Inject
     MySharedPreferences mySharedPreferences;
 
@@ -175,8 +198,10 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     AdView adView;
 
     private SwitchCompat switchNotifications, switchUpdate;
-
     private InterstitialAd mInterstitialAd;
+    private GridLayoutManager gridLayoutManager;
+    private MoviesListAdapter moviesListAdapter;
+    private static final int PERMISSION_CODE = 0;
 
     //
     // Bind strings.
@@ -200,13 +225,21 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         // Set timber tag.
         //
 
-        Timber.tag(MainActivity.class.getSimpleName());
+        Timber.tag(TAG);
 
         //
         // Initialize butter knife.
         //
 
         ButterKnife.bind(this);
+
+        //
+        // Log fabric content view event only once.
+        //
+
+        if (savedInstanceState == null) {
+            FabricEvents.logContentViewEvent(TAG);
+        }
 
         //
         // Get drawer switches.
@@ -236,22 +269,118 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
                         24,
                         getResources().getDisplayMetrics()));
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        assert drawer != null;
-//        drawer.addDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        assert navigationView != null;
-//        navigationView.setNavigationItemSelectedListener(this);
-//
-//        sharedPreferences = MainActivity.this.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-//        editor = sharedPreferences.edit();
+        //
+        // Set swipe refresh layout refresh listener.
+        //
+
+        swipeRefreshLayoutMovies.setOnRefreshListener(() -> {
+            Timber.i("OnRefreshListener");
+            presenter.refreshMovies();
+        });
+
+        //
+        // Set toolbar.
+        //
+
+        setSupportActionBar(toolbar);
+
+        //
+        // Add drawer toggle.
+        //
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this,
+                drawer,
+                toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        //
+        // Set navigation select listener.
+        //
+
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //
+        // Calculate item counts & spacing.
+        //
+
+        DisplayMetrics displayMetrics = MainActivity.this.getResources().getDisplayMetrics();
+        int itemWithDp = 201;
+        int totalWidthDp = (displayMetrics.widthPixels * 160 / displayMetrics.densityDpi);
+        int spanCount = Math.max(1, totalWidthDp / itemWithDp);
+        Timber.i("Number of items in row: %d", spanCount);
+        int totalSpacingDp = totalWidthDp - (spanCount * itemWithDp);
+        int spacingDp = totalSpacingDp / (spanCount * 2);
+        Timber.i("Spacing between items in dp: %d", spacingDp);
+        int spacingPx = spacingDp * (displayMetrics.densityDpi / 160);
+        Timber.i("Spacing between items in px: %d", spacingPx);
+
+        //
+        // Set recycler view spacing.
+        //
+
+        recyclerViewMovies.addItemDecoration(new SpacesItemDecoration(MainActivity.this,
+                spacingPx));
+
+        //
+        // Set recycler view layout manager.
+        //
+
+        gridLayoutManager = new GridLayoutManager(MainActivity.this, spanCount);
+        recyclerViewMovies.setLayoutManager(gridLayoutManager);
+
+        //
+        // Set recycler view adapter.
+        //
+
+        moviesListAdapter = new MoviesListAdapter(MainActivity.this);
+        recyclerViewMovies.setAdapter(moviesListAdapter);
+
+        //
+        // Set recycler view scroll detector.
+        //
+
+        recyclerViewMovies.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Timber.i("Recycler view onScrolled.");
+
+                presenter.recyclerScrolled(recyclerViewMovies.getChildCount(),
+                        gridLayoutManager.getItemCount(),
+                        gridLayoutManager.findFirstVisibleItemPosition());
+            }
+        });
+
+        //
+        // Load movies.
+        //
+
+        presenter.loadMovies();
+
+        //
+        // Load ads.
+        //
+
+        loadAds();
+
+        //
+        // Set schedulers.
+        //
+
+        presenter.setSchedulers();
+
+        //
+        // Check Update.
+        //
+
+        presenter.checkUpdate();
+
+
 //
 //        notificationsEnabled = sharedPreferences.getBoolean("notificationsEnabled", true);
 //        updateEnabled = sharedPreferences.getBoolean("updateEnabled", true);
@@ -451,28 +580,94 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         //
 
         presenter.setView(this);
+        presenter.onResumed();
+    }
 
-        //
-        // Load ads.
-        //
-
-        loadAds();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        presenter.onPaused();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        presenter.onDestroyed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //
+        // Inflate the options menu from XML.
+        //
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
 
         //
-        // Unsubscribe from rx callbacks.
+        // Get the SearchView and set the searchable configuration.
         //
 
-        presenter.rxUnsubscribe();
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+
+        //
+        // Assumes current activity is the searchable activity.
+        //
+
+        assert searchManager != null;
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        //
+        // Enable submit button.
+        //
+
+        searchView.setSubmitButtonEnabled(true);
+
+        return true;
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+        Timber.i("Selected menu item with title: %s.", item.getTitle());
+        int id = item.getItemId();
+
+        if (id == R.id.nav_notifications) {
+            Timber.i("nav_notifications");
+            presenter.notificationSwitchClicked();
+        } else if (id == R.id.nav_about) {
+            Timber.i("nav_about");
+            presenter.aboutClicked();
+        } else if (id == R.id.nav_developer) {
+            Timber.i("nav_developer");
+            presenter.developerClicked();
+        } else if (id == R.id.nav_check_update) {
+            Timber.i("nav_check_update");
+            presenter.checkUpdateClicked();
+        } else if (id == R.id.nav_auto_update) {
+            Timber.i("nav_auto_update");
+            presenter.updateSwitchClicked();
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Timber.i("onBackPressed");
+        presenter.backClicked();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Timber.i("onRequestPermissionsResult");
+        Timber.i("requestCode: %d.", requestCode);
+
+        if (requestCode == PERMISSION_CODE) {
+            presenter.permissionCallback(grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        }
     }
 
     @Override
@@ -486,73 +681,92 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
-    public void enableNotificationsSwitch() {
+    public boolean notificationsSwitchChecked() {
+        return switchNotifications.isChecked();
+    }
 
+    @Override
+    public void enableNotificationsSwitch() {
+        switchNotifications.setChecked(true);
     }
 
     @Override
     public void disableNotificationsSwitch() {
+        switchNotifications.setChecked(false);
+    }
 
+    @Override
+    public boolean updateSwitchChecked() {
+        return switchUpdate.isChecked();
     }
 
     @Override
     public void enableUpdateSwitch() {
-
+        switchUpdate.setChecked(true);
     }
 
     @Override
     public void disableUpdateSwitch() {
-
+        switchUpdate.setChecked(false);
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public void showAboutDialog() {
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.dialog_about_app, null));
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
     public void showDeveloperDialog() {
-
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment overlay = new FragmentDialogDeveloper();
+        overlay.show(fm, "FragmentDialogDeveloper");
     }
 
     @Override
     public void setError(String error) {
-
+        Timber.i("Setting error message to: %s.", error);
+        tvError.setText(error);
     }
 
     @Override
     public void clearError() {
-
+        Timber.i("Clear error message.");
+        tvError.setText("");
     }
 
     @Override
     public void showErrorTv() {
-
+        tvError.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideErrorTv() {
-
+        tvError.setVisibility(View.GONE);
     }
 
     @Override
     public void showSwipeLayout() {
-
+        swipeRefreshLayoutMovies.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideSwipeLayout() {
-
+        swipeRefreshLayoutMovies.setVisibility(View.GONE);
     }
 
     @Override
     public void showSwipeLoading() {
-
+        swipeRefreshLayoutMovies.setRefreshing(true);
     }
 
     @Override
     public void hideSwipeLoading() {
-
+        swipeRefreshLayoutMovies.setRefreshing(false);
     }
 
     @Override
@@ -572,27 +786,55 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @Override
     public void showAdView() {
-
+        adView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideAdView() {
+        adView.setVisibility(View.GONE);
+    }
 
+    @Override
+    public boolean isAdViewNull() {
+        return adView == null;
+    }
+
+    @Override
+    public void pauseAdView() {
+        adView.pause();
+    }
+
+    @Override
+    public void resumeAdView() {
+        adView.resume();
+    }
+
+    @Override
+    public void destroyAdView() {
+        adView.destroy();
     }
 
     @Override
     public boolean getDrawerOpened() {
-        return false;
+        return drawer.isDrawerOpen(GravityCompat.START);
     }
 
     @Override
     public void closeDrawer() {
+        drawer.closeDrawer(GravityCompat.START);
+    }
 
+    @Override
+    public boolean isStoragePermissionGranted() {
+        return ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public void requestStoragePermission() {
-
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                PERMISSION_CODE);
     }
 
     @Override
@@ -647,7 +889,13 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @Override
     public void closeApp() {
+        MainActivity.this.finish();
+    }
 
+    @OnClick(R.id.error_view)
+    void errorClicked() {
+        Timber.i("errorClicked");
+        presenter.errorClicked();
     }
 
     private void loadAds() {
@@ -656,21 +904,25 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     private void loadBannerAd() {
+        Timber.i("loadBannerAd");
         adView.loadAd(new AdRequest.Builder().build());
 
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int errorCode) {
+                Timber.i("onAdFailedToLoad");
                 presenter.bannerAdFailed();
             }
 
             @Override
             public void onAdLoaded() {
+                Timber.i("onAdLoaded");
                 presenter.bannerAdLoaded();
             }
 
             @Override
             public void onAdClicked() {
+                Timber.i("onAdClicked");
                 super.onAdClicked();
                 presenter.bannerClicked();
             }
@@ -678,6 +930,7 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     private void loadInterstitialAd() {
+        Timber.i("loadInterstitialAd");
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(interstitialAdUnitId);
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
@@ -685,12 +938,14 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClicked() {
+                Timber.i("onAdClicked");
                 super.onAdClicked();
                 presenter.interstitialClicked();
             }
 
             @Override
             public void onAdClosed() {
+                Timber.i("onAdClosed");
                 super.onAdClosed();
                 presenter.interstitialClosed();
             }

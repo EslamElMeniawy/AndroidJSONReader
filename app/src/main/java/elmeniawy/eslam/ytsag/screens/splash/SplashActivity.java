@@ -12,10 +12,13 @@ import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.screens.main.MainActivity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import elmeniawy.eslam.ytsag.utils.FabricEvents;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import timber.log.Timber;
 
 public class SplashActivity extends AppCompatActivity implements SplashMVP.View {
+    private static final String TAG = SplashActivity.class.getSimpleName();
+
     @Inject
     MySharedPreferences mySharedPreferences;
 
@@ -46,7 +49,15 @@ public class SplashActivity extends AppCompatActivity implements SplashMVP.View 
         // Set timber tag.
         //
 
-        Timber.tag(SplashActivity.class.getSimpleName());
+        Timber.tag(TAG);
+
+        //
+        // Log fabric content view event only once.
+        //
+
+        if (savedInstanceState == null) {
+            FabricEvents.logContentViewEvent(TAG);
+        }
     }
 
     @Override

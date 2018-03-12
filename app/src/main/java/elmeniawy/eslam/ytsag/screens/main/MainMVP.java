@@ -20,9 +20,13 @@ public interface MainMVP {
 
         ApplicationDatabase getDatabase();
 
+        boolean notificationsSwitchChecked();
+
         void enableNotificationsSwitch();
 
         void disableNotificationsSwitch();
+
+        boolean updateSwitchChecked();
 
         void enableUpdateSwitch();
 
@@ -58,9 +62,19 @@ public interface MainMVP {
 
         void hideAdView();
 
+        boolean isAdViewNull();
+
+        void pauseAdView();
+
+        void resumeAdView();
+
+        void destroyAdView();
+
         boolean getDrawerOpened();
 
         void closeDrawer();
+
+        boolean isStoragePermissionGranted();
 
         void requestStoragePermission();
 
@@ -90,29 +104,25 @@ public interface MainMVP {
     interface Presenter {
         void setView(MainMVP.View view);
 
-        void rxUnsubscribe();
-
         void notificationSwitchClicked();
 
         void updateSwitchClicked();
 
-        void setNotificationScheduler();
-
-        void stopNotificationScheduler();
-
-        void setUpdateScheduler();
-
-        void stopUpdateScheduler();
-
         void aboutClicked();
 
-        void updateClicked();
+        void developerClicked();
 
         void checkUpdateClicked();
 
         void errorClicked();
 
         void loadMovies();
+
+        void setSchedulers();
+
+        void checkUpdate();
+
+        void recyclerScrolled(int mOnScreenItems, int mTotalItemsInList, int mFirstVisibleItem);
 
         void refreshMovies();
 
@@ -129,6 +139,12 @@ public interface MainMVP {
         void permissionCallback(boolean granted);
 
         void backClicked();
+
+        void onPaused();
+
+        void onResumed();
+
+        void onDestroyed();
 
         void movieClicked(MovieViewModel movie);
     }

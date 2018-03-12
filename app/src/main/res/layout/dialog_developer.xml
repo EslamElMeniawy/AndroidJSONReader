@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -12,11 +13,12 @@
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal">
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             style="@style/DialogAboutHeaderImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_developer_mode_white_36dp"
+            android:tint="@color/headingsText"
+            app:srcCompat="@drawable/ic_developer_mode_black_24dp"
             tools:ignore="ContentDescription" />
 
         <TextView
