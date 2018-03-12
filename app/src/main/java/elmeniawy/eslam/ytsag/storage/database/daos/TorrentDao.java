@@ -10,6 +10,7 @@ import java.util.List;
 
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.utils.DatabaseUtils;
+import io.reactivex.Maybe;
 
 /**
  * TorrentDao
@@ -23,8 +24,9 @@ public interface TorrentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     List<Long> insertData(List<TorrentEntity> torrentsList);
 
-    @Query("SELECT * FROM " + DatabaseUtils.TABLE_TORRENTS)
-    List<TorrentEntity> getData();
+    @Query("SELECT * FROM " + DatabaseUtils.TABLE_TORRENTS + " WHERE "
+            + DatabaseUtils.COLUMN_MOVIE_ID + " = :movieId")
+    Maybe<List<TorrentEntity>> getData(Long movieId);
 
     @Delete
     int deleteData(List<TorrentEntity> torrentsList);

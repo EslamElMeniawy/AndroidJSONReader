@@ -10,6 +10,7 @@ import java.util.List;
 
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.utils.DatabaseUtils;
+import io.reactivex.Maybe;
 
 /**
  * MovieDao
@@ -24,7 +25,7 @@ public interface MovieDao {
     List<Long> insertData(List<MovieEntity> movieList);
 
     @Query("SELECT * FROM " + DatabaseUtils.TABLE_MOVIES)
-    List<MovieEntity> getData();
+    Maybe<List<MovieEntity>> getData();
 
     @Delete
     int deleteData(List<MovieEntity> movieList);

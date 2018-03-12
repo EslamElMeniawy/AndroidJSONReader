@@ -113,6 +113,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+    implementation "android.arch.persistence.room:rxjava2:$roomVersion"
 
     //
     // Fabric.
@@ -144,14 +145,15 @@ dependencies {
     // Room.
     //
 
-    implementation "android.arch.persistence.room:runtime:$project.roomVersion"
-    annotationProcessor "android.arch.persistence.room:compiler:$project.roomVersion"
+    implementation "android.arch.persistence.room:runtime:$roomVersion"
+    annotationProcessor "android.arch.persistence.room:compiler:$roomVersion"
 
     //
     // Test helpers for Room.
     //
 
-    testImplementation "android.arch.persistence.room:testing:$project.roomVersion"
+    testImplementation "android.arch.persistence.room:testing:$roomVersion"
+    androidTestImplementation "android.arch.core:core-testing:$roomVersion"
 
     //
     // Timber.

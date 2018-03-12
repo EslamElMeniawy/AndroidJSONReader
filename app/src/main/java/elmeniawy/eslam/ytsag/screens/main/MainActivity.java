@@ -88,6 +88,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -211,15 +212,29 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         // Get drawer switches.
         //
 
-        switchNotifications = (SwitchCompat) navigationView
+        switchNotifications = navigationView
                 .getMenu()
-                .findItem(R.id.notifications_switch)
-                .getActionView();
+                .findItem(R.id.nav_notifications)
+                .getActionView()
+                .findViewById(R.id.notifications_switch);
 
-        switchUpdate = (SwitchCompat) navigationView
+        switchUpdate = navigationView
                 .getMenu()
-                .findItem(R.id.update_switch)
-                .getActionView();
+                .findItem(R.id.nav_auto_update)
+                .getActionView()
+                .findViewById(R.id.update_switch);
+
+        //
+        // Set swipe refresh layout refreshing colors & offset.
+        //
+
+        swipeRefreshLayoutMovies.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+
+        swipeRefreshLayoutMovies.setProgressViewOffset(false,
+                0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                        24,
+                        getResources().getDisplayMetrics()));
 
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
