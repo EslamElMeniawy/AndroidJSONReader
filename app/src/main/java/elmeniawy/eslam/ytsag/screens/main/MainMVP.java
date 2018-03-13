@@ -37,9 +37,9 @@ public interface MainMVP {
 
         void showDeveloperDialog();
 
-        void setError(String error);
+        void setInternetError();
 
-        void clearError();
+        void setGetMoviesError();
 
         void showErrorTv();
 
@@ -55,7 +55,11 @@ public interface MainMVP {
 
         void updateMovies(MovieViewModel movie);
 
-        void showSnackBar(String message);
+        void showInternetErrorSnackBar();
+
+        void showGetMoviesErrorSnackBar();
+
+        void showPermissionErrorSnackBar();
 
         void setMainPadding();
 

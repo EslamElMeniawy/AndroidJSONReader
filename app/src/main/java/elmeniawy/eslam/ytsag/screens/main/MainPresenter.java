@@ -79,26 +79,26 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void checkUpdateClicked() {
         if (view != null) {
-            boolean storagePermissionGranted = view.isStoragePermissionGranted();
+            boolean isUpdateAvailable = model.getUpdateAvailable(view.getSharedPreferences());
+            Timber.i("Update available: %s.", String.valueOf(isUpdateAvailable));
 
-            Timber.i("Storage permission granted: %s.",
-                    String.valueOf(storagePermissionGranted));
+            if (isUpdateAvailable) {
+                boolean storagePermissionGranted = view.isStoragePermissionGranted();
 
-            if (storagePermissionGranted) {
-                boolean isUpdateAvailable = model.getUpdateAvailable(view.getSharedPreferences());
-                Timber.i("Update available: %s.", String.valueOf(isUpdateAvailable));
+                Timber.i("Storage permission granted: %s.",
+                        String.valueOf(storagePermissionGranted));
 
-                if (isUpdateAvailable) {
+                if (storagePermissionGranted) {
                     view.showDownloadConfirmDialog();
                 } else {
-                    view.showCheckingUpdatesDialog();
-
-                    //
-                    // Check for update.
-                    //
+                    view.requestStoragePermission();
                 }
             } else {
-                view.requestStoragePermission();
+                view.showCheckingUpdatesDialog();
+
+                //
+                // Check for update.
+                //
             }
         }
     }
@@ -231,7 +231,13 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void permissionCallback(boolean granted) {
-
+        if (view != null) {
+            if (granted) {
+                view.showDownloadConfirmDialog();
+            } else {
+                view.showPermissionErrorSnackBar();
+            }
+        }
     }
 
     @Override

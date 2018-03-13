@@ -87,6 +87,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -215,6 +216,21 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @BindString(R.string.interstitial_ad_unit_id)
     String interstitialAdUnitId;
+
+    @BindString(R.string.no_internet_error)
+    String noInternetRefresh;
+
+    @BindString(R.string.no_internet)
+    String noInternet;
+
+    @BindString(R.string.get_movies_json_error)
+    String errorGetRefresh;
+
+    @BindString(R.string.get_movies_error)
+    String errorGet;
+
+    @BindString(R.string.write_permission)
+    String noPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -750,15 +766,13 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
-    public void setError(String error) {
-        Timber.i("Setting error message to: %s.", error);
-        tvError.setText(error);
+    public void setInternetError() {
+        tvError.setText(noInternetRefresh);
     }
 
     @Override
-    public void clearError() {
-        Timber.i("Clear error message.");
-        tvError.setText("");
+    public void setGetMoviesError() {
+        tvError.setText(errorGetRefresh);
     }
 
     @Override
@@ -805,8 +819,18 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
-    public void showSnackBar(String message) {
+    public void showInternetErrorSnackBar() {
+        showSnackBar(noInternet);
+    }
 
+    @Override
+    public void showGetMoviesErrorSnackBar() {
+        showSnackBar(errorGet);
+    }
+
+    @Override
+    public void showPermissionErrorSnackBar() {
+        showSnackBar(noPermission);
     }
 
     @Override
@@ -931,6 +955,10 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     void errorClicked() {
         Timber.i("errorClicked");
         presenter.errorClicked();
+    }
+
+    private void showSnackBar(String message) {
+        Snackbar.make(main, message, Snackbar.LENGTH_LONG).show();
     }
 
     private void loadAds() {

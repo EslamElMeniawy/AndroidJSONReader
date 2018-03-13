@@ -54,5 +54,4 @@
     <string name="downloading">Downloading new version&#8230;</string>
 
     <string name="write_permission">Permission needed for downloading new APK</string>
-    <string name="allow">Allow</string>
 </resources>
