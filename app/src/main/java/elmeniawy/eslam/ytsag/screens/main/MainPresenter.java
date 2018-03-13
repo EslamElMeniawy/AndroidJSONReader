@@ -35,7 +35,12 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void notificationSwitchClicked() {
         if (view != null) {
-            if (view.notificationsSwitchChecked()) {
+            boolean notificationsSwitchChecked = view.notificationsSwitchChecked();
+
+            Timber.i("Notifications switch checked: %s.",
+                    String.valueOf(notificationsSwitchChecked));
+
+            if (notificationsSwitchChecked) {
                 stopNotificationScheduler();
             } else {
                 setNotificationScheduler();
@@ -46,7 +51,10 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void updateSwitchClicked() {
         if (view != null) {
-            if (view.updateSwitchChecked()) {
+            boolean updateSwitchChecked = view.updateSwitchChecked();
+            Timber.i("Update switch checked: %s.", String.valueOf(updateSwitchChecked));
+
+            if (updateSwitchChecked) {
                 stopUpdateScheduler();
             } else {
                 setUpdateScheduler();
@@ -71,12 +79,24 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void checkUpdateClicked() {
         if (view != null) {
-            if (view.isStoragePermissionGranted()) {
-                view.showCheckingUpdatesDialog();
+            boolean storagePermissionGranted = view.isStoragePermissionGranted();
 
-                //
-                // Check for update.
-                //
+            Timber.i("Storage permission granted: %s.",
+                    String.valueOf(storagePermissionGranted));
+
+            if (storagePermissionGranted) {
+                boolean isUpdateAvailable = model.getUpdateAvailable(view.getSharedPreferences());
+                Timber.i("Update available: %s.", String.valueOf(isUpdateAvailable));
+
+                if (isUpdateAvailable) {
+                    view.showDownloadConfirmDialog();
+                } else {
+                    view.showCheckingUpdatesDialog();
+
+                    //
+                    // Check for update.
+                    //
+                }
             } else {
                 view.requestStoragePermission();
             }
@@ -105,23 +125,26 @@ public class MainPresenter implements MainMVP.Presenter {
         Timber.i("setSchedulers");
 
         if (view != null) {
-            Timber.i("App run before: %s.",
-                    String.valueOf(model.getRunBefore(view.getSharedPreferences())));
+            boolean runBefore = model.getRunBefore(view.getSharedPreferences());
+            Timber.i("App run before: %s.", String.valueOf(runBefore));
 
-            if (model.getRunBefore(view.getSharedPreferences())) {
+            if (runBefore) {
+                boolean notificationEnabled = model
+                        .getNotificationsEnabled(view.getSharedPreferences());
+
                 Timber.i("Notifications enabled: %s.",
-                        String.valueOf(model.getNotificationsEnabled(view.getSharedPreferences())));
+                        String.valueOf(notificationEnabled));
 
-                if (model.getNotificationsEnabled(view.getSharedPreferences())) {
+                if (notificationEnabled) {
                     setNotificationScheduler();
                 } else {
                     stopNotificationScheduler();
                 }
 
-                Timber.i("Auto update enabled: %s.",
-                        String.valueOf(model.getUpdateEnabled(view.getSharedPreferences())));
+                boolean updateEnabled = model.getUpdateEnabled(view.getSharedPreferences());
+                Timber.i("Auto update enabled: %s.", String.valueOf(updateEnabled));
 
-                if (model.getUpdateEnabled(view.getSharedPreferences())) {
+                if (updateEnabled) {
                     setUpdateScheduler();
                 } else {
                     stopUpdateScheduler();
