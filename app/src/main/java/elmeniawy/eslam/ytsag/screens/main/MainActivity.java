@@ -97,6 +97,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -116,6 +117,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -201,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     private InterstitialAd mInterstitialAd;
     private GridLayoutManager gridLayoutManager;
     private MoviesListAdapter moviesListAdapter;
+    private List<MovieViewModel> moviesList = new ArrayList<>();
     private static final int PERMISSION_CODE = 0;
 
     //
@@ -320,11 +325,13 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         Timber.i("Spacing between items in px: %d", spacingPx);
 
         //
-        // Set recycler view spacing.
+        // Set recycler view spacing & animator.
         //
 
         recyclerViewMovies.addItemDecoration(new SpacesItemDecoration(MainActivity.this,
                 spacingPx));
+
+        recyclerViewMovies.setItemAnimator(new DefaultItemAnimator());
 
         //
         // Set recycler view layout manager.
@@ -337,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         // Set recycler view adapter.
         //
 
-        moviesListAdapter = new MoviesListAdapter(MainActivity.this);
+        moviesListAdapter = new MoviesListAdapter(moviesList, MainActivity.this);
         recyclerViewMovies.setAdapter(moviesListAdapter);
 
         //
@@ -771,7 +778,15 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @Override
     public void updateMovies(MovieViewModel movie) {
+        moviesList.add(movie);
 
+        if (moviesList.isEmpty()) {
+            moviesListAdapter.notifyItemInserted(0);
+        } else {
+            moviesListAdapter.notifyItemInserted(moviesList.size() - 1);
+        }
+
+        Timber.i("updateMovies: %d.", moviesList.size());
     }
 
     @Override

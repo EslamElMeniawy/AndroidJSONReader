@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/image_width"
     android:layout_height="wrap_content"
     android:background="@drawable/movie_background"
     android:padding="@dimen/drawer_image_padding">
 
-    <ImageView
+    <android.support.v7.widget.AppCompatImageView
         android:id="@+id/movie_image"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/image_height"
-        tools:ignore="ContentDescription" />
+        android:layout_height="@dimen/image_height" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/movie_tittle"
         style="@style/LargeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/movie_image"
         android:ellipsize="end"
-        android:maxLines="1"
+        android:maxLines="2"
         android:paddingTop="@dimen/drawer_image_padding" />
 
-    <LinearLayout
+    <android.support.v7.widget.LinearLayoutCompat
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,7 +28,7 @@
         android:orientation="horizontal"
         android:weightSum="3">
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/movie_year"
             style="@style/MediumText"
             android:layout_width="match_parent"
@@ -46,16 +44,15 @@
             android:layout_weight="1"
             android:gravity="end">
 
-            <ImageView
+            <android.support.v7.widget.AppCompatImageView
                 android:id="@+id/image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/drawer_image_padding"
-                android:src="@drawable/ic_action_star"
-                tools:ignore="ContentDescription" />
+                android:src="@drawable/ic_action_star" />
 
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/movie_rating"
                 style="@style/MediumText"
                 android:layout_width="wrap_content"
@@ -65,48 +62,5 @@
                 android:paddingBottom="@dimen/drawer_image_padding"
                 android:paddingTop="@dimen/drawer_image_padding" />
         </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/movie_quality_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/drawer_image_padding"
-            android:layout_marginRight="@dimen/drawer_image_padding"
-            android:background="@color/darkBackground"
-            android:padding="@dimen/drawer_image_padding"
-            android:textColor="@color/normalText"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/movie_quality_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/drawer_image_padding"
-            android:layout_marginRight="@dimen/drawer_image_padding"
-            android:background="@color/darkBackground"
-            android:padding="@dimen/drawer_image_padding"
-            android:textColor="@color/normalText"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/movie_quality_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/drawer_image_padding"
-            android:layout_marginRight="@dimen/drawer_image_padding"
-            android:background="@color/darkBackground"
-            android:padding="@dimen/drawer_image_padding"
-            android:textColor="@color/normalText"
-            android:textStyle="bold"
-            android:visibility="gone" />
-    </LinearLayout>
+    </android.support.v7.widget.LinearLayoutCompat>
 </RelativeLayout>
