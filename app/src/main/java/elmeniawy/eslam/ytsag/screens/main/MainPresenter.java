@@ -2,6 +2,8 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import android.support.annotation.Nullable;
 
+import timber.log.Timber;
+
 /**
  * MainPresenter
  * <p>
@@ -10,9 +12,9 @@ import android.support.annotation.Nullable;
  */
 
 public class MainPresenter implements MainMVP.Presenter {
-    private int mPreviousTotal = 0, mVisibleThreshold = 1;
+    private static final String TAG = MainPresenter.class.getSimpleName();
+    private int mPreviousTotal = 0;
     private boolean mLoadingItems = true;
-    private int getPage = 1;
 
     @Nullable
     private MainMVP.View view;
@@ -21,6 +23,7 @@ public class MainPresenter implements MainMVP.Presenter {
 
     MainPresenter(MainMVP.Model model) {
         this.model = model;
+        Timber.tag(TAG);
     }
 
     @Override
@@ -30,12 +33,24 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void notificationSwitchClicked() {
-
+        if (view != null) {
+            if (view.notificationsSwitchChecked()) {
+                stopNotificationScheduler();
+            } else {
+                setNotificationScheduler();
+            }
+        }
     }
 
     @Override
     public void updateSwitchClicked() {
-
+        if (view != null) {
+            if (view.updateSwitchChecked()) {
+                stopUpdateScheduler();
+            } else {
+                setUpdateScheduler();
+            }
+        }
     }
 
     @Override
@@ -69,7 +84,36 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void setSchedulers() {
+        Timber.i("setSchedulers");
 
+        if (view != null) {
+            Timber.i("App run before: %s.",
+                    String.valueOf(model.getRunBefore(view.getSharedPreferences())));
+
+            if (model.getRunBefore(view.getSharedPreferences())) {
+                Timber.i("Notifications enabled: %s.",
+                        String.valueOf(model.getNotificationsEnabled(view.getSharedPreferences())));
+
+                if (model.getNotificationsEnabled(view.getSharedPreferences())) {
+                    setNotificationScheduler();
+                } else {
+                    stopNotificationScheduler();
+                }
+
+                Timber.i("Auto update enabled: %s.",
+                        String.valueOf(model.getUpdateEnabled(view.getSharedPreferences())));
+
+                if (model.getUpdateEnabled(view.getSharedPreferences())) {
+                    setUpdateScheduler();
+                } else {
+                    stopUpdateScheduler();
+                }
+            } else {
+                setNotificationScheduler();
+                setUpdateScheduler();
+                model.saveRunBefore(view.getSharedPreferences());
+            }
+        }
     }
 
     @Override
@@ -85,6 +129,8 @@ public class MainPresenter implements MainMVP.Presenter {
                 mPreviousTotal = mTotalItemsInList;
             }
         }
+
+        int mVisibleThreshold = 1;
 
         if (!mLoadingItems && (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
             mLoadingItems = true;
@@ -192,19 +238,43 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     private void setNotificationScheduler() {
+        Timber.i("setNotificationScheduler");
 
+        if (view != null) {
+            //stopNotificationScheduler();
+            model.saveNotificationsEnabled(view.getSharedPreferences(), true);
+            view.enableNotificationsSwitch();
+        }
     }
 
     private void stopNotificationScheduler() {
+        Timber.i("stopNotificationScheduler");
 
+        if (view != null) {
+            //stopNotificationScheduler();
+            model.saveNotificationsEnabled(view.getSharedPreferences(), false);
+            view.disableNotificationsSwitch();
+        }
     }
 
     private void setUpdateScheduler() {
+        Timber.i("setUpdateScheduler");
 
+        if (view != null) {
+            //stopNotificationScheduler();
+            model.saveUpdateEnabled(view.getSharedPreferences(), true);
+            view.enableUpdateSwitch();
+        }
     }
 
     private void stopUpdateScheduler() {
+        Timber.i("stopUpdateScheduler");
 
+        if (view != null) {
+            //stopNotificationScheduler();
+            model.saveUpdateEnabled(view.getSharedPreferences(), false);
+            view.disableUpdateSwitch();
+        }
     }
 
     private void rxUnsubscribe() {

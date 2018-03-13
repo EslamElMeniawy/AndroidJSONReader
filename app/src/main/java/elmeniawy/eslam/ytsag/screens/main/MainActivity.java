@@ -364,29 +364,10 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         });
 
         //
-        // Load movies.
-        //
-
-        presenter.loadMovies();
-
-        //
         // Load ads.
         //
 
         loadAds();
-
-        //
-        // Set schedulers.
-        //
-
-        presenter.setSchedulers();
-
-        //
-        // Check Update.
-        //
-
-        presenter.checkUpdate();
-
 
 //
 //        notificationsEnabled = sharedPreferences.getBoolean("notificationsEnabled", true);
@@ -587,18 +568,51 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         //
 
         presenter.setView(this);
+
+        //
+        // Load movies.
+        //
+
+        presenter.loadMovies();
+
+        //
+        // Set schedulers.
+        //
+
+        presenter.setSchedulers();
+
+        //
+        // Check Update.
+        //
+
+        presenter.checkUpdate();
+
+        //
+        // Call presenter resumed method to handle ad resume.
+        //
+
         presenter.onResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        //
+        // Call presenter paused method to handle ad pause.
+        //
+
         presenter.onPaused();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        //
+        // Call presenter destroyed method to handle ad destroy & rx unsubscribe.
+        //
+
         presenter.onDestroyed();
     }
 
