@@ -13,7 +13,6 @@ import timber.log.Timber;
 
 public class MainPresenter implements MainMVP.Presenter {
     private static final String TAG = MainPresenter.class.getSimpleName();
-    private int mPreviousTotal = 0;
     private boolean mLoadingItems = true;
 
     @Nullable
@@ -79,7 +78,14 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void loadMovies() {
+        if (view != null) {
+            mLoadingItems = true;
+            view.showSwipeLoading();
 
+            //
+            // Get movies.
+            //
+        }
     }
 
     @Override
@@ -123,27 +129,31 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void recyclerScrolled(int mOnScreenItems, int mTotalItemsInList, int mFirstVisibleItem) {
-        if (mLoadingItems) {
-            if (mTotalItemsInList > mPreviousTotal + 1) {
-                mLoadingItems = false;
-                mPreviousTotal = mTotalItemsInList;
+        if (view != null) {
+            int mVisibleThreshold = 1;
+
+            if (!mLoadingItems &&
+                    (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
+                mLoadingItems = true;
+                view.showSwipeLoading();
+
+                //
+                // Get more movies.
+                //
             }
-        }
-
-        int mVisibleThreshold = 1;
-
-        if (!mLoadingItems && (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
-            mLoadingItems = true;
-
-            //
-            // Get more movies.
-            //
         }
     }
 
     @Override
     public void refreshMovies() {
+        if (view != null) {
+            mLoadingItems = true;
+            view.showSwipeLoading();
 
+            //
+            // Get movies.
+            //
+        }
     }
 
     @Override
