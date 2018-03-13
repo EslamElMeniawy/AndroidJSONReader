@@ -132,6 +132,7 @@ import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;
+import elmeniawy.eslam.ytsag.utils.NetworkUtils;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainMVP.View,
@@ -909,6 +910,11 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     @Override
     public void showInterstitialAd() {
         mInterstitialAd.show();
+    }
+
+    @Override
+    public boolean isOnline() {
+        return NetworkUtils.isOnline(this);
     }
 
     @Override

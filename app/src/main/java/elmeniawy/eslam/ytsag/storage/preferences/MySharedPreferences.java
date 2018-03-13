@@ -19,11 +19,19 @@ public class MySharedPreferences {
         this.mSharedPreferences = mSharedPreferences;
     }
 
-    public void putData(String key, boolean data) {
+    public void putBoolean(String key, boolean data) {
         mSharedPreferences.edit().putBoolean(key, data).apply();
     }
 
-    public boolean getData(String key) {
+    public boolean getBoolean(String key) {
         return mSharedPreferences.getBoolean(key, false);
+    }
+
+    public void putLong(String key, long data) {
+        mSharedPreferences.edit().putLong(key, data).apply();
+    }
+
+    public long getLong(String key) {
+        return mSharedPreferences.getLong(key, 0);
     }
 }

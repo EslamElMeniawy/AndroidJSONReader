@@ -14,4 +14,6 @@ public class PreferencesUtils {
     public static final String KEY_RUN_BEFORE = PACKAGE_NAME + "RunBefore";
     public static final String KEY_NOTIFICATION_ENABLED = PACKAGE_NAME + "NotificationEnabled";
     public static final String KEY_UPDATE_ENABLED = PACKAGE_NAME + "UpdateEnabled";
+    public static final String KEY_UPDATE_AVAILABLE = PACKAGE_NAME + "UpdateAvailable";
+    public static final String KEY_UPDATE_LAST_CHECK = PACKAGE_NAME + "UpdateLastCheck";
 }

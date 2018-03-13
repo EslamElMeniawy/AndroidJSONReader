@@ -14,6 +14,6 @@ public class SplashRepository implements Repository {
     @Override
     public void saveFromNotification(MySharedPreferences sharedPreferences,
                                      Boolean fromNotification) {
-        sharedPreferences.putData(PreferencesUtils.KEY_FROM_NOTIFICATION, fromNotification);
+        sharedPreferences.putBoolean(PreferencesUtils.KEY_FROM_NOTIFICATION, fromNotification);
     }
 }

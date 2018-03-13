@@ -14,14 +14,14 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * ApiModule
+ * MoviesApiModule
  * <p>
  * Created by Eslam El-Meniawy on 07-Mar-2018.
  * CITC - Mansoura University
  */
 
 @Module
-public class ApiModule {
+public class MoviesApiModule {
     @Provides
     @Singleton
     OkHttpClient provideClient() {
@@ -80,8 +80,8 @@ public class ApiModule {
 
     @Provides
     @Singleton
-    ApiService provideApiService() {
-        return provideRetrofit(NetworkUtils.BASE_URL, provideClient())
-                .create(ApiService.class);
+    MoviesApiService provideApiService() {
+        return provideRetrofit(NetworkUtils.MOVIES_API_BASE_URL, provideClient())
+                .create(MoviesApiService.class);
     }
 }

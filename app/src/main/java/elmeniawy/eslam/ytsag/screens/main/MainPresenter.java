@@ -2,6 +2,8 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import android.support.annotation.Nullable;
 
+import java.util.Date;
+
 import timber.log.Timber;
 
 /**
@@ -68,7 +70,17 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void checkUpdateClicked() {
+        if (view != null) {
+            if (view.isStoragePermissionGranted()) {
+                view.showCheckingUpdatesDialog();
 
+                //
+                // Check for update.
+                //
+            } else {
+                view.requestStoragePermission();
+            }
+        }
     }
 
     @Override
@@ -124,7 +136,20 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void checkUpdate() {
-
+        if (view != null) {
+            if (model.getUpdateAvailable(view.getSharedPreferences())
+                    && view.isOnline()
+                    && ((new Date().getTime() -
+                    model.getLastCheckUpdateTime(view.getSharedPreferences())
+                    >= (24 * 60 * 60 * 1000))
+                    || model.getFromNotification(view.getSharedPreferences()))) {
+                if (view.isStoragePermissionGranted()) {
+                    view.showDownloadConfirmDialog();
+                } else {
+                    view.requestStoragePermission();
+                }
+            }
+        }
     }
 
     @Override

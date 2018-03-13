@@ -3,6 +3,7 @@ package elmeniawy.eslam.ytsag.screens.main;
 import java.util.List;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
+import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import io.reactivex.Observable;
@@ -29,6 +30,16 @@ public class MainModel implements MainMVP.Model {
     @Override
     public boolean getFromNotification(MySharedPreferences sharedPreferences) {
         return repository.getFromNotification(sharedPreferences);
+    }
+
+    @Override
+    public boolean getUpdateAvailable(MySharedPreferences sharedPreferences) {
+        return repository.getUpdateAvailable(sharedPreferences);
+    }
+
+    @Override
+    public long getLastCheckUpdateTime(MySharedPreferences sharedPreferences) {
+        return repository.getLastCheckUpdateTime(sharedPreferences);
     }
 
     @Override
@@ -64,6 +75,11 @@ public class MainModel implements MainMVP.Model {
     @Override
     public void saveMovies(ApplicationDatabase database, List<Movie> movieList) {
         repository.saveMovies(database, movieList);
+    }
+
+    @Override
+    public Observable<UpdateResponse> checkUpdateAvailable() {
+        return null;
     }
 
     @Override

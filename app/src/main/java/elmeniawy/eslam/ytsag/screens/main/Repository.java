@@ -3,6 +3,7 @@ package elmeniawy.eslam.ytsag.screens.main;
 import java.util.List;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
+import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import io.reactivex.Observable;
@@ -18,6 +19,10 @@ public interface Repository {
     boolean getRunBefore(MySharedPreferences sharedPreferences);
 
     boolean getFromNotification(MySharedPreferences sharedPreferences);
+
+    boolean getUpdateAvailable(MySharedPreferences sharedPreferences);
+
+    long getLastCheckUpdateTime(MySharedPreferences sharedPreferences);
 
     boolean getNotificationsEnabled(MySharedPreferences sharedPreferences);
 
@@ -36,6 +41,8 @@ public interface Repository {
     Observable<Movie> getMovies();
 
     void saveMovies(ApplicationDatabase database, List<Movie> movieList);
+
+    Observable<UpdateResponse> checkUpdateAvailable();
 
     void downloadApk();
 }
