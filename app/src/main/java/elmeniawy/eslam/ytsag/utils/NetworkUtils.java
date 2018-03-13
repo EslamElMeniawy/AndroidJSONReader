@@ -15,7 +15,7 @@ public class NetworkUtils {
     public static final String MOVIES_API_BASE_URL = "https://yts.am/api/v2/";
 
     public static final String Update_API_BASE_URL =
-            "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/";
+            "https://raw.githubusercontent.com/EslamElMeniawy/AndroidJSONReader/master/";
 
     /**
      * Check if device connected to Internet or not.
