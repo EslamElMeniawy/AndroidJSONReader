@@ -36,11 +36,11 @@ public interface Repository {
 
     void saveUpdateEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
 
-    Observable<Movie> getMoviesOnline();
+    Observable<Movie> getMoviesOnline(int firstPage);
 
-    Observable<Movie> getMoviesOffline();
+    Observable<Movie> getMoviesOffline(ApplicationDatabase database);
 
-    Observable<Movie> getMovies();
+    Observable<Movie> getMovies(ApplicationDatabase database, int firstPage);
 
     void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
                     List<TorrentEntity> torrentList);

@@ -18,6 +18,7 @@ public class MainPresenter implements MainMVP.Presenter {
     private static final String TAG = MainPresenter.class.getSimpleName();
     private boolean mLoadingItems = true;
     private MovieViewModel movieToOpen = null;
+    private int firstPage = 1;
 
     @Nullable
     private MainMVP.View view;
@@ -116,6 +117,9 @@ public class MainPresenter implements MainMVP.Presenter {
             //
             // Get movies.
             //
+
+            firstPage = 1;
+            model.getMovies(view.getDatabase(), firstPage);
         }
     }
 
@@ -128,6 +132,9 @@ public class MainPresenter implements MainMVP.Presenter {
             //
             // Get movies.
             //
+
+            firstPage = 1;
+            model.getMovies(view.getDatabase(), firstPage);
         }
     }
 
@@ -199,6 +206,9 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
                 // Get more movies.
                 //
+
+                firstPage++;
+                model.getMovies(view.getDatabase(), firstPage);
             }
         }
     }

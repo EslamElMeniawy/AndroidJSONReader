@@ -2,6 +2,8 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import dagger.Module;
 import dagger.Provides;
+import elmeniawy.eslam.ytsag.api.MoviesApiService;
+import elmeniawy.eslam.ytsag.api.UpdateApiService;
 
 /**
  * MainModule
@@ -23,7 +25,8 @@ public class MainModule {
     }
 
     @Provides
-    Repository provideMainRepository() {
-        return new MainRepository();
+    Repository provideMainRepository(MoviesApiService moviesApiService,
+                                     UpdateApiService updateApiService) {
+        return new MainRepository(moviesApiService, updateApiService);
     }
 }
