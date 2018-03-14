@@ -199,11 +199,11 @@ public class MainRepository implements Repository {
                 .subscribe(movieEntityList -> {
                     if (movieEntityList != null && movieEntityList.size() > 0) {
                         Completable.fromAction(() -> {
-                            int deletedRowaCount = database
+                            int deletedRowsCount = database
                                     .movieDao()
                                     .deleteData(movieEntityList);
 
-                            Timber.i("Deleted rows count: %d.", deletedRowaCount);
+                            Timber.i("Deleted rows count: %d.", deletedRowsCount);
                             insertMovies(database, movieList, torrentList);
                         });
                     } else {
