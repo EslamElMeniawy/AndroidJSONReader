@@ -5,6 +5,8 @@ import java.util.List;
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
+import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
+import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import io.reactivex.Observable;
 
@@ -40,7 +42,8 @@ public interface Repository {
 
     Observable<Movie> getMovies();
 
-    void saveMovies(ApplicationDatabase database, List<Movie> movieList);
+    void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
+                    List<TorrentEntity> torrentList);
 
     Observable<UpdateResponse> checkUpdateAvailable();
 

@@ -5,9 +5,15 @@ import java.util.List;
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
+import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
+import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * MainRepository
@@ -78,8 +84,31 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public void saveMovies(ApplicationDatabase database, List<Movie> movieList) {
+    public void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
+                           List<TorrentEntity> torrentList) {
+        //
+        // Get current saved movies.
+        //
 
+        database
+                .movieDao()
+                .getData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(movieEntityList -> {
+                    if (movieEntityList != null && movieEntityList.size() > 0) {
+                        Completable.fromAction(() -> {
+                            int deletedRowaCount = database
+                                    .movieDao()
+                                    .deleteData(movieEntityList);
+
+                            Timber.i("Deleted rows count: %d.", deletedRowaCount);
+                            insertMovies(database, movieList, torrentList);
+                        });
+                    } else {
+                        insertMovies(database, movieList, torrentList);
+                    }
+                });
     }
 
     @Override
@@ -90,5 +119,15 @@ public class MainRepository implements Repository {
     @Override
     public void downloadApk() {
 
+    }
+
+    private void insertMovies(ApplicationDatabase database, List<MovieEntity> movieList,
+                              List<TorrentEntity> torrentList) {
+        Completable.fromAction(() -> {
+            List<Long> moviesIds = database.movieDao().insertData(movieList);
+            Timber.i("Inserted movies ids: %s.", moviesIds.toString());
+            List<Long> torrentsIds = database.torrentDao().insertData(torrentList);
+            Timber.i("Inserted torrents ids: %s.", torrentsIds.toString());
+        });
     }
 }

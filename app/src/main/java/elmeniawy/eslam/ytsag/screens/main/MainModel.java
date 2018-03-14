@@ -1,12 +1,17 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
+import elmeniawy.eslam.ytsag.api.model.Torrent;
 import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
+import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
+import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import io.reactivex.Observable;
+import timber.log.Timber;
 
 /**
  * MainModel
@@ -20,6 +25,7 @@ public class MainModel implements MainMVP.Model {
 
     MainModel(Repository repository) {
         this.repository = repository;
+        Timber.tag(MainModel.class.getSimpleName());
     }
 
     @Override
@@ -74,7 +80,57 @@ public class MainModel implements MainMVP.Model {
 
     @Override
     public void saveMovies(ApplicationDatabase database, List<Movie> movieList) {
-        repository.saveMovies(database, movieList);
+        Timber.i("saveMovies");
+
+        //
+        // Map movies list to movies and torrents entities.
+        //
+
+        List<MovieEntity> movieEntityList = new ArrayList<>();
+        List<TorrentEntity> torrentEntities = new ArrayList<>();
+
+        for (Movie movie :
+                movieList) {
+            Timber.i("Current movie to convert: %s.", movie.toString());
+
+            //
+            // Movie entity object.
+            //
+
+            MovieEntity movieEntity = new MovieEntity();
+            movieEntity.setId(movie.getId());
+            movieEntity.setImdbCode(movie.getImdbCode());
+            movieEntity.setTitle(movie.getTitle());
+            movieEntity.setYear(movie.getYear());
+            movieEntity.setRating(movie.getRating());
+            movieEntity.setGenres(movie.getGenres());
+            movieEntity.setSynopsis(movie.getSynopsis());
+            movieEntity.setBackgroundImage(movie.getBackgroundImage());
+            movieEntity.setMediumCoverImage(movie.getMediumCoverImage());
+            Timber.i("Converted movie entity: %s.", movieEntity.toString());
+            movieEntityList.add(movieEntity);
+
+            //
+            // Torrent entity object.
+            //
+
+            for (Torrent torrent :
+                    movie.getTorrents()) {
+                TorrentEntity torrentEntity = new TorrentEntity();
+                torrentEntity.setUrl(torrent.getUrl());
+                torrentEntity.setQuality(torrent.getQuality());
+                torrentEntity.setSize(torrent.getSize());
+                torrentEntity.setMovieId(movie.getId());
+                Timber.i("Converted torrent entity: %s.", torrentEntity.toString());
+                torrentEntities.add(torrentEntity);
+            }
+        }
+
+        //
+        // Call repository method for saving data.
+        //
+
+        repository.saveMovies(database, movieEntityList, torrentEntities);
     }
 
     @Override
