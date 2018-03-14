@@ -61,7 +61,7 @@ public interface MainMVP {
 
         void showPermissionErrorSnackBar();
 
-        void setMainPadding();
+        void setMainPadding(int left, int top, int right, int bottom);
 
         void showAdView();
 

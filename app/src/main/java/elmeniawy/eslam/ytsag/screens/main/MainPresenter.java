@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import java.util.Date;
 
+import elmeniawy.eslam.ytsag.utils.FabricEvents;
 import timber.log.Timber;
 
 /**
@@ -16,6 +17,7 @@ import timber.log.Timber;
 public class MainPresenter implements MainMVP.Presenter {
     private static final String TAG = MainPresenter.class.getSimpleName();
     private boolean mLoadingItems = true;
+    private MovieViewModel movieToOpen = null;
 
     @Nullable
     private MainMVP.View view;
@@ -105,7 +107,16 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void errorClicked() {
+        if (view != null) {
+            view.hideErrorTv();
+            view.showSwipeLayout();
+            mLoadingItems = true;
+            view.showSwipeLoading();
 
+            //
+            // Get movies.
+            //
+        }
     }
 
     @Override
@@ -206,27 +217,35 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void bannerAdLoaded() {
-
+        if (view != null) {
+            view.showAdView();
+            view.setMainPadding(0, 16, 0, 0);
+        }
     }
 
     @Override
     public void bannerAdFailed() {
-
+        if (view != null) {
+            view.hideAdView();
+            view.setMainPadding(0, 16, 0, 16);
+        }
     }
 
     @Override
     public void bannerClicked() {
-
+        FabricEvents.logAdClickedEvent("Banner");
     }
 
     @Override
     public void interstitialClicked() {
-
+        FabricEvents.logAdClickedEvent("Interstitial");
     }
 
     @Override
     public void interstitialClosed() {
-
+        if (view != null) {
+            view.openDetails(movieToOpen);
+        }
     }
 
     @Override
@@ -298,7 +317,14 @@ public class MainPresenter implements MainMVP.Presenter {
 
     @Override
     public void movieClicked(MovieViewModel movie) {
-
+        if (view != null) {
+            if (view.getInterstitialLoaded()) {
+                movieToOpen = movie;
+                view.showInterstitialAd();
+            } else {
+                view.openDetails(movie);
+            }
+        }
     }
 
     private void setNotificationScheduler() {
