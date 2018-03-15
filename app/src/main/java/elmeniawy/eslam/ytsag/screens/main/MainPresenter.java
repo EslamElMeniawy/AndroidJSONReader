@@ -4,9 +4,11 @@ import android.support.annotation.Nullable;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.Torrent;
@@ -121,42 +123,24 @@ public class MainPresenter implements MainMVP.Presenter {
         if (view != null) {
             view.hideErrorTv();
             view.showSwipeLayout();
-            mLoadingItems = true;
-            view.showSwipeLoading();
+
 
             //
             // Get movies.
             //
 
-            view.clearMovies();
-            firstPage = 1;
-            moviesDisposable = model.
-                    getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
-                            view.getDatabase(), firstPage)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::handleResult, this::handleError);
+            loadFirstTimeMovies();
         }
     }
 
     @Override
     public void loadMovies() {
         if (view != null) {
-            mLoadingItems = true;
-            view.showSwipeLoading();
-
             //
             // Get movies.
             //
 
-            view.clearMovies();
-            firstPage = 1;
-            moviesDisposable = model
-                    .getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
-                            view.getDatabase(), firstPage)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::handleResult, this::handleError);
+            loadFirstTimeMovies();
         }
     }
 
@@ -230,7 +214,7 @@ public class MainPresenter implements MainMVP.Presenter {
                 // Get more movies.
                 //
 
-                firstPage++;
+                firstPage += 2;
                 moviesDisposable = model.getMovies(model
                                 .getMoviesLastFetchTime(view.getSharedPreferences()),
                         view.getDatabase(), firstPage)
@@ -244,21 +228,11 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void refreshMovies() {
         if (view != null) {
-            mLoadingItems = true;
-            view.showSwipeLoading();
-
             //
             // Get movies.
             //
 
-            view.clearMovies();
-            firstPage = 1;
-            moviesDisposable = model.
-                    getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
-                            view.getDatabase(), firstPage)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::handleResult, this::handleError);
+            loadFirstTimeMovies();
         }
     }
 
@@ -420,8 +394,24 @@ public class MainPresenter implements MainMVP.Presenter {
         }
     }
 
+    private void loadFirstTimeMovies() {
+        if (view != null) {
+            mLoadingItems = true;
+            view.showSwipeLoading();
+            view.clearMovies();
+            firstPage = 1;
+            moviesDisposable = model
+                    .getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
+                            view.getDatabase(), firstPage)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::handleResult, this::handleError);
+        }
+    }
+
     private void handleResult(Movie movie) {
         mLoadingItems = false;
+
         if (view != null) {
             view.hideSwipeLoading();
 
@@ -506,7 +496,7 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
                 // Show snack bar error.
                 //
-                firstPage--;
+                firstPage -= 2;
                 showSnackBarError(throwable);
             }
         }
@@ -515,7 +505,9 @@ public class MainPresenter implements MainMVP.Presenter {
     private void showTvError(Throwable throwable) {
         if (view != null) {
             if (throwable instanceof ConnectException
-                    || throwable instanceof SocketTimeoutException) {
+                    || throwable instanceof SocketTimeoutException
+                    || throwable instanceof UnknownHostException
+                    || throwable instanceof TimeoutException) {
                 view.setInternetError();
             } else {
                 view.setGetMoviesError();
@@ -532,7 +524,9 @@ public class MainPresenter implements MainMVP.Presenter {
             view.hideSwipeLoading();
 
             if (throwable instanceof ConnectException
-                    || throwable instanceof SocketTimeoutException) {
+                    || throwable instanceof SocketTimeoutException
+                    || throwable instanceof UnknownHostException
+                    || throwable instanceof TimeoutException) {
                 view.showInternetErrorSnackBar();
             } else {
                 view.showGetMoviesErrorSnackBar();

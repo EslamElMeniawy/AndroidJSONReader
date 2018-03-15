@@ -179,6 +179,10 @@ public interface MainMVP {
 
         void saveUpdateEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
 
+        void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
+
+        void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time);
+
         Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage);
 
         Observable<Movie> getMoviesOffline(ApplicationDatabase database);

@@ -79,6 +79,16 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
+    public void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time) {
+        repository.saveLastCheckUpdateTime(sharedPreferences, time);
+    }
+
+    @Override
+    public void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time) {
+        repository.saveMoviesLastFetchTime(sharedPreferences, time);
+    }
+
+    @Override
     public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage) {
 
         return repository.getMovies(timestamp, database, firstPage);

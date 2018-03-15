@@ -134,7 +134,7 @@ public class MovieEntity {
         return String.format(Locale.getDefault(),
                 "id: %d, imdbCode: %s, title: %s, year: %d, rating: %f, genres: %s," +
                         " synopsis: %s, backgroundImage: %s, mediumCoverImage: %s",
-                id, imdbCode, title, year, rating, genres.toString(), synopsis, backgroundImage,
-                mediumCoverImage);
+                id, imdbCode, title, year, rating, genres == null ? "" : genres.toString(),
+                synopsis, backgroundImage, mediumCoverImage);
     }
 }

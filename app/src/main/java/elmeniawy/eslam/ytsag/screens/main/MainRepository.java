@@ -1,5 +1,8 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import android.content.SharedPreferences;
+
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +19,6 @@ import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -94,9 +96,21 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public Observable<Movie> getMoviesOnline(int firstPage) {
+    public void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time) {
+        sharedPreferences.putLong(PreferencesUtils.KEY_UPDATE_LAST_CHECK, time);
+    }
+
+    @Override
+    public void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time) {
+        sharedPreferences.putLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH, time);
+    }
+
+    @Override
+    public Observable<Movie> getMoviesOnline(int firstPage, MySharedPreferences sharedPreferences,
+                                             ApplicationDatabase database) {
         Timber.i("getMoviesOnline");
         Timber.i("First page to get: %d.", firstPage);
+        List<Movie> movies = new ArrayList<>();
 
         Observable<MovieResponse> movieObservable = moviesApiService
                 .getMovies(firstPage)
@@ -104,7 +118,28 @@ public class MainRepository implements Repository {
 
         return movieObservable
                 .concatMap(movieResponse -> Observable
-                        .fromIterable(movieResponse.getData().getMovies()));
+                        .fromIterable(movieResponse.getData().getMovies()))
+                .doOnNext(movie -> movies.add(movie))
+                .doOnComplete(() -> {
+                    Timber.i("Get movies online complete.");
+                    Timber.i("Movies count: %d.", movies.size());
+
+                    if (firstPage == 1) {
+                        Timber.i("Get movies online complete first page.");
+
+                        //
+                        // Save movies fetch time.
+                        //
+
+                        saveMoviesLastFetchTime(sharedPreferences, System.currentTimeMillis());
+
+                        //
+                        // Save movies.
+                        //
+
+                        saveMovies(database, movies);
+                    }
+                });
     }
 
     @Override
@@ -183,24 +218,26 @@ public class MainRepository implements Repository {
             }
         }
 
+        Timber.i("Database movies list: %s.", movies);
         return Observable.fromIterable(movies);
     }
 
     @Override
-    public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage) {
+    public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage,
+                                       MySharedPreferences sharedPreferences) {
         if (firstPage == 1) {
             if (isUpToDate(timestamp)) {
-                return getMoviesOffline(database).switchIfEmpty(getMoviesOnline(firstPage));
+                return getMoviesOffline(database);
             } else {
-                return getMoviesOnline(firstPage);
+                return getMoviesOnline(firstPage, sharedPreferences, database);
             }
         } else {
-            return getMoviesOnline(firstPage);
+            return getMoviesOnline(firstPage, sharedPreferences, database);
         }
     }
 
     @Override
-    public void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
+    public void saveMovies(ApplicationDatabase database, List<Movie> movieList,
                            List<TorrentEntity> torrentList) {
         //
         // Get current saved movies.
@@ -210,7 +247,7 @@ public class MainRepository implements Repository {
                 .movieDao()
                 .getData()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribe(movieEntityList -> {
                     if (movieEntityList != null && movieEntityList.size() > 0) {
                         Completable.fromAction(() -> {
@@ -220,7 +257,10 @@ public class MainRepository implements Repository {
 
                             Timber.i("Deleted rows count: %d.", deletedRowsCount);
                             insertMovies(database, movieList, torrentList);
-                        });
+                        })
+                                .observeOn(Schedulers.io())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe();
                     } else {
                         insertMovies(database, movieList, torrentList);
                     }
@@ -249,6 +289,9 @@ public class MainRepository implements Repository {
             Timber.i("Inserted movies ids: %s.", moviesIds.toString());
             List<Long> torrentsIds = database.torrentDao().insertData(torrentList);
             Timber.i("Inserted torrents ids: %s.", torrentsIds.toString());
-        });
+        })
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 }

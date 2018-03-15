@@ -38,13 +38,19 @@ public interface Repository {
 
     void saveUpdateEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
 
-    Observable<Movie> getMoviesOnline(int firstPage);
+    void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
+
+    void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time);
+
+    Observable<Movie> getMoviesOnline(int firstPage, MySharedPreferences sharedPreferences,
+                                      ApplicationDatabase database);
 
     Observable<Movie> getMoviesOffline(ApplicationDatabase database);
 
-    Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage);
+    Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage,
+                                MySharedPreferences sharedPreferences);
 
-    void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
+    void saveMovies(ApplicationDatabase database, List<Movie> movieList,
                     List<TorrentEntity> torrentList);
 
     Observable<UpdateResponse> checkUpdateAvailable();
