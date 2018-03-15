@@ -30,7 +30,6 @@ public class MainRepository implements Repository {
     private MoviesApiService moviesApiService;
     private UpdateApiService updateApiService;
     private List<Movie> movies;
-    private long timestamp;
 
     //
     // Cash results for 30 seconds.
@@ -40,7 +39,6 @@ public class MainRepository implements Repository {
 
     MainRepository(MoviesApiService moviesApiService, UpdateApiService updateApiService) {
         this.moviesApiService = moviesApiService;
-        this.timestamp = System.currentTimeMillis();
         this.updateApiService = updateApiService;
         movies = new ArrayList<>();
         Timber.tag(MainRepository.class.getSimpleName());
@@ -93,6 +91,8 @@ public class MainRepository implements Repository {
 
     @Override
     public Observable<Movie> getMoviesOnline(int firstPage) {
+        Timber.i("getMoviesOnline");
+        Timber.i("First page to get: %d.", firstPage);
         return Observable.empty();
     }
 
@@ -176,8 +176,9 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public Observable<Movie> getMovies(ApplicationDatabase database, int firstPage) {
-        if (isUpToDate()) {
+    public Observable<Movie> getMovies(MySharedPreferences sharedPreferences,
+                                       ApplicationDatabase database, int firstPage) {
+        if (isUpToDate(sharedPreferences)) {
             return getMoviesOffline(database).switchIfEmpty(getMoviesOnline(firstPage));
         } else {
             return getMoviesOnline(firstPage);
@@ -222,8 +223,10 @@ public class MainRepository implements Repository {
 
     }
 
-    private boolean isUpToDate() {
-        return System.currentTimeMillis() - timestamp < STALE_MS;
+    private boolean isUpToDate(MySharedPreferences sharedPreferences) {
+        long timestamp = sharedPreferences.getLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH);
+        Timber.i("Last movies fetch time: %d.", timestamp);
+        return timestamp != 0 && System.currentTimeMillis() - timestamp < STALE_MS;
     }
 
     private void insertMovies(ApplicationDatabase database, List<MovieEntity> movieList,

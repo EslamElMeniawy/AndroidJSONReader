@@ -74,8 +74,10 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
-    public Observable<Movie> getMovies(ApplicationDatabase database, int firstPage) {
-        return repository.getMovies(database, firstPage);
+    public Observable<Movie> getMovies(MySharedPreferences sharedPreferences,
+                                       ApplicationDatabase database, int firstPage) {
+
+        return repository.getMovies(sharedPreferences, database, firstPage);
     }
 
     @Override

@@ -40,7 +40,8 @@ public interface Repository {
 
     Observable<Movie> getMoviesOffline(ApplicationDatabase database);
 
-    Observable<Movie> getMovies(ApplicationDatabase database, int firstPage);
+    Observable<Movie> getMovies(MySharedPreferences sharedPreferences, ApplicationDatabase database,
+                                int firstPage);
 
     void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
                     List<TorrentEntity> torrentList);

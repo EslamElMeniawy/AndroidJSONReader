@@ -175,7 +175,8 @@ public interface MainMVP {
 
         void saveUpdateEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
 
-        Observable<Movie> getMovies(ApplicationDatabase database, int firstPage);
+        Observable<Movie> getMovies(MySharedPreferences sharedPreferences,
+                                    ApplicationDatabase database, int firstPage);
 
         void saveMovies(ApplicationDatabase database, List<Movie> movieList);
 

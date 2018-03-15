@@ -16,4 +16,5 @@ public class PreferencesUtils {
     public static final String KEY_UPDATE_ENABLED = PACKAGE_NAME + "UpdateEnabled";
     public static final String KEY_UPDATE_AVAILABLE = PACKAGE_NAME + "UpdateAvailable";
     public static final String KEY_UPDATE_LAST_CHECK = PACKAGE_NAME + "UpdateLastCheck";
+    public static final String KEY_MOVIES_LAST_FETCH = PACKAGE_NAME + "MoviesLastFetch";
 }

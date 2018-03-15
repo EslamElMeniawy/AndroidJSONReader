@@ -119,7 +119,7 @@ public class MainPresenter implements MainMVP.Presenter {
             //
 
             firstPage = 1;
-            model.getMovies(view.getDatabase(), firstPage);
+            model.getMovies(view.getSharedPreferences(), view.getDatabase(), firstPage);
         }
     }
 
@@ -134,7 +134,7 @@ public class MainPresenter implements MainMVP.Presenter {
             //
 
             firstPage = 1;
-            model.getMovies(view.getDatabase(), firstPage);
+            model.getMovies(view.getSharedPreferences(), view.getDatabase(), firstPage);
         }
     }
 
@@ -208,7 +208,7 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
 
                 firstPage++;
-                model.getMovies(view.getDatabase(), firstPage);
+                model.getMovies(view.getSharedPreferences(), view.getDatabase(), firstPage);
             }
         }
     }
