@@ -49,6 +49,11 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
+    public long getMoviesLastFetchTime(MySharedPreferences sharedPreferences) {
+        return repository.getMoviesLastFetchTime(sharedPreferences);
+    }
+
+    @Override
     public boolean getNotificationsEnabled(MySharedPreferences sharedPreferences) {
         return repository.getNotificationsEnabled(sharedPreferences);
     }
@@ -74,10 +79,14 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
-    public Observable<Movie> getMovies(MySharedPreferences sharedPreferences,
-                                       ApplicationDatabase database, int firstPage) {
+    public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage) {
 
-        return repository.getMovies(sharedPreferences, database, firstPage);
+        return repository.getMovies(timestamp, database, firstPage);
+    }
+
+    @Override
+    public Observable<Movie> getMoviesOffline(ApplicationDatabase database) {
+        return repository.getMoviesOffline(database);
     }
 
     @Override

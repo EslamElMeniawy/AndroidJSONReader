@@ -6,6 +6,7 @@ import java.util.List;
 import elmeniawy.eslam.ytsag.api.MoviesApiService;
 import elmeniawy.eslam.ytsag.api.UpdateApiService;
 import elmeniawy.eslam.ytsag.api.model.Movie;
+import elmeniawy.eslam.ytsag.api.model.MovieResponse;
 import elmeniawy.eslam.ytsag.api.model.Torrent;
 import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
@@ -29,7 +30,6 @@ import timber.log.Timber;
 public class MainRepository implements Repository {
     private MoviesApiService moviesApiService;
     private UpdateApiService updateApiService;
-    private List<Movie> movies;
 
     //
     // Cash results for 30 seconds.
@@ -40,7 +40,6 @@ public class MainRepository implements Repository {
     MainRepository(MoviesApiService moviesApiService, UpdateApiService updateApiService) {
         this.moviesApiService = moviesApiService;
         this.updateApiService = updateApiService;
-        movies = new ArrayList<>();
         Timber.tag(MainRepository.class.getSimpleName());
     }
 
@@ -62,6 +61,11 @@ public class MainRepository implements Repository {
     @Override
     public long getLastCheckUpdateTime(MySharedPreferences sharedPreferences) {
         return sharedPreferences.getLong(PreferencesUtils.KEY_UPDATE_LAST_CHECK);
+    }
+
+    @Override
+    public long getMoviesLastFetchTime(MySharedPreferences sharedPreferences) {
+        return sharedPreferences.getLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH);
     }
 
     @Override
@@ -93,7 +97,14 @@ public class MainRepository implements Repository {
     public Observable<Movie> getMoviesOnline(int firstPage) {
         Timber.i("getMoviesOnline");
         Timber.i("First page to get: %d.", firstPage);
-        return Observable.empty();
+
+        Observable<MovieResponse> movieObservable = moviesApiService
+                .getMovies(firstPage)
+                .concatWith(moviesApiService.getMovies(firstPage + 1));
+
+        return movieObservable
+                .concatMap(movieResponse -> Observable
+                        .fromIterable(movieResponse.getData().getMovies()));
     }
 
     @Override
@@ -176,10 +187,13 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public Observable<Movie> getMovies(MySharedPreferences sharedPreferences,
-                                       ApplicationDatabase database, int firstPage) {
-        if (isUpToDate(sharedPreferences)) {
-            return getMoviesOffline(database).switchIfEmpty(getMoviesOnline(firstPage));
+    public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage) {
+        if (firstPage == 1) {
+            if (isUpToDate(timestamp)) {
+                return getMoviesOffline(database).switchIfEmpty(getMoviesOnline(firstPage));
+            } else {
+                return getMoviesOnline(firstPage);
+            }
         } else {
             return getMoviesOnline(firstPage);
         }
@@ -223,8 +237,7 @@ public class MainRepository implements Repository {
 
     }
 
-    private boolean isUpToDate(MySharedPreferences sharedPreferences) {
-        long timestamp = sharedPreferences.getLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH);
+    private boolean isUpToDate(long timestamp) {
         Timber.i("Last movies fetch time: %d.", timestamp);
         return timestamp != 0 && System.currentTimeMillis() - timestamp < STALE_MS;
     }

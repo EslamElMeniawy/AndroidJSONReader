@@ -26,6 +26,8 @@ public interface Repository {
 
     long getLastCheckUpdateTime(MySharedPreferences sharedPreferences);
 
+    long getMoviesLastFetchTime(MySharedPreferences sharedPreferences);
+
     boolean getNotificationsEnabled(MySharedPreferences sharedPreferences);
 
     boolean getUpdateEnabled(MySharedPreferences sharedPreferences);
@@ -40,8 +42,7 @@ public interface Repository {
 
     Observable<Movie> getMoviesOffline(ApplicationDatabase database);
 
-    Observable<Movie> getMovies(MySharedPreferences sharedPreferences, ApplicationDatabase database,
-                                int firstPage);
+    Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage);
 
     void saveMovies(ApplicationDatabase database, List<MovieEntity> movieList,
                     List<TorrentEntity> torrentList);

@@ -27,6 +27,9 @@ public class MovieViewModel implements Parcelable {
     private String mediumCoverImage;
     private List<TorrentViewModel> torrents;
 
+    MovieViewModel() {
+    }
+
     private MovieViewModel(Parcel in) {
         imdbCode = in.readString();
         title = in.readString();

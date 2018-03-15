@@ -55,6 +55,8 @@ public interface MainMVP {
 
         void updateMovies(MovieViewModel movie);
 
+        void clearMovies();
+
         void showInternetErrorSnackBar();
 
         void showGetMoviesErrorSnackBar();
@@ -165,6 +167,8 @@ public interface MainMVP {
 
         long getLastCheckUpdateTime(MySharedPreferences sharedPreferences);
 
+        long getMoviesLastFetchTime(MySharedPreferences sharedPreferences);
+
         boolean getNotificationsEnabled(MySharedPreferences sharedPreferences);
 
         boolean getUpdateEnabled(MySharedPreferences sharedPreferences);
@@ -175,8 +179,9 @@ public interface MainMVP {
 
         void saveUpdateEnabled(MySharedPreferences sharedPreferences, Boolean enabled);
 
-        Observable<Movie> getMovies(MySharedPreferences sharedPreferences,
-                                    ApplicationDatabase database, int firstPage);
+        Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage);
+
+        Observable<Movie> getMoviesOffline(ApplicationDatabase database);
 
         void saveMovies(ApplicationDatabase database, List<Movie> movieList);
 

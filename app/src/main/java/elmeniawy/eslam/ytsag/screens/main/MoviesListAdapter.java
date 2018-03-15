@@ -65,8 +65,8 @@ class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolde
         Timber.i("Rating: %f.", currentMovie.getRating());
 
         holder.movieRating
-                .setText(String.format(Locale.getDefault(),
-                        "%f/10", currentMovie.getRating()));
+                .setText(String.format(Locale.getDefault(), "%.1f/10",
+                        currentMovie.getRating()));
     }
 
     @Override
@@ -90,7 +90,7 @@ class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolde
         ViewHolderMoviesList(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            movieTitle.setHeight(movieTitle.getLineHeight() * 2);
+            movieTitle.setHeight(movieTitle.getLineHeight() * 3);
         }
 
         @OnClick

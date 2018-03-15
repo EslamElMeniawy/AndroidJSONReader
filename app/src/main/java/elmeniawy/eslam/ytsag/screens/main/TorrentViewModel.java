@@ -19,6 +19,9 @@ public class TorrentViewModel implements Parcelable {
     private String quality;
     private String size;
 
+    TorrentViewModel() {
+    }
+
     private TorrentViewModel(Parcel in) {
         url = in.readString();
         quality = in.readString();

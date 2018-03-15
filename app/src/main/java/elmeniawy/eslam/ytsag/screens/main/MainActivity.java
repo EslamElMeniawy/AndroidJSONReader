@@ -530,6 +530,13 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
+    public void clearMovies() {
+        Timber.i("Clearing movies.");
+        moviesList.clear();
+        moviesListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void showInternetErrorSnackBar() {
         showSnackBar(noInternet);
     }

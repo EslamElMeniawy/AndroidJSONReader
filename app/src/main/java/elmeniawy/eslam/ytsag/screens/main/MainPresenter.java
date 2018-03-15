@@ -2,9 +2,18 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import android.support.annotation.Nullable;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import elmeniawy.eslam.ytsag.api.model.Movie;
+import elmeniawy.eslam.ytsag.api.model.Torrent;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -19,6 +28,7 @@ public class MainPresenter implements MainMVP.Presenter {
     private boolean mLoadingItems = true;
     private MovieViewModel movieToOpen = null;
     private int firstPage = 1;
+    private Disposable moviesDisposable = null;
 
     @Nullable
     private MainMVP.View view;
@@ -118,8 +128,14 @@ public class MainPresenter implements MainMVP.Presenter {
             // Get movies.
             //
 
+            view.clearMovies();
             firstPage = 1;
-            model.getMovies(view.getSharedPreferences(), view.getDatabase(), firstPage);
+            moviesDisposable = model.
+                    getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
+                            view.getDatabase(), firstPage)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::handleResult, this::handleError);
         }
     }
 
@@ -133,8 +149,14 @@ public class MainPresenter implements MainMVP.Presenter {
             // Get movies.
             //
 
+            view.clearMovies();
             firstPage = 1;
-            model.getMovies(view.getSharedPreferences(), view.getDatabase(), firstPage);
+            moviesDisposable = model
+                    .getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
+                            view.getDatabase(), firstPage)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::handleResult, this::handleError);
         }
     }
 
@@ -199,7 +221,8 @@ public class MainPresenter implements MainMVP.Presenter {
             int mVisibleThreshold = 1;
 
             if (!mLoadingItems &&
-                    (mTotalItemsInList - mOnScreenItems) <= (mFirstVisibleItem + mVisibleThreshold)) {
+                    (mTotalItemsInList - mOnScreenItems) <=
+                            (mFirstVisibleItem + mVisibleThreshold)) {
                 mLoadingItems = true;
                 view.showSwipeLoading();
 
@@ -208,7 +231,12 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
 
                 firstPage++;
-                model.getMovies(view.getSharedPreferences(), view.getDatabase(), firstPage);
+                moviesDisposable = model.getMovies(model
+                                .getMoviesLastFetchTime(view.getSharedPreferences()),
+                        view.getDatabase(), firstPage)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::handleResult, this::handleError);
             }
         }
     }
@@ -222,6 +250,15 @@ public class MainPresenter implements MainMVP.Presenter {
             //
             // Get movies.
             //
+
+            view.clearMovies();
+            firstPage = 1;
+            moviesDisposable = model.
+                    getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
+                            view.getDatabase(), firstPage)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::handleResult, this::handleError);
         }
     }
 
@@ -378,6 +415,128 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     private void rxUnsubscribe() {
+        if (moviesDisposable != null && moviesDisposable.isDisposed()) {
+            moviesDisposable.dispose();
+        }
+    }
 
+    private void handleResult(Movie movie) {
+        mLoadingItems = false;
+        if (view != null) {
+            view.hideSwipeLoading();
+
+            //
+            // Convert movie object to movie view model object.
+            //
+
+            Timber.i("Movie to be converted: %s.", movie.toString());
+            MovieViewModel movieViewModel = new MovieViewModel();
+            movieViewModel.setImdbCode(movie.getImdbCode());
+            movieViewModel.setTitle(movie.getTitle());
+            movieViewModel.setYear(movie.getYear());
+            movieViewModel.setRating(movie.getRating());
+            movieViewModel.setGenres(movie.getGenres());
+            movieViewModel.setSynopsis(movie.getSynopsis());
+            movieViewModel.setBackgroundImage(movie.getBackgroundImage());
+            movieViewModel.setMediumCoverImage(movie.getMediumCoverImage());
+            List<TorrentViewModel> torrentViewModels = new ArrayList<>();
+
+            if (movie.getTorrents() != null && movie.getTorrents().size() > 0) {
+                for (Torrent torrent :
+                        movie.getTorrents()) {
+                    Timber.i("Torrent to be converted: %s.", torrent.toString());
+                    TorrentViewModel torrentViewModel = new TorrentViewModel();
+                    torrentViewModel.setUrl(torrent.getUrl());
+                    torrentViewModel.setQuality(torrent.getQuality());
+                    torrentViewModel.setSize(torrent.getSize());
+
+                    Timber.i("Converted torrent view model: %s.",
+                            torrentViewModel.toString());
+
+                    torrentViewModels.add(torrentViewModel);
+                }
+            }
+
+            movieViewModel.setTorrents(torrentViewModels);
+            Timber.i("Converted movie view model: %s.", movieViewModel.toString());
+
+            //
+            // Update view.
+            //
+
+            view.updateMovies(movieViewModel);
+        }
+    }
+
+    private void handleError(Throwable throwable) {
+        Timber.e(throwable);
+        mLoadingItems = false;
+
+        if (view != null) {
+            if (firstPage == 1) {
+                if (model.getMoviesLastFetchTime(view.getSharedPreferences()) == 0) {
+                    //
+                    // Show text view error.
+                    //
+
+                    showTvError(throwable);
+                } else {
+                    //
+                    // Get movies offline.
+                    //
+
+                    List<Movie> offlineMovies = new ArrayList<>();
+
+                    moviesDisposable = model
+                            .getMoviesOffline(view.getDatabase())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnNext(offlineMovies::add)
+                            .doOnError(throwable1 -> showTvError(throwable))
+                            .doOnComplete(() -> {
+                                if (offlineMovies.size() > 0) {
+                                    showSnackBarError(throwable);
+                                } else {
+                                    showTvError(throwable);
+                                }
+                            })
+                            .subscribe(this::handleResult);
+                }
+            } else {
+                //
+                // Show snack bar error.
+                //
+                firstPage--;
+                showSnackBarError(throwable);
+            }
+        }
+    }
+
+    private void showTvError(Throwable throwable) {
+        if (view != null) {
+            if (throwable instanceof ConnectException
+                    || throwable instanceof SocketTimeoutException) {
+                view.setInternetError();
+            } else {
+                view.setGetMoviesError();
+            }
+
+            view.hideSwipeLoading();
+            view.hideSwipeLayout();
+            view.showErrorTv();
+        }
+    }
+
+    private void showSnackBarError(Throwable throwable) {
+        if (view != null) {
+            view.hideSwipeLoading();
+
+            if (throwable instanceof ConnectException
+                    || throwable instanceof SocketTimeoutException) {
+                view.showInternetErrorSnackBar();
+            } else {
+                view.showGetMoviesErrorSnackBar();
+            }
+        }
     }
 }
