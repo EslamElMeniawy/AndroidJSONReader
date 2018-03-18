@@ -57,6 +57,30 @@ public interface SearchMVP {
 
     interface Presenter {
         void setView(SearchMVP.View view);
+
+        void errorClicked();
+
+        void setQuery(String queryTerm);
+
+        void searchMovies();
+
+        void recyclerScrolled(int mOnScreenItems, int mTotalItemsInList, int mFirstVisibleItem);
+
+        void refreshMovies();
+
+        void bannerAdLoaded();
+
+        void bannerAdFailed();
+
+        void bannerClicked();
+
+        void onPaused();
+
+        void onResumed();
+
+        void onDestroyed();
+
+        void movieClicked(MovieViewModel movie);
     }
 
     interface Model {

@@ -100,6 +100,7 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Vi
                 ((MainActivity) context).presenter.movieClicked(list.get(getLayoutPosition()));
             } else if (context instanceof SearchActivity) {
                 Timber.i("Context is from search activity.");
+                ((SearchActivity) context).presenter.movieClicked(list.get(getLayoutPosition()));
             }
         }
     }

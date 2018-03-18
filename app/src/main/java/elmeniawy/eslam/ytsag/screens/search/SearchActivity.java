@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
@@ -40,6 +41,7 @@ import timber.log.Timber;
 
 public class SearchActivity extends AppCompatActivity implements SearchMVP.View {
     @Inject
+    public
     SearchMVP.Presenter presenter;
 
     //
@@ -124,7 +126,7 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
 
         swipeRefreshLayoutMovies.setOnRefreshListener(() -> {
             Timber.i("OnRefreshListener");
-            //presenter.refreshMovies();
+            presenter.refreshMovies();
         });
 
         //
@@ -181,9 +183,9 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
                 super.onScrolled(recyclerView, dx, dy);
                 Timber.i("Recycler view onScrolled.");
 
-                /*presenter.recyclerScrolled(recyclerViewMovies.getChildCount(),
+                presenter.recyclerScrolled(recyclerViewMovies.getChildCount(),
                         gridLayoutManager.getItemCount(),
-                        gridLayoutManager.findFirstVisibleItemPosition());*/
+                        gridLayoutManager.findFirstVisibleItemPosition());
             }
         });
 
@@ -325,10 +327,16 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
         presenter.setView(this);
 
         //
+        // Search movies.
+        //
+
+        presenter.searchMovies();
+
+        //
         // Call presenter resumed method to handle ad resume.
         //
 
-        //presenter.onResumed();
+        presenter.onResumed();
     }
 
     @Override
@@ -339,7 +347,7 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
         // Call presenter paused method to handle ad pause.
         //
 
-        //presenter.onPaused();
+        presenter.onPaused();
     }
 
     @Override
@@ -350,13 +358,13 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
         // Call presenter destroyed method to handle ad destroy & rx unsubscribe.
         //
 
-        //presenter.onDestroyed();
+        presenter.onDestroyed();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            //presenter.searchMovies(intent.getStringExtra(SearchManager.QUERY));
+            presenter.setQuery(intent.getStringExtra(SearchManager.QUERY));
         }
     }
 
@@ -468,6 +476,12 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
                 .putExtra(ConstantUtils.INTENT_KEY_TORRENTS, new ArrayList<>(torrentsList)));
     }
 
+    @OnClick(R.id.error_view)
+    void errorClicked() {
+        Timber.i("errorClicked");
+        presenter.errorClicked();
+    }
+
     private void loadAds() {
         Timber.i("loadBannerAd");
         adView.loadAd(new AdRequest.Builder().build());
@@ -476,20 +490,20 @@ public class SearchActivity extends AppCompatActivity implements SearchMVP.View 
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 Timber.i("onAdFailedToLoad");
-                //presenter.bannerAdFailed();
+                presenter.bannerAdFailed();
             }
 
             @Override
             public void onAdLoaded() {
                 Timber.i("onAdLoaded");
-                //presenter.bannerAdLoaded();
+                presenter.bannerAdLoaded();
             }
 
             @Override
             public void onAdClicked() {
                 Timber.i("onAdClicked");
                 super.onAdClicked();
-                //presenter.bannerClicked();
+                presenter.bannerClicked();
             }
         });
     }
