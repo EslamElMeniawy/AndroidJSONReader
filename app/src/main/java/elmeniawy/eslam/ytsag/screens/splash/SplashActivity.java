@@ -46,12 +46,6 @@ public class SplashActivity extends AppCompatActivity implements SplashMVP.View 
         ((MyApplication) getApplication()).getComponent().inject(this);
 
         //
-        // Set timber tag.
-        //
-
-        Timber.tag(TAG);
-
-        //
         // Log fabric content view event only once.
         //
 

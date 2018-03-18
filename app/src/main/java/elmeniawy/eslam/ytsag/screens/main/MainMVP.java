@@ -108,7 +108,7 @@ public interface MainMVP {
 
         boolean isOnline();
 
-        void openDetails(MovieViewModel movie);
+        void openDetails(MovieViewModel movie, List<TorrentViewModel> torrentsList);
 
         void closeApp();
     }

@@ -24,7 +24,6 @@ public class MainModel implements MainMVP.Model {
 
     MainModel(Repository repository) {
         this.repository = repository;
-        Timber.tag(MainModel.class.getSimpleName());
     }
 
     @Override

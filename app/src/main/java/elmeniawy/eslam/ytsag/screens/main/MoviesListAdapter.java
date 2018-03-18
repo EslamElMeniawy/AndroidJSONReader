@@ -26,7 +26,6 @@ import timber.log.Timber;
  */
 @SuppressWarnings("DefaultFileTemplate")
 class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolderMoviesList> {
-    private static final String TAG = MoviesListAdapter.class.getSimpleName();
     private List<MovieViewModel> list;
     private Context context;
 
@@ -42,7 +41,6 @@ class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolde
                 .from(parent.getContext())
                 .inflate(R.layout.movie_item, parent, false);
 
-        Timber.tag(TAG);
         return new ViewHolderMoviesList(itemView);
     }
 

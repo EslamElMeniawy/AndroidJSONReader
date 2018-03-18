@@ -1,7 +1,6 @@
 package elmeniawy.eslam.ytsag.storage.database.daos;
 
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
@@ -25,9 +24,6 @@ public interface TorrentDao {
     List<Long> insertData(List<TorrentEntity> torrentsList);
 
     @Query("SELECT * FROM " + DatabaseUtils.TABLE_TORRENTS + " WHERE "
-            + DatabaseUtils.COLUMN_MOVIE_ID + " = :movieId  ORDER BY id DESC")
+            + DatabaseUtils.COLUMN_MOVIE_ID + " = :movieId")
     Maybe<List<TorrentEntity>> getData(Long movieId);
-
-    @Delete
-    int deleteData(List<TorrentEntity> torrentsList);
 }

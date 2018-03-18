@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,8 +52,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.root.MyApplication;
+import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import elmeniawy.eslam.ytsag.utils.ConstantUtils;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;
 import elmeniawy.eslam.ytsag.utils.NetworkUtils;
 import timber.log.Timber;
@@ -142,12 +145,6 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         //
 
         ((MyApplication) getApplication()).getComponent().inject(this);
-
-        //
-        // Set timber tag.
-        //
-
-        Timber.tag(TAG);
 
         //
         // Initialize butter knife.
@@ -660,8 +657,11 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
-    public void openDetails(MovieViewModel movie) {
-
+    public void openDetails(MovieViewModel movie, List<TorrentViewModel> torrentsList) {
+        startActivity(new Intent(MainActivity.this,
+                DetailsActivity.class)
+                .putExtra(ConstantUtils.INTENT_KEY_MOVIE, movie)
+                .putExtra(ConstantUtils.INTENT_KEY_TORRENTS, new ArrayList<>(torrentsList)));
     }
 
     @Override

@@ -29,7 +29,6 @@ import timber.log.Timber;
  */
 
 public class MainPresenter implements MainMVP.Presenter {
-    private static final String TAG = MainPresenter.class.getSimpleName();
     private boolean mLoadingItems = true;
     private MovieViewModel movieToOpen = null;
     private int firstPage = 1;
@@ -46,7 +45,6 @@ public class MainPresenter implements MainMVP.Presenter {
 
     MainPresenter(MainMVP.Model model) {
         this.model = model;
-        Timber.tag(TAG);
     }
 
     @Override
@@ -272,7 +270,7 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void interstitialClosed() {
         if (view != null) {
-            view.openDetails(movieToOpen);
+            view.openDetails(movieToOpen, movieToOpen.getTorrents());
         }
     }
 
@@ -350,7 +348,7 @@ public class MainPresenter implements MainMVP.Presenter {
                 movieToOpen = movie;
                 view.showInterstitialAd();
             } else {
-                view.openDetails(movie);
+                view.openDetails(movie, movie.getTorrents());
             }
         }
     }

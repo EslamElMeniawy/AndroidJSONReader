@@ -47,7 +47,6 @@ public class MainRepository implements Repository {
     MainRepository(MoviesApiService moviesApiService, UpdateApiService updateApiService) {
         this.moviesApiService = moviesApiService;
         this.updateApiService = updateApiService;
-        Timber.tag(MainRepository.class.getSimpleName());
     }
 
     @Override

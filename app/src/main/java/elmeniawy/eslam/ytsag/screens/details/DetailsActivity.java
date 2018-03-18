@@ -20,9 +20,17 @@ package elmeniawy.eslam.ytsag.screens.details;
 //import com.squareup.picasso.Target;
 //
 //import elmeniawy.eslam.ytsag.Movie;
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import java.util.List;
+
 import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.screens.main.MovieViewModel;
+import elmeniawy.eslam.ytsag.screens.main.TorrentViewModel;
+import elmeniawy.eslam.ytsag.utils.ConstantUtils;
+import timber.log.Timber;
 
 public class DetailsActivity extends AppCompatActivity {
 //    private AdView mAdView;
@@ -33,6 +41,19 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+
+        Bundle bundle = DetailsActivity.this.getIntent().getExtras();
+
+        if (bundle != null) {
+            MovieViewModel movie = bundle.getParcelable(ConstantUtils.INTENT_KEY_MOVIE);
+            Timber.i("Movie: %s.", movie);
+
+            List<TorrentViewModel> torrents = bundle
+                    .getParcelableArrayList(ConstantUtils.INTENT_KEY_TORRENTS);
+
+            Timber.i("Torrents: %s.", torrents);
+        }
+
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 //

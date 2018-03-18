@@ -79,4 +79,9 @@ public class TorrentViewModel implements Parcelable {
     public String getSize() {
         return size;
     }
+
+    @Override
+    public String toString() {
+        return String.format("url: %s, quality: %s, size: %s", url, quality, size);
+    }
 }

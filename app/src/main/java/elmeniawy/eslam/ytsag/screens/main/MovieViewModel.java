@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * MovieViewModel
@@ -168,5 +169,14 @@ public class MovieViewModel implements Parcelable {
 
     public List<TorrentViewModel> getTorrents() {
         return torrents;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(Locale.getDefault(), "imdbCode: %s, title: %s, year: %d," +
+                        " rating: %f, genres: %s, synopsis: %s, backgroundImage: %s," +
+                        " mediumCoverImage: %s, torrents: %s",
+                imdbCode, title, year, rating, genres, synopsis, backgroundImage, mediumCoverImage,
+                torrents);
     }
 }
