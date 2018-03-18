@@ -5,7 +5,10 @@ import java.util.List;
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
+import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
+import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 /**
@@ -63,7 +66,7 @@ public interface MainMVP {
 
         void showPermissionErrorSnackBar();
 
-        void setMainPadding(int left, int top, int right, int bottom);
+        void setMainPadding(int bottom);
 
         void showAdView();
 
@@ -181,16 +184,18 @@ public interface MainMVP {
 
         void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
 
-        void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time);
+        Observable<Movie> getMovies(long timestamp, ApplicationDatabase database,
+                                    int firstPage, MySharedPreferences sharedPreferences);
 
-        Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage);
+        Maybe<List<MovieEntity>> getMoviesOffline(ApplicationDatabase database);
 
-        Observable<Movie> getMoviesOffline(ApplicationDatabase database);
-
-        void saveMovies(ApplicationDatabase database, List<Movie> movieList);
+        Maybe<List<TorrentEntity>> getMovieOfflineTorrents(ApplicationDatabase database,
+                                                           Long movieId);
 
         Observable<UpdateResponse> checkUpdateAvailable();
 
         void downloadApk();
+
+        void rxUnsubscribe();
     }
 }

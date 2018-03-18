@@ -24,7 +24,7 @@ public interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     List<Long> insertData(List<MovieEntity> movieList);
 
-    @Query("SELECT * FROM " + DatabaseUtils.TABLE_MOVIES)
+    @Query("SELECT * FROM " + DatabaseUtils.TABLE_MOVIES + " ORDER BY id DESC")
     Maybe<List<MovieEntity>> getData();
 
     @Delete

@@ -552,8 +552,8 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
-    public void setMainPadding(int left, int top, int right, int bottom) {
-        main.setPadding(left, top, right, bottom);
+    public void setMainPadding(int bottom) {
+        main.setPadding(0, 16, 0, bottom);
     }
 
     @Override

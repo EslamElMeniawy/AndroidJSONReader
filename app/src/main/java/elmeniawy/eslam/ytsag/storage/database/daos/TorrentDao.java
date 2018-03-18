@@ -25,7 +25,7 @@ public interface TorrentDao {
     List<Long> insertData(List<TorrentEntity> torrentsList);
 
     @Query("SELECT * FROM " + DatabaseUtils.TABLE_TORRENTS + " WHERE "
-            + DatabaseUtils.COLUMN_MOVIE_ID + " = :movieId")
+            + DatabaseUtils.COLUMN_MOVIE_ID + " = :movieId  ORDER BY id DESC")
     Maybe<List<TorrentEntity>> getData(Long movieId);
 
     @Delete

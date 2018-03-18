@@ -1,8 +1,5 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
-import android.content.SharedPreferences;
-
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +15,9 @@ import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -38,6 +37,12 @@ public class MainRepository implements Repository {
     //
 
     private static final long STALE_MS = 30 * 1000;
+
+    private Disposable disposableGetMovies = null,
+            disposableDeleteMovies = null,
+            disposableInsertMovies = null;
+
+    private List<Movie> movies = new ArrayList<>();
 
     MainRepository(MoviesApiService moviesApiService, UpdateApiService updateApiService) {
         this.moviesApiService = moviesApiService;
@@ -100,17 +105,14 @@ public class MainRepository implements Repository {
         sharedPreferences.putLong(PreferencesUtils.KEY_UPDATE_LAST_CHECK, time);
     }
 
-    @Override
-    public void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time) {
-        sharedPreferences.putLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH, time);
-    }
-
-    @Override
-    public Observable<Movie> getMoviesOnline(int firstPage, MySharedPreferences sharedPreferences,
-                                             ApplicationDatabase database) {
+    private Observable<Movie> getMoviesOnline(int firstPage, MySharedPreferences sharedPreferences,
+                                              ApplicationDatabase database) {
         Timber.i("getMoviesOnline");
         Timber.i("First page to get: %d.", firstPage);
-        List<Movie> movies = new ArrayList<>();
+
+        if (firstPage == 1) {
+            movies = new ArrayList<>();
+        }
 
         Observable<MovieResponse> movieObservable = moviesApiService
                 .getMovies(firstPage)
@@ -119,7 +121,7 @@ public class MainRepository implements Repository {
         return movieObservable
                 .concatMap(movieResponse -> Observable
                         .fromIterable(movieResponse.getData().getMovies()))
-                .doOnNext(movie -> movies.add(movie))
+                .doOnNext(movies::add)
                 .doOnComplete(() -> {
                     Timber.i("Get movies online complete.");
                     Timber.i("Movies count: %d.", movies.size());
@@ -143,83 +145,20 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public Observable<Movie> getMoviesOffline(ApplicationDatabase database) {
+    public Maybe<List<MovieEntity>> getMoviesOffline(ApplicationDatabase database) {
         Timber.i("getMoviesOffline");
-        List<Movie> movies = new ArrayList<>();
-
-        //
-        // Get movies entities from database.
-        //
-
-        List<MovieEntity> movieEntityList = database
+        return database
                 .movieDao()
-                .getData()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .blockingGet();
+                .getData();
+    }
 
-        Timber.i("movieEntityList: %s.", movieEntityList);
-
-        if (movieEntityList != null && movieEntityList.size() > 0) {
-            for (MovieEntity movieEntity :
-                    movieEntityList) {
-                Timber.i("Current movie entity to convert: %s.", movieEntity.toString());
-
-                //
-                // Map movie entity to movie object.
-                //
-
-                Movie movie = new Movie();
-                movie.setId(movieEntity.getId());
-                movie.setImdbCode(movieEntity.getImdbCode());
-                movie.setTitle(movieEntity.getTitle());
-                movie.setYear(movieEntity.getYear());
-                movie.setRating(movieEntity.getRating());
-                movie.setGenres(movieEntity.getGenres());
-                movie.setSynopsis(movieEntity.getSynopsis());
-                movie.setBackgroundImage(movieEntity.getBackgroundImage());
-                movie.setMediumCoverImage(movieEntity.getMediumCoverImage());
-
-
-                //
-                // Get torrents entities for current movie from database.
-                //
-
-                List<TorrentEntity> torrentEntities = database
-                        .torrentDao()
-                        .getData(movieEntity.getId())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io())
-                        .blockingGet();
-
-                Timber.i("torrentEntities: %s.", torrentEntities);
-                List<Torrent> torrents = new ArrayList<>();
-
-                if (torrentEntities != null && torrentEntities.size() > 0) {
-                    for (TorrentEntity torrentEntity :
-                            torrentEntities) {
-                        Torrent torrent = new Torrent();
-                        torrent.setUrl(torrentEntity.getUrl());
-                        torrent.setQuality(torrentEntity.getQuality());
-                        torrent.setSize(torrentEntity.getSize());
-                        Timber.i("Converted torrent: %s.", torrent.toString());
-                        torrents.add(torrent);
-                    }
-
-                    movie.setTorrents(torrents);
-                }
-
-                //
-                // Add movie to movies list.
-                //
-
-                Timber.i("Converted movie: %s.", movie.toString());
-                movies.add(movie);
-            }
-        }
-
-        Timber.i("Database movies list: %s.", movies);
-        return Observable.fromIterable(movies);
+    @Override
+    public Maybe<List<TorrentEntity>> getMovieOfflineTorrents(ApplicationDatabase database,
+                                                              Long movieId) {
+        Timber.i("getMovieOfflineTorrents");
+        return database
+                .torrentDao()
+                .getData(movieId);
     }
 
     @Override
@@ -227,44 +166,13 @@ public class MainRepository implements Repository {
                                        MySharedPreferences sharedPreferences) {
         if (firstPage == 1) {
             if (isUpToDate(timestamp)) {
-                return getMoviesOffline(database);
+                return Observable.fromIterable(movies);
             } else {
                 return getMoviesOnline(firstPage, sharedPreferences, database);
             }
         } else {
             return getMoviesOnline(firstPage, sharedPreferences, database);
         }
-    }
-
-    @Override
-    public void saveMovies(ApplicationDatabase database, List<Movie> movieList,
-                           List<TorrentEntity> torrentList) {
-        //
-        // Get current saved movies.
-        //
-
-        database
-                .movieDao()
-                .getData()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(movieEntityList -> {
-                    if (movieEntityList != null && movieEntityList.size() > 0) {
-                        Completable.fromAction(() -> {
-                            int deletedRowsCount = database
-                                    .movieDao()
-                                    .deleteData(movieEntityList);
-
-                            Timber.i("Deleted rows count: %d.", deletedRowsCount);
-                            insertMovies(database, movieList, torrentList);
-                        })
-                                .observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe();
-                    } else {
-                        insertMovies(database, movieList, torrentList);
-                    }
-                });
     }
 
     @Override
@@ -277,19 +185,124 @@ public class MainRepository implements Repository {
 
     }
 
+    @Override
+    public void rxUnsubscribe() {
+        if (disposableGetMovies != null && disposableGetMovies.isDisposed()) {
+            disposableGetMovies.dispose();
+        }
+
+        if (disposableDeleteMovies != null && disposableDeleteMovies.isDisposed()) {
+            disposableDeleteMovies.dispose();
+        }
+
+        if (disposableInsertMovies != null && disposableInsertMovies.isDisposed()) {
+            disposableInsertMovies.dispose();
+        }
+    }
+
     private boolean isUpToDate(long timestamp) {
         Timber.i("Last movies fetch time: %d.", timestamp);
         return timestamp != 0 && System.currentTimeMillis() - timestamp < STALE_MS;
     }
 
+    private void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time) {
+        sharedPreferences.putLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH, time);
+    }
+
+    private void saveMovies(ApplicationDatabase database, List<Movie> movieList) {
+        Timber.i("saveMovies");
+
+        //
+        // Map movies list to movies and torrents entities.
+        //
+
+        List<MovieEntity> movieEntityList = new ArrayList<>();
+        List<TorrentEntity> torrentEntities = new ArrayList<>();
+
+        for (Movie movie :
+                movieList) {
+            Timber.i("Current movie to convert: %s.", movie.toString());
+
+            //
+            // Movie entity object.
+            //
+
+            MovieEntity movieEntity = new MovieEntity();
+            movieEntity.setId(movie.getId());
+            movieEntity.setImdbCode(movie.getImdbCode());
+            movieEntity.setTitle(movie.getTitle());
+            movieEntity.setYear(movie.getYear());
+            movieEntity.setRating(movie.getRating());
+            movieEntity.setGenres(movie.getGenres());
+            movieEntity.setSynopsis(movie.getSynopsis());
+            movieEntity.setBackgroundImage(movie.getBackgroundImage());
+            movieEntity.setMediumCoverImage(movie.getMediumCoverImage());
+            Timber.i("Converted movie entity: %s.", movieEntity.toString());
+            movieEntityList.add(movieEntity);
+
+            //
+            // Torrent entity object.
+            //
+
+            for (Torrent torrent :
+                    movie.getTorrents()) {
+                TorrentEntity torrentEntity = new TorrentEntity();
+                torrentEntity.setUrl(torrent.getUrl());
+                torrentEntity.setQuality(torrent.getQuality());
+                torrentEntity.setSize(torrent.getSize());
+                torrentEntity.setMovieId(movie.getId());
+                Timber.i("Converted torrent entity: %s.", torrentEntity.toString());
+                torrentEntities.add(torrentEntity);
+            }
+        }
+
+        //
+        // Call repository method for saving data.
+        //
+
+        disposableGetMovies = database
+                .movieDao()
+                .getData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(movieEntityList1 -> {
+                    Timber.i("Got entities: %s.", movieEntityList1);
+
+                    if (movieEntityList1 != null && movieEntityList1.size() > 0) {
+                        deleteMovies(database, movieEntityList1, movieEntityList, torrentEntities);
+                    } else {
+                        insertMovies(database, movieEntityList, torrentEntities);
+                    }
+                });
+    }
+
+    private void deleteMovies(ApplicationDatabase database,
+                              List<MovieEntity> moviesToDelete,
+                              List<MovieEntity> moviesToInsert,
+                              List<TorrentEntity> torrentsToInsert) {
+        disposableDeleteMovies = Completable
+                .fromAction(() -> {
+                    int deletedRowsCount = database
+                            .movieDao()
+                            .deleteData(moviesToDelete);
+
+                    Timber.i("Deleted rows count: %d.", deletedRowsCount);
+                    insertMovies(database, moviesToInsert, torrentsToInsert);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe();
+    }
+
     private void insertMovies(ApplicationDatabase database, List<MovieEntity> movieList,
                               List<TorrentEntity> torrentList) {
-        Completable.fromAction(() -> {
-            List<Long> moviesIds = database.movieDao().insertData(movieList);
-            Timber.i("Inserted movies ids: %s.", moviesIds.toString());
-            List<Long> torrentsIds = database.torrentDao().insertData(torrentList);
-            Timber.i("Inserted torrents ids: %s.", torrentsIds.toString());
-        })
+        disposableInsertMovies = Completable
+                .fromAction(() -> {
+                    List<Long> moviesIds = database.movieDao().insertData(movieList);
+                    Timber.i("Inserted movies ids: %s.", moviesIds.toString());
+                    List<Long> torrentsIds = database.torrentDao().insertData(torrentList);
+                    Timber.i("Inserted torrents ids: %s.", torrentsIds.toString());
+                })
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .subscribe();

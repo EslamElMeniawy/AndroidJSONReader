@@ -12,7 +12,10 @@ import java.util.concurrent.TimeoutException;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.Torrent;
+import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
+import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -30,7 +33,11 @@ public class MainPresenter implements MainMVP.Presenter {
     private boolean mLoadingItems = true;
     private MovieViewModel movieToOpen = null;
     private int firstPage = 1;
-    private Disposable moviesDisposable = null;
+
+    private Disposable moviesOnlineDisposable = null,
+            moviesOfflineDisposable = null,
+            torrentsDisposable = null,
+            moviesDisposable = null;
 
     @Nullable
     private MainMVP.View view;
@@ -215,9 +222,9 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
 
                 firstPage += 2;
-                moviesDisposable = model.getMovies(model
+                moviesOnlineDisposable = model.getMovies(model
                                 .getMoviesLastFetchTime(view.getSharedPreferences()),
-                        view.getDatabase(), firstPage)
+                        view.getDatabase(), firstPage, view.getSharedPreferences())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::handleResult, this::handleError);
@@ -240,7 +247,7 @@ public class MainPresenter implements MainMVP.Presenter {
     public void bannerAdLoaded() {
         if (view != null) {
             view.showAdView();
-            view.setMainPadding(0, 16, 0, 0);
+            view.setMainPadding(0);
         }
     }
 
@@ -248,7 +255,7 @@ public class MainPresenter implements MainMVP.Presenter {
     public void bannerAdFailed() {
         if (view != null) {
             view.hideAdView();
-            view.setMainPadding(0, 16, 0, 16);
+            view.setMainPadding(16);
         }
     }
 
@@ -389,9 +396,23 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     private void rxUnsubscribe() {
+        if (moviesOnlineDisposable != null && moviesOnlineDisposable.isDisposed()) {
+            moviesOnlineDisposable.dispose();
+        }
+
+        if (moviesOfflineDisposable != null && moviesOfflineDisposable.isDisposed()) {
+            moviesOfflineDisposable.dispose();
+        }
+
+        if (torrentsDisposable != null && torrentsDisposable.isDisposed()) {
+            torrentsDisposable.dispose();
+        }
+
         if (moviesDisposable != null && moviesDisposable.isDisposed()) {
             moviesDisposable.dispose();
         }
+
+        model.rxUnsubscribe();
     }
 
     private void loadFirstTimeMovies() {
@@ -400,9 +421,10 @@ public class MainPresenter implements MainMVP.Presenter {
             view.showSwipeLoading();
             view.clearMovies();
             firstPage = 1;
-            moviesDisposable = model
+
+            moviesOnlineDisposable = model
                     .getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
-                            view.getDatabase(), firstPage)
+                            view.getDatabase(), firstPage, view.getSharedPreferences())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::handleResult, this::handleError);
@@ -475,22 +497,7 @@ public class MainPresenter implements MainMVP.Presenter {
                     // Get movies offline.
                     //
 
-                    List<Movie> offlineMovies = new ArrayList<>();
-
-                    moviesDisposable = model
-                            .getMoviesOffline(view.getDatabase())
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .doOnNext(offlineMovies::add)
-                            .doOnError(throwable1 -> showTvError(throwable))
-                            .doOnComplete(() -> {
-                                if (offlineMovies.size() > 0) {
-                                    showSnackBarError(throwable);
-                                } else {
-                                    showTvError(throwable);
-                                }
-                            })
-                            .subscribe(this::handleResult);
+                    getMoviesOffline(throwable);
                 }
             } else {
                 //
@@ -498,6 +505,104 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
                 firstPage -= 2;
                 showSnackBarError(throwable);
+            }
+        }
+    }
+
+    private void getMoviesOffline(Throwable throwable) {
+        if (view != null) {
+            moviesOfflineDisposable = model
+                    .getMoviesOffline(view.getDatabase())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(movieEntityList -> {
+                        Timber.i("Got entities: %s.", movieEntityList);
+                        List<Movie> offlineMovies = new ArrayList<>();
+
+                        if (movieEntityList != null && movieEntityList.size() > 0) {
+                            for (MovieEntity movieEntity :
+                                    movieEntityList) {
+                                Timber.i("Current movie entity to convert: %s.",
+                                        movieEntity.toString());
+                                //
+                                // Map movie entity to movie object.
+                                //
+
+                                Movie movie = new Movie();
+                                movie.setId(movieEntity.getId());
+                                movie.setImdbCode(movieEntity.getImdbCode());
+                                movie.setTitle(movieEntity.getTitle());
+                                movie.setYear(movieEntity.getYear());
+                                movie.setRating(movieEntity.getRating());
+                                movie.setGenres(movieEntity.getGenres());
+                                movie.setSynopsis(movieEntity.getSynopsis());
+                                movie.setBackgroundImage(movieEntity.getBackgroundImage());
+                                movie.setMediumCoverImage(movieEntity.getMediumCoverImage());
+
+                                //
+                                // Add movie to movies list.
+                                //
+
+                                offlineMovies.add(movie);
+                            }
+
+                            //
+                            // Get torrents for the gotten movies.
+                            //
+
+                            getTorrentsOffline(offlineMovies, 0, throwable);
+                        } else {
+                            showTvError(throwable);
+                        }
+                    });
+        }
+    }
+
+    private void getTorrentsOffline(List<Movie> movies, int index, Throwable throwable) {
+        if (view != null) {
+            if (index < movies.size()) {
+                torrentsDisposable = model
+                        .getMovieOfflineTorrents(view.getDatabase(), movies.get(index).getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(torrentEntityList -> {
+                            Timber.i("Got entities: %s.", torrentEntityList);
+                            List<Torrent> torrents = new ArrayList<>();
+
+                            if (torrentEntityList != null && torrentEntityList.size() > 0) {
+                                for (TorrentEntity torrentEntity :
+                                        torrentEntityList) {
+                                    //
+                                    // Map torrent entity to torrent object.
+                                    //
+
+                                    Torrent torrent = new Torrent();
+                                    torrent.setUrl(torrentEntity.getUrl());
+                                    torrent.setQuality(torrentEntity.getQuality());
+                                    torrent.setSize(torrentEntity.getSize());
+
+                                    //
+                                    // Add torrent to torrents list.
+                                    //
+
+                                    torrents.add(torrent);
+                                }
+                            }
+
+                            Movie movie = movies.get(index);
+                            movie.setTorrents(torrents);
+                            movies.set(index, movie);
+                            int nextIndex = index + 1;
+                            getTorrentsOffline(movies, nextIndex, throwable);
+                        });
+            } else {
+                showSnackBarError(throwable);
+
+                moviesDisposable = Observable
+                        .fromIterable(movies)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::handleResult);
             }
         }
     }

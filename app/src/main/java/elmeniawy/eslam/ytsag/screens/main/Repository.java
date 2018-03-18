@@ -8,6 +8,7 @@ import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 /**
@@ -40,20 +41,16 @@ public interface Repository {
 
     void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
 
-    void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time);
-
-    Observable<Movie> getMoviesOnline(int firstPage, MySharedPreferences sharedPreferences,
-                                      ApplicationDatabase database);
-
-    Observable<Movie> getMoviesOffline(ApplicationDatabase database);
-
     Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage,
                                 MySharedPreferences sharedPreferences);
 
-    void saveMovies(ApplicationDatabase database, List<Movie> movieList,
-                    List<TorrentEntity> torrentList);
+    Maybe<List<MovieEntity>> getMoviesOffline(ApplicationDatabase database);
+
+    Maybe<List<TorrentEntity>> getMovieOfflineTorrents(ApplicationDatabase database, Long movieId);
 
     Observable<UpdateResponse> checkUpdateAvailable();
 
     void downloadApk();
+
+    void rxUnsubscribe();
 }
