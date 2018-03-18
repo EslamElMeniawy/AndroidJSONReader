@@ -21,7 +21,6 @@ import elmeniawy.eslam.ytsag.utils.FabricEvents;
  */
 @SuppressWarnings("DefaultFileTemplate")
 public class TabFragmentSocial extends Fragment {
-    private static final String TAG = TabFragmentSocial.class.getSimpleName();
     private Unbinder unbinder;
 
     @Override
@@ -33,7 +32,7 @@ public class TabFragmentSocial extends Fragment {
         //
 
         if (savedInstanceState == null) {
-            FabricEvents.logContentViewEvent(TAG);
+            FabricEvents.logContentViewEvent(TabFragmentSocial.class.getSimpleName());
         }
     }
 

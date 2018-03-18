@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 //    private ProgressDialog progressDialog;
 //    private long downloadStartTime;
 //
-    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Inject
     MySharedPreferences mySharedPreferences;
@@ -157,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         //
 
         if (savedInstanceState == null) {
-            FabricEvents.logContentViewEvent(TAG);
+            FabricEvents.logContentViewEvent(MainActivity.class.getSimpleName());
         }
 
         //

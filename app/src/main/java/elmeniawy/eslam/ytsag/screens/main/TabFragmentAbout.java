@@ -16,8 +16,6 @@ import elmeniawy.eslam.ytsag.utils.FabricEvents;
  */
 @SuppressWarnings("DefaultFileTemplate")
 public class TabFragmentAbout extends Fragment {
-    private static final String TAG = TabFragmentAbout.class.getSimpleName();
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +25,7 @@ public class TabFragmentAbout extends Fragment {
         //
 
         if (savedInstanceState == null) {
-            FabricEvents.logContentViewEvent(TAG);
+            FabricEvents.logContentViewEvent(TabFragmentAbout.class.getSimpleName());
         }
     }
 

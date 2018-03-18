@@ -17,8 +17,6 @@ import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import timber.log.Timber;
 
 public class SplashActivity extends AppCompatActivity implements SplashMVP.View {
-    private static final String TAG = SplashActivity.class.getSimpleName();
-
     @Inject
     MySharedPreferences mySharedPreferences;
 
@@ -50,7 +48,7 @@ public class SplashActivity extends AppCompatActivity implements SplashMVP.View 
         //
 
         if (savedInstanceState == null) {
-            FabricEvents.logContentViewEvent(TAG);
+            FabricEvents.logContentViewEvent(SplashActivity.class.getSimpleName());
         }
     }
 

@@ -26,7 +26,6 @@ import elmeniawy.eslam.ytsag.utils.FabricEvents;
  */
 @SuppressWarnings("DefaultFileTemplate")
 public class FragmentDialogDeveloper extends DialogFragment {
-    private static final String TAG = FragmentDialogDeveloper.class.getSimpleName();
     private Unbinder unbinder;
 
     @BindView(R.id.developerPager)
@@ -47,7 +46,7 @@ public class FragmentDialogDeveloper extends DialogFragment {
         //
 
         if (savedInstanceState == null) {
-            FabricEvents.logContentViewEvent(TAG);
+            FabricEvents.logContentViewEvent(FragmentDialogDeveloper.class.getSimpleName());
         }
     }
 
