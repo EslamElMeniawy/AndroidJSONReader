@@ -25,11 +25,11 @@ import timber.log.Timber;
  * Created by Eslam El-Meniawy on 02-Jan-16.
  */
 @SuppressWarnings("DefaultFileTemplate")
-class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolderMoviesList> {
+public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolderMoviesList> {
     private List<MovieViewModel> list;
     private Context context;
 
-    MoviesListAdapter(List<MovieViewModel> list, Context context) {
+    public MoviesListAdapter(List<MovieViewModel> list, Context context) {
         this.list = list;
         this.context = context;
     }

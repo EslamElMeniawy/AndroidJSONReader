@@ -12,11 +12,11 @@ import elmeniawy.eslam.ytsag.R;
  */
 
 @SuppressWarnings("DefaultFileTemplate")
-class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
     private Context context;
     private int space;
 
-    SpacesItemDecoration(Context context, int space) {
+    public SpacesItemDecoration(Context context, int space) {
         this.space = space;
         this.context = context;
     }

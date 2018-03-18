@@ -1,6 +1,10 @@
 package elmeniawy.eslam.ytsag.screens.search;
 
+import java.util.List;
+
 import elmeniawy.eslam.ytsag.api.model.Movie;
+import elmeniawy.eslam.ytsag.screens.main.MovieViewModel;
+import elmeniawy.eslam.ytsag.screens.main.TorrentViewModel;
 import io.reactivex.Observable;
 
 /**
@@ -12,6 +16,43 @@ import io.reactivex.Observable;
 
 public interface SearchMVP {
     interface View {
+        void showNoResults();
+
+        void setInternetError();
+
+        void setGetMoviesError();
+
+        void showError();
+
+        void hideError();
+
+        void showSwipeLayout();
+
+        void hideSwipeLayout();
+
+        void showSwipeLoading();
+
+        void hideSwipeLoading();
+
+        void updateMovies(MovieViewModel movie);
+
+        void clearMovies();
+
+        void setMainPadding(int bottom);
+
+        void showAdView();
+
+        void hideAdView();
+
+        boolean isAdViewNull();
+
+        void pauseAdView();
+
+        void resumeAdView();
+
+        void destroyAdView();
+
+        void openDetails(MovieViewModel movie, List<TorrentViewModel> torrentsList);
     }
 
     interface Presenter {
