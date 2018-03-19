@@ -52,6 +52,8 @@ public class DetailsActivity extends AppCompatActivity {
                     .getParcelableArrayList(ConstantUtils.INTENT_KEY_TORRENTS);
 
             Timber.i("Torrents: %s.", torrents);
+
+            //gridView.setExpanded(true);
         }
 
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
