@@ -47,7 +47,8 @@
             android:id="@+id/MoviesRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/movie_item" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <com.google.android.gms.ads.AdView

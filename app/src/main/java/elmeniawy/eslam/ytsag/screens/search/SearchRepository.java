@@ -2,8 +2,8 @@ package elmeniawy.eslam.ytsag.screens.search;
 
 import elmeniawy.eslam.ytsag.api.MoviesApiService;
 import elmeniawy.eslam.ytsag.api.model.Movie;
-import elmeniawy.eslam.ytsag.api.model.MovieResponse;
 import io.reactivex.Observable;
+import timber.log.Timber;
 
 /**
  * SearchRepository
@@ -14,6 +14,7 @@ import io.reactivex.Observable;
 
 public class SearchRepository implements Repository {
     private MoviesApiService moviesApiService;
+    private long movieCount = 0;
 
     SearchRepository(MoviesApiService moviesApiService) {
         this.moviesApiService = moviesApiService;
@@ -21,12 +22,23 @@ public class SearchRepository implements Repository {
 
     @Override
     public Observable<Movie> getMovies(String searchQuery, int firstPage) {
-        Observable<MovieResponse> movieObservable = moviesApiService
+        return moviesApiService
                 .searchMovies(searchQuery, firstPage)
-                .concatWith(moviesApiService.searchMovies(searchQuery, firstPage + 1));
+                .concatMap(movieResponse -> {
+                    Timber.i("Movie count: %d.", movieResponse.getData().getMovieCount());
+                    movieCount = movieResponse.getData().getMovieCount();
 
-        return movieObservable
-                .concatMap(movieResponse -> Observable
-                        .fromIterable(movieResponse.getData().getMovies()));
+                    if (movieResponse.getData().getMovies() != null
+                            && movieResponse.getData().getMovies().size() > 0) {
+                        return Observable.fromIterable(movieResponse.getData().getMovies());
+                    } else {
+                        return Observable.empty();
+                    }
+                });
+    }
+
+    @Override
+    public long getMoviesCount() {
+        return movieCount;
     }
 }

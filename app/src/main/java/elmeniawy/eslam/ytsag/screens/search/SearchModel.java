@@ -21,4 +21,9 @@ public class SearchModel implements SearchMVP.Model {
     public Observable<Movie> getMovies(String searchQuery, int firstPage) {
         return repository.getMovies(searchQuery, firstPage);
     }
+
+    @Override
+    public long getMoviesCount() {
+        return repository.getMoviesCount();
+    }
 }

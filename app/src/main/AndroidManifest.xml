@@ -74,7 +74,8 @@
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
+            android:theme="@style/TranslucentTheme"
+            tools:replace="android:theme" />
 
         <receiver android:name=".AlarmReceiver" />
         <receiver android:name=".UpdateReceiver" />

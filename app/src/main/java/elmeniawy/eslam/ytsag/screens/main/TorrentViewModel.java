@@ -19,7 +19,7 @@ public class TorrentViewModel implements Parcelable {
     private String quality;
     private String size;
 
-    TorrentViewModel() {
+    public TorrentViewModel() {
     }
 
     private TorrentViewModel(Parcel in) {

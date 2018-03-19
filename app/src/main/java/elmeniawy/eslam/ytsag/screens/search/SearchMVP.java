@@ -52,6 +52,10 @@ public interface SearchMVP {
 
         void destroyAdView();
 
+        boolean getInterstitialLoaded();
+
+        void showInterstitialAd();
+
         void openDetails(MovieViewModel movie, List<TorrentViewModel> torrentsList);
     }
 
@@ -74,6 +78,10 @@ public interface SearchMVP {
 
         void bannerClicked();
 
+        void interstitialClicked();
+
+        void interstitialClosed();
+
         void onPaused();
 
         void onResumed();
@@ -85,5 +93,7 @@ public interface SearchMVP {
 
     interface Model {
         Observable<Movie> getMovies(String searchQuery, int firstPage);
+
+        long getMoviesCount();
     }
 }

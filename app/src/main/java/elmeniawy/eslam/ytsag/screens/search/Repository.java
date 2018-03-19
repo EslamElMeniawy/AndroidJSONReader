@@ -12,4 +12,6 @@ import io.reactivex.Observable;
 
 public interface Repository {
     Observable<Movie> getMovies(String searchQuery, int firstPage);
+
+    long getMoviesCount();
 }

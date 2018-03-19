@@ -3,6 +3,7 @@ package elmeniawy.eslam.ytsag.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("unused")
 public class MovieResponse {
     @SerializedName("status")
     @Expose
