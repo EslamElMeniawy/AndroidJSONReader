@@ -1,5 +1,7 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,8 +106,7 @@ public class MainRepository implements Repository {
         sharedPreferences.putLong(PreferencesUtils.KEY_UPDATE_LAST_CHECK, time);
     }
 
-    private Observable<Movie> getMoviesOnline(int firstPage, MySharedPreferences sharedPreferences,
-                                              ApplicationDatabase database) {
+    private Observable<Movie> getMoviesOnline(int firstPage) {
         Timber.i("getMoviesOnline");
         Timber.i("First page to get: %d.", firstPage);
 
@@ -115,32 +116,16 @@ public class MainRepository implements Repository {
 
         Observable<MovieResponse> movieObservable = moviesApiService
                 .getMovies(firstPage)
-                .concatWith(moviesApiService.getMovies(firstPage + 1));
+                .concatWith(moviesApiService.getMovies(firstPage + 1))
+                .doOnNext(movieResponse -> {
+                    if (firstPage == 1) {
+                        movies.addAll(movieResponse.getData().getMovies());
+                    }
+                });
 
         return movieObservable
                 .concatMap(movieResponse -> Observable
-                        .fromIterable(movieResponse.getData().getMovies()))
-                .doOnNext(movies::add)
-                .doOnComplete(() -> {
-                    Timber.i("Get movies online complete.");
-                    Timber.i("Movies count: %d.", movies.size());
-
-                    if (firstPage == 1) {
-                        Timber.i("Get movies online complete first page.");
-
-                        //
-                        // Save movies fetch time.
-                        //
-
-                        saveMoviesLastFetchTime(sharedPreferences, System.currentTimeMillis());
-
-                        //
-                        // Save movies.
-                        //
-
-                        saveMovies(database, movies);
-                    }
-                });
+                        .fromIterable(movieResponse.getData().getMovies()));
     }
 
     @Override
@@ -161,17 +146,90 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage,
-                                       MySharedPreferences sharedPreferences) {
+    public Observable<Movie> getMovies(long timestamp, int firstPage) {
         if (firstPage == 1) {
             if (isUpToDate(timestamp)) {
                 return Observable.fromIterable(movies);
             } else {
-                return getMoviesOnline(firstPage, sharedPreferences, database);
+                return getMoviesOnline(firstPage);
             }
         } else {
-            return getMoviesOnline(firstPage, sharedPreferences, database);
+            return getMoviesOnline(firstPage);
         }
+    }
+
+    @Override
+    public void saveMovies(ApplicationDatabase database, MySharedPreferences sharedPreferences,
+                           List<Movie> movieList, long time) {
+        Timber.i("saveMovies");
+
+        //
+        // Map movies list to movies and torrents entities.
+        //
+
+        List<MovieEntity> movieEntityList = new ArrayList<>();
+        List<TorrentEntity> torrentEntities = new ArrayList<>();
+
+        for (Movie movie :
+                movieList) {
+            Gson gson = new Gson();
+            Timber.i("Current movie to convert: %s.", gson.toJson(movie));
+
+            //
+            // Movie entity object.
+            //
+
+            MovieEntity movieEntity = new MovieEntity();
+            movieEntity.setId(movie.getId());
+            movieEntity.setImdbCode(movie.getImdbCode());
+            movieEntity.setTitle(movie.getTitle());
+            movieEntity.setYear(movie.getYear());
+            movieEntity.setRating(movie.getRating());
+            movieEntity.setGenres(movie.getGenres());
+            movieEntity.setSynopsis(movie.getSynopsis());
+            movieEntity.setBackgroundImage(movie.getBackgroundImage());
+            movieEntity.setMediumCoverImage(movie.getMediumCoverImage());
+            Timber.i("Converted movie entity: %s.", movieEntity);
+            movieEntityList.add(movieEntity);
+
+            //
+            // Torrent entity object.
+            //
+
+            if (movie.getTorrents() != null) {
+                for (Torrent torrent :
+                        movie.getTorrents()) {
+                    TorrentEntity torrentEntity = new TorrentEntity();
+                    torrentEntity.setUrl(torrent.getUrl());
+                    torrentEntity.setQuality(torrent.getQuality());
+                    torrentEntity.setSize(torrent.getSize());
+                    torrentEntity.setMovieId(movie.getId());
+                    Timber.i("Converted torrent entity: %s.", torrentEntity);
+                    torrentEntities.add(torrentEntity);
+                }
+            }
+        }
+
+        //
+        // Call repository method for saving data.
+        //
+
+        disposableGetMovies = database
+                .movieDao()
+                .getData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(movieEntityList1 -> {
+                    Timber.i("Got entities: %s.", movieEntityList1);
+
+                    if (movieEntityList1 != null && movieEntityList1.size() > 0) {
+                        deleteMovies(database, sharedPreferences, movieEntityList1, movieEntityList,
+                                torrentEntities, time);
+                    } else {
+                        insertMovies(database, sharedPreferences, movieEntityList, torrentEntities,
+                                time);
+                    }
+                });
     }
 
     @Override
@@ -199,86 +257,18 @@ public class MainRepository implements Repository {
         }
     }
 
-    private boolean isUpToDate(long timestamp) {
+    @Override
+    public boolean isUpToDate(long timestamp) {
         Timber.i("Last movies fetch time: %d.", timestamp);
         return timestamp != 0 && System.currentTimeMillis() - timestamp < STALE_MS;
     }
 
-    private void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time) {
-        sharedPreferences.putLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH, time);
-    }
-
-    private void saveMovies(ApplicationDatabase database, List<Movie> movieList) {
-        Timber.i("saveMovies");
-
-        //
-        // Map movies list to movies and torrents entities.
-        //
-
-        List<MovieEntity> movieEntityList = new ArrayList<>();
-        List<TorrentEntity> torrentEntities = new ArrayList<>();
-
-        for (Movie movie :
-                movieList) {
-            Timber.i("Current movie to convert: %s.", movie.toString());
-
-            //
-            // Movie entity object.
-            //
-
-            MovieEntity movieEntity = new MovieEntity();
-            movieEntity.setId(movie.getId());
-            movieEntity.setImdbCode(movie.getImdbCode());
-            movieEntity.setTitle(movie.getTitle());
-            movieEntity.setYear(movie.getYear());
-            movieEntity.setRating(movie.getRating());
-            movieEntity.setGenres(movie.getGenres());
-            movieEntity.setSynopsis(movie.getSynopsis());
-            movieEntity.setBackgroundImage(movie.getBackgroundImage());
-            movieEntity.setMediumCoverImage(movie.getMediumCoverImage());
-            Timber.i("Converted movie entity: %s.", movieEntity.toString());
-            movieEntityList.add(movieEntity);
-
-            //
-            // Torrent entity object.
-            //
-
-            for (Torrent torrent :
-                    movie.getTorrents()) {
-                TorrentEntity torrentEntity = new TorrentEntity();
-                torrentEntity.setUrl(torrent.getUrl());
-                torrentEntity.setQuality(torrent.getQuality());
-                torrentEntity.setSize(torrent.getSize());
-                torrentEntity.setMovieId(movie.getId());
-                Timber.i("Converted torrent entity: %s.", torrentEntity.toString());
-                torrentEntities.add(torrentEntity);
-            }
-        }
-
-        //
-        // Call repository method for saving data.
-        //
-
-        disposableGetMovies = database
-                .movieDao()
-                .getData()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(movieEntityList1 -> {
-                    Timber.i("Got entities: %s.", movieEntityList1);
-
-                    if (movieEntityList1 != null && movieEntityList1.size() > 0) {
-                        deleteMovies(database, movieEntityList1, movieEntityList, torrentEntities);
-                    } else {
-                        insertMovies(database, movieEntityList, torrentEntities);
-                    }
-                });
-    }
-
     private void deleteMovies(ApplicationDatabase database,
+                              MySharedPreferences sharedPreferences,
                               List<MovieEntity> moviesToDelete,
                               List<MovieEntity> moviesToInsert,
-                              List<TorrentEntity> torrentsToInsert) {
+                              List<TorrentEntity> torrentsToInsert,
+                              long time) {
         disposableDeleteMovies = Completable
                 .fromAction(() -> {
                     int deletedRowsCount = database
@@ -286,24 +276,33 @@ public class MainRepository implements Repository {
                             .deleteData(moviesToDelete);
 
                     Timber.i("Deleted rows count: %d.", deletedRowsCount);
-                    insertMovies(database, moviesToInsert, torrentsToInsert);
+
+                    insertMovies(database, sharedPreferences, moviesToInsert, torrentsToInsert,
+                            time);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe();
     }
 
-    private void insertMovies(ApplicationDatabase database, List<MovieEntity> movieList,
-                              List<TorrentEntity> torrentList) {
+    private void insertMovies(ApplicationDatabase database, MySharedPreferences sharedPreferences,
+                              List<MovieEntity> movieList, List<TorrentEntity> torrentList,
+                              long time) {
         disposableInsertMovies = Completable
                 .fromAction(() -> {
                     List<Long> moviesIds = database.movieDao().insertData(movieList);
                     Timber.i("Inserted movies ids: %s.", moviesIds.toString());
                     List<Long> torrentsIds = database.torrentDao().insertData(torrentList);
                     Timber.i("Inserted torrents ids: %s.", torrentsIds.toString());
+                    saveMoviesLastFetchTime(sharedPreferences, time);
                 })
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    private void saveMoviesLastFetchTime(MySharedPreferences sharedPreferences, long time) {
+        Timber.i("Save last fetch time: %d.", time);
+        sharedPreferences.putLong(PreferencesUtils.KEY_MOVIES_LAST_FETCH, time);
     }
 }

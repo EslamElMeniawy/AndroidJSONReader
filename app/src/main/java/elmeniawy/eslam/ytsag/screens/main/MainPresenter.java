@@ -2,6 +2,8 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -32,6 +34,7 @@ public class MainPresenter implements MainMVP.Presenter {
     private boolean mLoadingItems = true;
     private MovieViewModel movieToOpen = null;
     private int firstPage = 1;
+    private Gson gson = new Gson();
 
     private Disposable moviesOnlineDisposable = null,
             moviesOfflineDisposable = null,
@@ -220,9 +223,9 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
 
                 firstPage += 2;
-                moviesOnlineDisposable = model.getMovies(model
-                                .getMoviesLastFetchTime(view.getSharedPreferences()),
-                        view.getDatabase(), firstPage, view.getSharedPreferences())
+                moviesOnlineDisposable = model
+                        .getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
+                                firstPage)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::handleResult, this::handleError);
@@ -419,12 +422,30 @@ public class MainPresenter implements MainMVP.Presenter {
             view.showSwipeLoading();
             view.clearMovies();
             firstPage = 1;
+            List<Movie> onlineMovies = new ArrayList<>();
 
             moviesOnlineDisposable = model
                     .getMovies(model.getMoviesLastFetchTime(view.getSharedPreferences()),
-                            view.getDatabase(), firstPage, view.getSharedPreferences())
+                            firstPage)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext(onlineMovies::add)
+                    .doOnComplete(() -> {
+                        Timber.i("Get movies complete.");
+                        Timber.i("Movies count: %d.", onlineMovies.size());
+
+                        if (!model
+                                .isUpToDate(model
+                                        .getMoviesLastFetchTime(view
+                                                .getSharedPreferences()))) {
+                            //
+                            // Save movies for offline use.
+                            //
+
+                            model.saveMovies(view.getDatabase(), view.getSharedPreferences(),
+                                    onlineMovies, System.currentTimeMillis());
+                        }
+                    })
                     .subscribe(this::handleResult, this::handleError);
         }
     }
@@ -439,7 +460,7 @@ public class MainPresenter implements MainMVP.Presenter {
             // Convert movie object to movie view model object.
             //
 
-            Timber.i("Movie to be converted: %s.", movie.toString());
+            Timber.i("Movie to be converted: %s.", gson.toJson(movie));
             MovieViewModel movieViewModel = new MovieViewModel();
             movieViewModel.setImdbCode(movie.getImdbCode());
             movieViewModel.setTitle(movie.getTitle());
@@ -454,21 +475,21 @@ public class MainPresenter implements MainMVP.Presenter {
             if (movie.getTorrents() != null && movie.getTorrents().size() > 0) {
                 for (Torrent torrent :
                         movie.getTorrents()) {
-                    Timber.i("Torrent to be converted: %s.", torrent.toString());
+                    Timber.i("Torrent to be converted: %s.", gson.toJson(torrent));
                     TorrentViewModel torrentViewModel = new TorrentViewModel();
                     torrentViewModel.setUrl(torrent.getUrl());
                     torrentViewModel.setQuality(torrent.getQuality());
                     torrentViewModel.setSize(torrent.getSize());
 
                     Timber.i("Converted torrent view model: %s.",
-                            torrentViewModel.toString());
+                            torrentViewModel);
 
                     torrentViewModels.add(torrentViewModel);
                 }
             }
 
             movieViewModel.setTorrents(torrentViewModels);
-            Timber.i("Converted movie view model: %s.", movieViewModel.toString());
+            Timber.i("Converted movie view model: %s.", movieViewModel);
 
             //
             // Update view.

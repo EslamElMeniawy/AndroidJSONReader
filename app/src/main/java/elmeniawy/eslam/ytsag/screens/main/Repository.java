@@ -41,8 +41,10 @@ public interface Repository {
 
     void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
 
-    Observable<Movie> getMovies(long timestamp, ApplicationDatabase database, int firstPage,
-                                MySharedPreferences sharedPreferences);
+    Observable<Movie> getMovies(long timestamp, int firstPage);
+
+    void saveMovies(ApplicationDatabase database, MySharedPreferences sharedPreferences,
+                    List<Movie> movies, long time);
 
     Maybe<List<MovieEntity>> getMoviesOffline(ApplicationDatabase database);
 
@@ -53,4 +55,6 @@ public interface Repository {
     void downloadApk();
 
     void rxUnsubscribe();
+
+    boolean isUpToDate(long time);
 }

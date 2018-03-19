@@ -10,7 +10,6 @@ import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
-import timber.log.Timber;
 
 /**
  * MainModel
@@ -82,10 +81,15 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
-    public Observable<Movie> getMovies(long timestamp, ApplicationDatabase database,
-                                       int firstPage, MySharedPreferences sharedPreferences) {
+    public Observable<Movie> getMovies(long timestamp, int firstPage) {
 
-        return repository.getMovies(timestamp, database, firstPage, sharedPreferences);
+        return repository.getMovies(timestamp, firstPage);
+    }
+
+    @Override
+    public void saveMovies(ApplicationDatabase database, MySharedPreferences sharedPreferences,
+                           List<Movie> movies, long time) {
+        repository.saveMovies(database, sharedPreferences, movies, time);
     }
 
     @Override
@@ -112,5 +116,10 @@ public class MainModel implements MainMVP.Model {
     @Override
     public void rxUnsubscribe() {
         repository.rxUnsubscribe();
+    }
+
+    @Override
+    public boolean isUpToDate(long time) {
+        return repository.isUpToDate(time);
     }
 }
