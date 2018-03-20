@@ -62,6 +62,8 @@ public interface DetailsMVP {
 
         void fillData();
 
+        void imdbClicked();
+
         void torrentClicked(int position);
 
         void bannerAdLoaded();

@@ -14,6 +14,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import elmeniawy.eslam.ytsag.BuildConfig;
 import elmeniawy.eslam.ytsag.root.timber.CrashReportingTree;
+import elmeniawy.eslam.ytsag.screens.details.DetailsModule;
 import elmeniawy.eslam.ytsag.screens.main.MainModule;
 import elmeniawy.eslam.ytsag.screens.search.SearchModule;
 import elmeniawy.eslam.ytsag.screens.splash.SplashModule;
@@ -47,6 +48,7 @@ public class MyApplication extends Application implements HasActivityInjector {
                 .splashModule(new SplashModule())
                 .mainModule(new MainModule())
                 .searchModule(new SearchModule())
+                .detailsModule(new DetailsModule())
                 .build();
 
         //

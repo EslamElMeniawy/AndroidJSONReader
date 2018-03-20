@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.helpers.CustomRelativeLayout;
 import elmeniawy.eslam.ytsag.helpers.ExpandableHeightGridView;
@@ -326,6 +327,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsMVP.Vie
     @Override
     public void destroyAdView() {
         adView.destroy();
+    }
+
+    @OnClick(R.id.movie_imdb_link)
+    void imdbClicked() {
+        presenter.imdbClicked();
     }
 
     private void loadAds() {
