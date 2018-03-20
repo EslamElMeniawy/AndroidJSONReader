@@ -6,43 +6,46 @@
  ~ Created by Eslam El-Meniawy.
  ~ CITC - Mansoura University
  -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/darkBackground"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="@dimen/drawer_image_padding">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/drawer_image_padding"
+        android:layout_marginRight="@dimen/drawer_image_padding"
+        android:src="@drawable/ic_action_download"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/movie_quality_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
-        android:orientation="horizontal"
-        android:padding="@dimen/drawer_image_padding"
-        tools:ignore="UseCompoundDrawables">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/drawer_image_padding"
-            android:layout_marginRight="@dimen/drawer_image_padding"
-            android:src="@drawable/ic_action_download"
-            tools:ignore="ContentDescription" />
-
-        <TextView
-            android:id="@+id/movie_quality_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/normalText"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:layout_toEndOf="@+id/download"
+        android:layout_toRightOf="@+id/download"
+        android:gravity="center"
+        android:textColor="@color/normalText"
+        android:textStyle="bold"
+        tools:text="1080p" />
 
     <TextView
         android:id="@+id/movie_quality_size"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/movie_quality_text"
+        android:layout_toEndOf="@+id/download"
+        android:layout_toRightOf="@+id/download"
         android:gravity="center"
-        android:textColor="@color/normalText" />
-</LinearLayout>
+        android:textColor="@color/normalText"
+        tools:text="1.65 GB" />
+
+
+</RelativeLayout>
