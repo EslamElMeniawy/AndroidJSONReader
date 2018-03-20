@@ -38,6 +38,8 @@ public interface DetailsMVP {
 
         void openMovieWebPage(String imdbUrl);
 
+        void setMainPadding(int bottom);
+
         void showAdView();
 
         void hideAdView();

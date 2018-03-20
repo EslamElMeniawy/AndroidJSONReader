@@ -1,199 +1,365 @@
 package elmeniawy.eslam.ytsag.screens.details;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import butterknife.BindColor;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.helpers.CustomRelativeLayout;
+import elmeniawy.eslam.ytsag.helpers.ExpandableHeightGridView;
+import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.screens.main.MovieViewModel;
 import elmeniawy.eslam.ytsag.screens.main.TorrentViewModel;
 import elmeniawy.eslam.ytsag.utils.ConstantUtils;
+import elmeniawy.eslam.ytsag.utils.FabricEvents;
 import timber.log.Timber;
 
-public class DetailsActivity extends AppCompatActivity {
-//    private AdView mAdView;
-//    private RelativeLayout main;
+public class DetailsActivity extends AppCompatActivity implements DetailsMVP.View {
+    @Inject
+    DetailsMVP.Presenter presenter;
 
-    @SuppressWarnings("ConstantConditions")
+    //
+    // Bind views.
+    //
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.loading)
+    ProgressBar loading;
+
+    @BindView(R.id.scrollView)
+    ScrollView scrollData;
+
+    @BindView(R.id.error_view)
+    TextView tvError;
+
+    @BindView(R.id.main)
+    RelativeLayout main;
+
+    @BindView(R.id.adView)
+    AdView adView;
+
+    @BindView(R.id.background)
+    CustomRelativeLayout background;
+
+    @BindView(R.id.movie_medium_image)
+    ImageView image;
+
+    @BindView(R.id.movie_tittle)
+    TextView title;
+
+    @BindView(R.id.movie_year)
+    TextView year;
+
+    @BindView(R.id.movie_genres)
+    TextView genres;
+
+    @BindView(R.id.movie_imdb_rate)
+    TextView rate;
+
+    @BindView(R.id.grid_torrents)
+    ExpandableHeightGridView torrents;
+
+    @BindView(R.id.movie_synopsis)
+    TextView synopsis;
+
+    //
+    // Bind colors.
+    //
+
+    @BindColor(R.color.colorAccent)
+    int accentColor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
+        //
+        // Inject activity.
+        //
+
+        ((MyApplication) getApplication()).getComponent().inject(this);
+
+        //
+        // Initialize butter knife.
+        //
+
+        ButterKnife.bind(this);
+
+        //
+        // Log fabric content view event only once.
+        //
+
+        if (savedInstanceState == null) {
+            FabricEvents.logContentViewEvent(DetailsActivity.class.getSimpleName());
+        }
+
+        //
+        // Set progress bar color.
+        //
+
+        loading.getIndeterminateDrawable().setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+
+        //
+        // Set toolbar.
+        //
+
+        setSupportActionBar(toolbar);
+
+        //
+        // Show up button in toolbar.
+        //
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        //
+        // Expand torrents grid.
+        //
+
+        torrents.setExpanded(true);
+
         Bundle bundle = DetailsActivity.this.getIntent().getExtras();
+        Timber.i("Bundle: %s.", bundle);
 
         if (bundle != null) {
             MovieViewModel movie = bundle.getParcelable(ConstantUtils.INTENT_KEY_MOVIE);
             Timber.i("Movie: %s.", movie);
+            presenter.setMovie(movie);
 
             List<TorrentViewModel> torrents = bundle
                     .getParcelableArrayList(ConstantUtils.INTENT_KEY_TORRENTS);
 
             Timber.i("Torrents: %s.", torrents);
-
-            //gridView.setExpanded(true);
+            presenter.setTorrents(torrents);
         }
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//
-//        ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
-//        TextView error = (TextView) findViewById(R.id.error_view);
-//
-//        Bundle bundle = DetailsActivity.this.getIntent().getExtras();
-//        if (bundle != null) {
-//            final Movie movie = bundle.getParcelable("movie");
-//
-//            TextView title = (TextView) findViewById(R.id.movie_tittle);
-//            TextView year = (TextView) findViewById(R.id.movie_year);
-//            TextView genres = (TextView) findViewById(R.id.movie_genres);
-//            TextView rate = (TextView) findViewById(R.id.movie_imdb_rate);
-//            TextView qualityText1 = (TextView) findViewById(R.id.movie_quality_1_text);
-//            TextView qualityText2 = (TextView) findViewById(R.id.movie_quality_2_text);
-//            TextView qualityText3 = (TextView) findViewById(R.id.movie_quality_3_text);
-//            TextView qualitySize1 = (TextView) findViewById(R.id.movie_quality_1_size);
-//            TextView qualitySize2 = (TextView) findViewById(R.id.movie_quality_2_size);
-//            TextView qualitySize3 = (TextView) findViewById(R.id.movie_quality_3_size);
-//            TextView synopsis = (TextView) findViewById(R.id.movie_synopsis);
-//            ImageView imdbLink = (ImageView) findViewById(R.id.movie_imdb_link);
-//            LinearLayout quality1 = (LinearLayout) findViewById(R.id.movie_quality_1);
-//            LinearLayout quality2 = (LinearLayout) findViewById(R.id.movie_quality_2);
-//            LinearLayout quality3 = (LinearLayout) findViewById(R.id.movie_quality_3);
-//            final ImageView image = (ImageView) findViewById(R.id.movie_medium_image);
-//            LinearLayout qualityLayout1 = (LinearLayout) findViewById(R.id.movie_quality_1_layout);
-//            LinearLayout qualityLayout2 = (LinearLayout) findViewById(R.id.movie_quality_2_layout);
-//            LinearLayout qualityLayout3 = (LinearLayout) findViewById(R.id.movie_quality_3_layout);
-//            final RelativeLayout background = (RelativeLayout) findViewById(R.id.background);
-//
-//            Picasso.with(DetailsActivity.this)
-//                    .load(movie.getMediumCoverImage())
-//                    .placeholder(R.drawable.placeholder)
-//                    .error(R.drawable.placeholder)
-//                    .into(image);
-//            Picasso.with(DetailsActivity.this)
-//                    .load(movie.getBackgroundImage())
-//                    .into(new Target() {
-//                        @Override
-//                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-//                            if (android.os.Build.VERSION.SDK_INT >= 16) {
-//                                background.setBackground(new BitmapDrawable(DetailsActivity.this.getResources(), bitmap));
-//                            } else {
-//                                //noinspection deprecation
-//                                background.setBackgroundDrawable(new BitmapDrawable(bitmap));
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onBitmapFailed(Drawable errorDrawable) {
-//                        }
-//
-//                        @Override
-//                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-//                        }
-//                    });
-//            title.setText(movie.getTitle());
-//            year.setText(movie.getYear());
-//            genres.setText(movie.getGenres());
-//            rate.setText(String.valueOf(movie.getRating()));
-//            synopsis.setText(movie.getSynopsis());
-//            imdbLink.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.imdb.com/title/" + movie.getImdbCode()));
-//                    startActivity(browserIntent);
-//                }
-//            });
-//            for (int i = 0; i < movie.getTorrentsQuality().length && i < movie.getTorrentsUrl().length && i < movie.getTorrentsSize().length; i++) {
-//                if (i == 0) {
-//                    qualityText1.setText(movie.getTorrentsQuality()[0]);
-//                    qualitySize1.setText(movie.getTorrentsSize()[0]);
-//                    quality1.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getTorrentsUrl()[0]));
-//                            startActivity(browserIntent);
-//                        }
-//                    });
-//                    qualityLayout1.setVisibility(View.VISIBLE);
-//                }
-//                if (i == 1) {
-//                    qualityText2.setText(movie.getTorrentsQuality()[1]);
-//                    qualitySize2.setText(movie.getTorrentsSize()[1]);
-//                    quality2.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getTorrentsUrl()[1]));
-//                            startActivity(browserIntent);
-//                        }
-//                    });
-//                    qualityLayout2.setVisibility(View.VISIBLE);
-//                }
-//                if (i == 2) {
-//                    qualityText3.setText(movie.getTorrentsQuality()[2]);
-//                    qualitySize3.setText(movie.getTorrentsSize()[2]);
-//                    quality3.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getTorrentsUrl()[2]));
-//                            startActivity(browserIntent);
-//                        }
-//                    });
-//                    qualityLayout3.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        } else {
-//            scrollView.setVisibility(View.GONE);
-//            error.setVisibility(View.VISIBLE);
-//        }
-//
-//        main = (RelativeLayout) findViewById(R.id.main);
-//
-//        mAdView = (AdView) findViewById(R.id.adView);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        mAdView.loadAd(adRequest);
-//        mAdView.setAdListener(new AdListener() {
-//            @Override
-//            public void onAdFailedToLoad(int errorCode) {
-//                if (mAdView.getVisibility() == View.VISIBLE) {
-//                    mAdView.setVisibility(View.GONE);
-//                    main.setPadding(0, 16, 0, 16);
-//                }
-//            }
-//
-//            @Override
-//            public void onAdLoaded() {
-//                if (mAdView.getVisibility() == View.GONE) {
-//                    mAdView.setVisibility(View.VISIBLE);
-//                    main.setPadding(0, 16, 0, 0);
-//                }
-//            }
-//        });
+        //
+        // Load ads.
+        //
+
+        loadAds();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onPause() {
-//        if (mAdView != null) {
-//            mAdView.pause();
-//        }
         super.onPause();
+
+        //
+        // Call presenter paused method to handle ad pause.
+        //
+
+        presenter.onPaused();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        if (mAdView != null) {
-//            mAdView.resume();
-//        }
+
+        //
+        // Set view.
+        //
+
+        presenter.setView(this);
+
+        //
+        // Fill movie data.
+        //
+
+        presenter.fillData();
+
+        //
+        // Call presenter resumed method to handle ad resume.
+        //
+
+        presenter.onResumed();
     }
 
     @Override
     protected void onDestroy() {
-//        if (mAdView != null) {
-//            mAdView.destroy();
-//        }
         super.onDestroy();
+
+        //
+        // Call presenter destroyed method to handle ad destroy & rx unsubscribe.
+        //
+
+        presenter.onDestroyed();
+    }
+
+    @Override
+    public void hideLoading() {
+        loading.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showData() {
+        scrollData.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showError() {
+        tvError.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void setTitle(String title) {
+        this.title.setText(title);
+    }
+
+    @Override
+    public void setYear(String year) {
+        this.year.setText(year);
+    }
+
+    @Override
+    public void setGenres(String genres) {
+        this.genres.setText(genres);
+    }
+
+    @Override
+    public void setTorrents(List<TorrentViewModel> torrents) {
+        this.torrents.setAdapter(new TorrentsAdapter(this, torrents));
+
+        this.torrents.setOnItemClickListener((parent, view, position, id) ->
+                presenter.torrentClicked(position));
+    }
+
+    @Override
+    public void setSynopsis(String synopsis) {
+        this.synopsis.setText(synopsis);
+    }
+
+    @Override
+    public void loadMovieImage(String imageUrl) {
+        Picasso
+                .get()
+                .load(imageUrl)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(image);
+    }
+
+    @Override
+    public void loadMovieBackground(String backgroundUrl) {
+        Picasso
+                .get()
+                .load(backgroundUrl)
+                .into(background);
+    }
+
+    @Override
+    public void openTorrentWebPage(String torrentUrl) {
+        openBrowser(torrentUrl);
+    }
+
+    @Override
+    public void openMovieWebPage(String imdbUrl) {
+        openBrowser(imdbUrl);
+    }
+
+    @Override
+    public void setMainPadding(int bottom) {
+        main.setPadding(0, 16, 0, bottom);
+    }
+
+    @Override
+    public void showAdView() {
+        adView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideAdView() {
+        adView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public boolean isAdViewNull() {
+        return adView == null;
+    }
+
+    @Override
+    public void pauseAdView() {
+        adView.pause();
+    }
+
+    @Override
+    public void resumeAdView() {
+        adView.resume();
+    }
+
+    @Override
+    public void destroyAdView() {
+        adView.destroy();
+    }
+
+    private void loadAds() {
+        loadBannerAd();
+    }
+
+    private void loadBannerAd() {
+        Timber.i("loadBannerAd");
+        adView.loadAd(new AdRequest.Builder().build());
+
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                Timber.i("onAdFailedToLoad");
+                presenter.bannerAdFailed();
+            }
+
+            @Override
+            public void onAdLoaded() {
+                Timber.i("onAdLoaded");
+                presenter.bannerAdLoaded();
+            }
+
+            @Override
+            public void onAdClicked() {
+                Timber.i("onAdClicked");
+                super.onAdClicked();
+                presenter.bannerClicked();
+            }
+        });
+    }
+
+    private void openBrowser(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 }

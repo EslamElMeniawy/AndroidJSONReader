@@ -63,7 +63,6 @@
         <activity
             android:name=".screens.details.DetailsActivity"
             android:label="@string/title_activity_details"
-            android:parentActivityName=".screens.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="UnusedAttribute">
             <meta-data
