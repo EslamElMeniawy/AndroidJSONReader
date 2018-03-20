@@ -17,7 +17,8 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/adView">
+        android:layout_above="@+id/adView"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -107,13 +108,13 @@
                         android:id="@+id/grid_torrents"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:columnWidth="90dp"
+                        android:columnWidth="@dimen/torrent_item_width"
                         android:gravity="center"
-                        android:horizontalSpacing="10dp"
+                        android:horizontalSpacing="@dimen/drawer_image_padding"
                         android:isScrollContainer="false"
                         android:numColumns="auto_fit"
                         android:stretchMode="columnWidth"
-                        android:verticalSpacing="10dp" />
+                        android:verticalSpacing="@dimen/drawer_image_padding" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -158,4 +159,10 @@
         android:textColor="@color/normalText"
         android:textStyle="bold"
         android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 </RelativeLayout>
