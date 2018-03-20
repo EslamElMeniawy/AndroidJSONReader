@@ -166,6 +166,12 @@ dependencies {
     //
 
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //
+    // Android-Job.
+    //
+
+    implementation 'com.evernote:android-job:1.2.5'
 }
 
 apply plugin: 'com.google.gms.google-services'

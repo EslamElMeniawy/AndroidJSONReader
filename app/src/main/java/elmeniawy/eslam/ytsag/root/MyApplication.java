@@ -5,6 +5,7 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.evernote.android.job.JobManager;
 import com.google.firebase.FirebaseApp;
 
 import javax.inject.Inject;
@@ -13,6 +14,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import elmeniawy.eslam.ytsag.BuildConfig;
+import elmeniawy.eslam.ytsag.jobs.YtsJobCreator;
 import elmeniawy.eslam.ytsag.root.timber.CrashReportingTree;
 import elmeniawy.eslam.ytsag.screens.details.DetailsModule;
 import elmeniawy.eslam.ytsag.screens.main.MainModule;
@@ -78,6 +80,12 @@ public class MyApplication extends Application implements HasActivityInjector {
         //
 
         FirebaseApp.initializeApp(this);
+
+        //
+        // Initialize job manager.
+        //
+
+        JobManager.create(this).addJobCreator(new YtsJobCreator());
     }
 
     public ApplicationComponent getComponent() {

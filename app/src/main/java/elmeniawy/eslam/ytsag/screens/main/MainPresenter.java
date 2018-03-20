@@ -2,6 +2,7 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import android.support.annotation.Nullable;
 
+import com.evernote.android.job.JobManager;
 import com.google.gson.Gson;
 
 import java.net.ConnectException;
@@ -14,6 +15,8 @@ import java.util.concurrent.TimeoutException;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.Torrent;
+import elmeniawy.eslam.ytsag.jobs.NotificationsJob;
+import elmeniawy.eslam.ytsag.jobs.UpdateJob;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;
@@ -360,7 +363,8 @@ public class MainPresenter implements MainMVP.Presenter {
         Timber.i("setNotificationScheduler");
 
         if (view != null) {
-            //stopNotificationScheduler();
+            view.startBootReceiver();
+            NotificationsJob.scheduleJob();
             model.saveNotificationsEnabled(view.getSharedPreferences(), true);
             view.enableNotificationsSwitch();
         }
@@ -370,7 +374,12 @@ public class MainPresenter implements MainMVP.Presenter {
         Timber.i("stopNotificationScheduler");
 
         if (view != null) {
-            //stopNotificationScheduler();
+            JobManager.instance().cancelAllForTag(NotificationsJob.TAG);
+
+            if (!model.getUpdateEnabled(view.getSharedPreferences())) {
+                view.stopBootReceiver();
+            }
+
             model.saveNotificationsEnabled(view.getSharedPreferences(), false);
             view.disableNotificationsSwitch();
         }
@@ -380,7 +389,8 @@ public class MainPresenter implements MainMVP.Presenter {
         Timber.i("setUpdateScheduler");
 
         if (view != null) {
-            //stopNotificationScheduler();
+            view.startBootReceiver();
+            UpdateJob.scheduleJob();
             model.saveUpdateEnabled(view.getSharedPreferences(), true);
             view.enableUpdateSwitch();
         }
@@ -388,9 +398,13 @@ public class MainPresenter implements MainMVP.Presenter {
 
     private void stopUpdateScheduler() {
         Timber.i("stopUpdateScheduler");
+        JobManager.instance().cancelAllForTag(UpdateJob.TAG);
 
         if (view != null) {
-            //stopNotificationScheduler();
+            if (!model.getNotificationsEnabled(view.getSharedPreferences())) {
+                view.stopBootReceiver();
+            }
+
             model.saveUpdateEnabled(view.getSharedPreferences(), false);
             view.disableUpdateSwitch();
         }

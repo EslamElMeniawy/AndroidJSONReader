@@ -3,6 +3,7 @@ package elmeniawy.eslam.ytsag.screens.main;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -51,6 +52,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import elmeniawy.eslam.ytsag.R;
+import elmeniawy.eslam.ytsag.helpers.BootReceiver;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
 import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
@@ -666,6 +668,28 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     @Override
     public void closeApp() {
         MainActivity.this.finish();
+    }
+
+    @Override
+    public void startBootReceiver() {
+        Timber.i("startBootReceiver");
+        ComponentName receiver = new ComponentName(this, BootReceiver.class);
+        PackageManager pm = getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    @Override
+    public void stopBootReceiver() {
+        Timber.i("stopBootReceiver");
+        ComponentName receiver = new ComponentName(this, BootReceiver.class);
+        PackageManager pm = getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
     }
 
     @OnClick(R.id.error_view)

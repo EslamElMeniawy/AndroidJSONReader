@@ -111,6 +111,10 @@ public interface MainMVP {
         void openDetails(MovieViewModel movie, List<TorrentViewModel> torrentsList);
 
         void closeApp();
+
+        void startBootReceiver();
+
+        void stopBootReceiver();
     }
 
     interface Presenter {

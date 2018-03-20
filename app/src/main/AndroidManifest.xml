@@ -76,28 +76,6 @@
             android:theme="@style/TranslucentTheme"
             tools:replace="android:theme" />
 
-        <receiver android:name=".AlarmReceiver" />
-        <receiver android:name=".UpdateReceiver" />
-
-        <receiver
-            android:name=".BootReceiver"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".UpdateBootReceiver"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name=".SchedulingService" />
-        <service android:name=".UpdateService" />
-
         <activity
             android:name=".screens.search.SearchActivity"
             android:label="@string/title_activity_search"
@@ -116,6 +94,14 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
+        <receiver
+            android:name=".helpers.BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
