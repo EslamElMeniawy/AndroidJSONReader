@@ -15,8 +15,8 @@ import java.util.concurrent.TimeoutException;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.Torrent;
-import elmeniawy.eslam.ytsag.jobs.NotificationsJob;
-import elmeniawy.eslam.ytsag.jobs.UpdateJob;
+import elmeniawy.eslam.ytsag.jobs.notifications.NotificationsJob;
+import elmeniawy.eslam.ytsag.jobs.update.UpdateJob;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;

@@ -1,4 +1,4 @@
-package elmeniawy.eslam.ytsag.jobs;
+package elmeniawy.eslam.ytsag.jobs.update;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -17,8 +17,6 @@ import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import elmeniawy.eslam.ytsag.utils.SchedulingUtils;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -28,15 +26,17 @@ import timber.log.Timber;
  * CITC - Mansoura University
  */
 
-public class UpdateJob extends Job {
+public class UpdateJob extends Job implements UpdateMVP.View {
     public static final String TAG = "update_job_tag";
-    private Disposable disposable = null;
 
     @Inject
     UpdateApiService updateApiService;
 
     @Inject
     MySharedPreferences sharedPreferences;
+
+    @Inject
+    UpdateMVP.Presenter presenter;
 
     @NonNull
     @Override
@@ -50,14 +50,15 @@ public class UpdateJob extends Job {
         ((MyApplication) getContext().getApplicationContext()).getComponent().inject(this);
 
         //
-        // Check for updates.
+        // Set view & call run job.
         //
 
-        disposable = updateApiService
-                .checkUpdate(System.currentTimeMillis())
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(this::handleUpdateResult);
+        presenter.setView(this);
+        presenter.runJob();
+
+        //
+        // Return job success.
+        //
 
         return Result.SUCCESS;
     }
@@ -65,10 +66,7 @@ public class UpdateJob extends Job {
     @Override
     protected void onCancel() {
         super.onCancel();
-
-        if (disposable != null && disposable.isDisposed()) {
-            disposable.dispose();
-        }
+        presenter.rxUnsubscribe();
     }
 
     public static void scheduleJob() {
@@ -82,26 +80,39 @@ public class UpdateJob extends Job {
                 .schedule();
     }
 
-    private void handleUpdateResult(UpdateResponse updateResponse) {
-        if (updateResponse.getSuccess()) {
-            try {
-                PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
-                int verCode = pInfo.versionCode;
+    @Override
+    public MySharedPreferences getSharedPreferences() {
+        return sharedPreferences;
+    }
 
-                if (updateResponse.getVersion() > verCode) {
-                    sharedPreferences.putBoolean(PreferencesUtils.KEY_UPDATE_AVAILABLE, true);
-                    
-                    NotificationsHelper.showNotification(getContext(), 2,
-                            getContext()
-                                    .getResources()
-                                    .getString(R.string.update_notification_alert_title),
-                            getContext()
-                                    .getResources()
-                                    .getString(R.string.update_notification_alert_msg));
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                Timber.e(e);
-            }
+    @Override
+    public int getVersionCode() {
+        try {
+            PackageInfo pInfo = getContext()
+                    .getPackageManager()
+                    .getPackageInfo(getContext().getPackageName(), 0);
+
+            return pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            Timber.e(e);
         }
+
+
+        return 0;
+    }
+
+    @Override
+    public String getTitle() {
+        return getContext().getResources().getString(R.string.update_notification_alert_title);
+    }
+
+    @Override
+    public String getMessage() {
+        return getContext().getResources().getString(R.string.update_notification_alert_msg);
+    }
+
+    @Override
+    public void showNotification(int id, String title, String message) {
+        NotificationsHelper.showNotification(getContext(), id, title, message);
     }
 }

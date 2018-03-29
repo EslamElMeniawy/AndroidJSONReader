@@ -6,8 +6,8 @@ import android.content.Intent;
 
 import javax.inject.Inject;
 
-import elmeniawy.eslam.ytsag.jobs.NotificationsJob;
-import elmeniawy.eslam.ytsag.jobs.UpdateJob;
+import elmeniawy.eslam.ytsag.jobs.notifications.NotificationsJob;
+import elmeniawy.eslam.ytsag.jobs.update.UpdateJob;
 import elmeniawy.eslam.ytsag.root.MyApplication;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;

@@ -11,6 +11,7 @@ import java.util.List;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.utils.DatabaseUtils;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 /**
  * MovieDao
@@ -31,5 +32,5 @@ public interface MovieDao {
     int deleteData(List<MovieEntity> movieList);
 
     @Query("SELECT max(id) FROM " + DatabaseUtils.TABLE_MOVIES)
-    long getLatestId();
+    Single<Long> getLatestId();
 }

@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobCreator;
 
+import elmeniawy.eslam.ytsag.jobs.notifications.NotificationsJob;
+import elmeniawy.eslam.ytsag.jobs.update.UpdateJob;
+
 /**
  * YtsJobCreator
  * <p>

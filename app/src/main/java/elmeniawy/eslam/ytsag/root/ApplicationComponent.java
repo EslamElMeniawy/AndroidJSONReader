@@ -8,8 +8,10 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import elmeniawy.eslam.ytsag.api.MoviesApiModule;
 import elmeniawy.eslam.ytsag.api.UpdateApiModule;
 import elmeniawy.eslam.ytsag.helpers.BootReceiver;
-import elmeniawy.eslam.ytsag.jobs.NotificationsJob;
-import elmeniawy.eslam.ytsag.jobs.UpdateJob;
+import elmeniawy.eslam.ytsag.jobs.notifications.NotificationsJob;
+import elmeniawy.eslam.ytsag.jobs.notifications.NotificationsModule;
+import elmeniawy.eslam.ytsag.jobs.update.UpdateJob;
+import elmeniawy.eslam.ytsag.jobs.update.UpdateModule;
 import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
 import elmeniawy.eslam.ytsag.screens.details.DetailsModule;
 import elmeniawy.eslam.ytsag.screens.main.MainActivity;
@@ -32,7 +34,7 @@ import elmeniawy.eslam.ytsag.storage.preferences.SharedPreferencesModule;
 @Component(modules = {AndroidSupportInjectionModule.class, ApplicationModule.class,
         SharedPreferencesModule.class, ApplicationDatabaseModule.class, MoviesApiModule.class,
         UpdateApiModule.class, SplashModule.class, MainModule.class, SearchModule.class,
-        DetailsModule.class})
+        DetailsModule.class, NotificationsModule.class, UpdateModule.class})
 public interface ApplicationComponent extends AndroidInjector<MyApplication> {
     void inject(SplashActivity target);
 
