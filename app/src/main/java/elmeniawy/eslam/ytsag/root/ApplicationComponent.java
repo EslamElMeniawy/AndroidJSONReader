@@ -8,6 +8,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import elmeniawy.eslam.ytsag.api.MoviesApiModule;
 import elmeniawy.eslam.ytsag.api.UpdateApiModule;
 import elmeniawy.eslam.ytsag.helpers.BootReceiver;
+import elmeniawy.eslam.ytsag.jobs.NotificationsJob;
 import elmeniawy.eslam.ytsag.screens.details.DetailsActivity;
 import elmeniawy.eslam.ytsag.screens.details.DetailsModule;
 import elmeniawy.eslam.ytsag.screens.main.MainActivity;
@@ -41,4 +42,6 @@ public interface ApplicationComponent extends AndroidInjector<MyApplication> {
     void inject(SearchActivity target);
 
     void inject(BootReceiver target);
+
+    void inject(NotificationsJob target);
 }

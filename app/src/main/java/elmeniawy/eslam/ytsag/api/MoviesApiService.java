@@ -13,10 +13,13 @@ import retrofit2.http.Query;
  */
 
 public interface MoviesApiService {
-    @GET("list_movies.json")
+    @GET("list_movies.json?limit=20")
     Observable<MovieResponse> getMovies(@Query("page") Integer page);
 
-    @GET("list_movies.json")
+    @GET("list_movies.json?limit=20")
     Observable<MovieResponse> searchMovies(@Query("query_term") String queryTerm,
                                            @Query("page") Integer page);
+
+    @GET("list_movies.json?limit=1&page=1")
+    Observable<MovieResponse> getLatestMovie();
 }

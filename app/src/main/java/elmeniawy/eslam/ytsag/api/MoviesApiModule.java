@@ -28,22 +28,6 @@ public class MoviesApiModule {
         return new OkHttpClient
                 .Builder()
                 .addInterceptor(provideLoggingInterceptor())
-                .addInterceptor(chain -> {
-                    Request request = chain.request();
-
-                    HttpUrl url = request.url()
-                            .newBuilder()
-                            .addQueryParameter("limit", "20")
-                            .build();
-
-                    request = request
-                            .newBuilder()
-                            .url(url)
-                            .build();
-
-                    return chain
-                            .proceed(request);
-                })
                 .build();
     }
 

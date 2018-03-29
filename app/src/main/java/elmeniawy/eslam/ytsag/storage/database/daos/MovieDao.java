@@ -29,4 +29,7 @@ public interface MovieDao {
 
     @Delete
     int deleteData(List<MovieEntity> movieList);
+
+    @Query("SELECT max(id) FROM " + DatabaseUtils.TABLE_MOVIES)
+    long getLatestId();
 }
