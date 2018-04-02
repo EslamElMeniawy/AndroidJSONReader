@@ -2,12 +2,17 @@ package elmeniawy.eslam.ytsag.screens.main;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -15,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -41,7 +47,11 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2.FetchListener;
+import com.tonyodev.fetch2rx.RxFetch;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +61,7 @@ import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import elmeniawy.eslam.ytsag.BuildConfig;
 import elmeniawy.eslam.ytsag.R;
 import elmeniawy.eslam.ytsag.helpers.BootReceiver;
 import elmeniawy.eslam.ytsag.root.MyApplication;
@@ -64,11 +75,6 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements MainMVP.View,
         NavigationView.OnNavigationItemSelectedListener {
-    //    private long downloadId = -1;
-//    private Fetch fetch;
-//    private ProgressDialog progressDialog;
-//    private long downloadStartTime;
-//
 
     @Inject
     MySharedPreferences mySharedPreferences;
@@ -135,6 +141,26 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @BindString(R.string.write_permission)
     String noPermission;
+
+    @BindString(R.string.update_error)
+    String errorUpdate;
+
+    @BindString(R.string.no_update)
+    String noUpdate;
+
+    //
+    // Dialogs.
+    //
+
+    private ProgressDialog dialogCheckingUpdate;
+    private ProgressDialog dialogDownloading;
+
+    //
+    // Fetch.
+    //
+
+    private RxFetch rxFetch;
+    private FetchListener fetchListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -550,6 +576,16 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
     }
 
     @Override
+    public void showUpdateErrorSnackBar() {
+        showSnackBar(errorUpdate);
+    }
+
+    @Override
+    public void showNoUpdateSnackBar() {
+        showSnackBar(noUpdate);
+    }
+
+    @Override
     public void setMainPadding(int bottom) {
         main.setPadding(0, 16, 0, bottom);
     }
@@ -609,37 +645,94 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
 
     @Override
     public void showCheckingUpdatesDialog() {
+        dialogCheckingUpdate = ProgressDialog.show(MainActivity.this, null,
+                getString(R.string.checking_update), true);
+    }
 
+    @Override
+    public void cancelCheckingUpdatesDialog() {
+        if (dialogCheckingUpdate != null) {
+            dialogCheckingUpdate.dismiss();
+        }
     }
 
     @Override
     public void showDownloadConfirmDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
+        builder.setMessage(R.string.update_notification_alert_title)
+                .setTitle(R.string.update);
+
+        builder.setPositiveButton(R.string.download, (dialog, id) -> {
+            dialog.dismiss();
+            presenter.downloadConfirmed();
+        });
+
+        builder.setNegativeButton(R.string.remind_later, (dialog, id) -> {
+            presenter.downloadRefused();
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
     public void showDownloadingDialog() {
-
+        dialogDownloading = new ProgressDialog(MainActivity.this);
+        dialogDownloading.setMessage(getString(R.string.downloading));
+        dialogDownloading.setIndeterminate(false);
+        dialogDownloading.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialogDownloading.setCancelable(true);
+        dialogDownloading.setProgressNumberFormat("%1d/%2d KB");
+        dialogDownloading.setOnCancelListener(dialog -> presenter.downloadCanceled());
+        dialogDownloading.show();
     }
 
     @Override
     public void setDownloadProgress(int progress) {
-
+        if (dialogDownloading != null) {
+            dialogDownloading.setProgress(progress);
+        }
     }
 
     @Override
     public void setDownloadMaxSize(int max) {
-
+        if (dialogDownloading != null) {
+            dialogDownloading.setMax(max);
+        }
     }
 
     @Override
     public void cancelDownloadDialog() {
-
+        if (dialogDownloading != null) {
+            dialogDownloading.dismiss();
+        }
     }
 
     @Override
-    public void showInstallDialog() {
+    public void showInstallDialog(String path) {
+        File file = new File(path);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri downloaded_apk = FileProvider.getUriForFile(MainActivity.this,
+                    getApplicationContext().getPackageName() + ".provider",
+                    file);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
+                    "application/vnd.android.package-archive");
+
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            intent.setDataAndType(Uri.fromFile(file),
+                    "application/vnd.android.package-archive");
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -690,6 +783,110 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
+    }
+
+    @Override
+    public int getVersionCode() {
+        try {
+            PackageInfo pInfo = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0);
+
+            return pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            Timber.e(e);
+        }
+
+
+        return 0;
+    }
+
+    @Override
+    public RxFetch getRxFetch() {
+        if (rxFetch == null) {
+            rxFetch = new RxFetch.Builder(MainActivity.this,
+                    MainActivity.class.getSimpleName())
+                    .setDownloadConcurrentLimit(1)
+                    .enableLogging(BuildConfig.DEBUG)
+                    .build();
+        }
+
+        return rxFetch;
+    }
+
+    @Override
+    public FetchListener getFetchListener() {
+        if (fetchListener == null) {
+            fetchListener = new FetchListener() {
+                @Override
+                public void onQueued(Download download) {
+
+                }
+
+                @Override
+                public void onCompleted(Download download) {
+                    presenter.downloadComplete(download.getId());
+                }
+
+                @Override
+                public void onError(Download download) {
+                    presenter.downloadError(download.getId());
+                }
+
+                @Override
+                public void onProgress(Download download, long l, long l1) {
+                    presenter.downloadProgress(download.getId(), download.getDownloaded(),
+                            download.getTotal());
+                }
+
+                @Override
+                public void onPaused(Download download) {
+
+                }
+
+                @Override
+                public void onResumed(Download download) {
+
+                }
+
+                @Override
+                public void onCancelled(Download download) {
+
+                }
+
+                @Override
+                public void onRemoved(Download download) {
+
+                }
+
+                @Override
+                public void onDeleted(Download download) {
+
+                }
+            };
+        }
+
+        return fetchListener;
+    }
+
+    @Override
+    public void addFetchListener(FetchListener fetchListener) {
+        rxFetch.addListener(fetchListener);
+    }
+
+    @Override
+    public void removeFetchListener(FetchListener fetchListener) {
+        rxFetch.removeListener(fetchListener);
+    }
+
+    @Override
+    public String getApkDirectoryPath() {
+        return Environment.getExternalStorageDirectory() + "/YTS/";
+    }
+
+    @Override
+    public String getApkPath(long downloadStartTime) {
+        return Environment.getExternalStorageDirectory()
+                + "/YTS/YTS" + downloadStartTime + ".apk";
     }
 
     @OnClick(R.id.error_view)
@@ -755,182 +952,5 @@ public class MainActivity extends AppCompatActivity implements MainMVP.View,
             }
         });
     }
-//
-//    @Override
-//    protected void onPause() {
-//        if (mAdView != null) {
-//            mAdView.pause();
-//        }
-//
-//        if (downloadId != -1 && fetch != null) {
-//            fetch.removeFetchListener(this);
-//        }
-//
-//        super.onPause();
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        try {
-//            listMovies.clear();
-//            moviesListAdapter.notifyDataSetChanged();
-//            String savedMovies = sharedPreferences.getString("moviesList", "");
-//            if (!savedMovies.equals("")) {
-//                listMovies = parseJSONResponse(new JSONObject(savedMovies), true);
-//                moviesListAdapter.setMoviesList(listMovies);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (mAdView != null) {
-//            mAdView.resume();
-//        }
-//
-//        if (downloadId != -1 && fetch != null) {
-//            fetch.addFetchListener(MainActivity.this);
-//        }
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//        listMovies.clear();
-//        moviesListAdapter.notifyDataSetChanged();
-//
-//        if (mAdView != null) {
-//            mAdView.destroy();
-//        }
-//
-//        if (downloadId != -1 && fetch != null) {
-//            fetch.release();
-//        }
-//
-//        super.onDestroy();
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        if (requestQueue != null) {
-//            requestQueue.cancelAll(TAG);
-//        }
-//    }
-//
-//    private void downloadUpdate() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//        builder.setMessage(R.string.update_notification_alert_title)
-//                .setTitle(R.string.update);
-//        builder.setPositiveButton(R.string.download, new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                downloadStartTime = System.currentTimeMillis();
-//
-//                String PATH = Environment.getExternalStorageDirectory() + "/YTS/";
-//                String fileName = "YTS" + downloadStartTime + ".apk";
-//
-//                try {
-//                    File fetchDir = new File(PATH);
-//                    deleteFileAndContents(fetchDir);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
-//
-//                fetch = Fetch.getInstance(MainActivity.this);
-//
-//                String downloadUrl = "https://raw.githubusercontent.com/EslamEl-Meniawy/AndroidJSONReader/master/app/app-release.apk#" + downloadStartTime;
-//                com.tonyodev.fetch.request.Request request = new com.tonyodev.fetch.request.Request(downloadUrl,
-//                        PATH, fileName);
-//                downloadId = fetch.enqueue(request);
-//                fetch.addFetchListener(MainActivity.this);
-//
-//                progressDialog = new ProgressDialog(MainActivity.this);
-//                progressDialog.setMessage(getString(R.string.downloading));
-//                progressDialog.setIndeterminate(false);
-//                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//                progressDialog.setCancelable(true);
-//                progressDialog.setProgressNumberFormat("%1d/%2d KB");
-//
-//                progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                    @Override
-//                    public void onCancel(DialogInterface dialogInterface) {
-//                        fetch.removeFetchListener(MainActivity.this);
-//                        fetch.release();
-//                        downloadId = -1;
-//                    }
-//                });
-//
-//                progressDialog.show();
-//            }
-//        });
-//        builder.setNegativeButton(R.string.remind_later, new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                editor.putLong("lastCheck", new Date().getTime());
-//                editor.apply();
-//                dialog.dismiss();
-//            }
-//        });
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-//    }
-//
-//    @Override
-//    public void onUpdate(long id, int status, int progress, long downloadedBytes, long fileSize, int error) {
-//        if (downloadId == id) {
-//            if (status == Fetch.STATUS_ERROR) {
-//                progressDialog.dismiss();
-//
-//                fetch.removeFetchListener(MainActivity.this);
-//                fetch.release();
-//                downloadId = -1;
-//
-//                Snackbar.make(MainActivity.this.findViewById(R.id.nav_view), getResources().getText(R.string.update_error), Snackbar.LENGTH_LONG).show();
-//            } else if (status == Fetch.STATUS_DONE) {
-//                progressDialog.dismiss();
-//
-//                fetch.removeFetchListener(MainActivity.this);
-//                fetch.release();
-//                downloadId = -1;
-//
-//                if (android.os.Build.VERSION.SDK_INT >= 24) {
-//                    Intent intent = new Intent(Intent.ACTION_VIEW, FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider",
-//                            new File(Environment.getExternalStorageDirectory() + "/YTS/YTS" + downloadStartTime + ".apk")));
-//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent);
-//                } else {
-//                    Intent intent = new Intent(Intent.ACTION_VIEW);
-//                    intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/YTS/YTS" + downloadStartTime + ".apk")),
-//                            "application/vnd.android.package-archive");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent);
-//                }
-//            } else {
-//                progressDialog.setMax((int) (fileSize / 1024));
-//                progressDialog.setProgress((int) (downloadedBytes / 1024));
-//            }
-//        }
-//    }
-//
-//    private void deleteFileAndContents(File file) throws Exception {
-//        if (file == null) {
-//            return;
-//        }
-//
-//        if (file.exists()) {
-//            if (file.isDirectory()) {
-//                File[] contents = file.listFiles();
-//                if (contents != null) {
-//                    for (File content : contents) {
-//                        deleteFileAndContents(content);
-//                    }
-//                }
-//            }
-//            //noinspection ResultOfMethodCallIgnored
-//            file.delete();
-//        }
-//    }
 
 }

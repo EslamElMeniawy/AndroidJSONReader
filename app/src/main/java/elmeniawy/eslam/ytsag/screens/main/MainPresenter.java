@@ -4,7 +4,9 @@ import android.support.annotation.Nullable;
 
 import com.evernote.android.job.JobManager;
 import com.google.gson.Gson;
+import com.tonyodev.fetch2.Request;
 
+import java.io.File;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -15,11 +17,13 @@ import java.util.concurrent.TimeoutException;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
 import elmeniawy.eslam.ytsag.api.model.Torrent;
+import elmeniawy.eslam.ytsag.api.model.UpdateResponse;
 import elmeniawy.eslam.ytsag.jobs.notifications.NotificationsJob;
 import elmeniawy.eslam.ytsag.jobs.update.UpdateJob;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.utils.FabricEvents;
+import elmeniawy.eslam.ytsag.utils.NetworkUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -42,7 +46,13 @@ public class MainPresenter implements MainMVP.Presenter {
     private Disposable moviesOnlineDisposable = null,
             moviesOfflineDisposable = null,
             torrentsDisposable = null,
-            moviesDisposable = null;
+            moviesDisposable = null,
+            checkUpdateDisposable = null,
+            downloadDisposable = null,
+            enqueueDisposable = null;
+
+    private int downloadId = -1;
+    private long downloadStartTime;
 
     @Nullable
     private MainMVP.View view;
@@ -125,6 +135,10 @@ public class MainPresenter implements MainMVP.Presenter {
                 //
                 // Check for update.
                 //
+
+                checkUpdateDisposable = model
+                        .checkUpdateAvailable(System.currentTimeMillis())
+                        .subscribe(this::handleCheckUpdateResponse, this::handleCheckUpdateError);
             }
         }
     }
@@ -207,6 +221,56 @@ public class MainPresenter implements MainMVP.Presenter {
                     view.requestStoragePermission();
                 }
             }
+        }
+    }
+
+    @Override
+    public void downloadConfirmed() {
+        if (view != null) {
+            view.showDownloadingDialog();
+            downloadStartTime = System.currentTimeMillis();
+
+            downloadDisposable = model
+                    .downloadApk(view.getRxFetch())
+                    .subscribe(downloads -> view.addFetchListener(view.getFetchListener()),
+                            throwable -> {
+                                Timber.e(throwable);
+                                downloadEnded();
+                                view.showUpdateErrorSnackBar();
+                            });
+
+            try {
+                File fetchDir = new File(view.getApkDirectoryPath());
+                deleteFileAndContents(fetchDir);
+            } catch (Exception e) {
+                Timber.e(e);
+                downloadEnded();
+                view.showUpdateErrorSnackBar();
+                return;
+            }
+
+            String downloadUrl = NetworkUtils.APK_URL + downloadStartTime;
+            Request request = new Request(downloadUrl, view.getApkPath(downloadStartTime));
+
+            enqueueDisposable = view
+                    .getRxFetch()
+                    .enqueue(request)
+                    .asObservable()
+                    .subscribe(download -> downloadId = download.getId());
+        }
+    }
+
+    @Override
+    public void downloadRefused() {
+        if (view != null) {
+            model.saveLastCheckUpdateTime(view.getSharedPreferences(), new Date().getTime());
+        }
+    }
+
+    @Override
+    public void downloadCanceled() {
+        if (view != null) {
+            downloadEnded();
         }
     }
 
@@ -312,6 +376,18 @@ public class MainPresenter implements MainMVP.Presenter {
             if (!view.isAdViewNull()) {
                 view.pauseAdView();
             }
+
+            if (downloadId != -1 && view.getRxFetch() != null) {
+                model.saveDownloadId(view.getSharedPreferences(), downloadId);
+                view.removeFetchListener(view.getFetchListener());
+                view.getRxFetch().pause();
+                view.getRxFetch().close();
+            } else {
+                model.saveDownloadId(view.getSharedPreferences(), -1);
+            }
+
+            view.cancelCheckingUpdatesDialog();
+            view.cancelDownloadDialog();
         }
     }
 
@@ -324,6 +400,14 @@ public class MainPresenter implements MainMVP.Presenter {
         if (view != null) {
             if (!view.isAdViewNull()) {
                 view.resumeAdView();
+
+                downloadId = (int) model.getDownloadId(view.getSharedPreferences());
+
+                if (downloadId != -1) {
+                    view.getRxFetch().resume();
+                    view.addFetchListener(view.getFetchListener());
+                    view.showDownloadingDialog();
+                }
             }
         }
     }
@@ -356,6 +440,32 @@ public class MainPresenter implements MainMVP.Presenter {
             } else {
                 view.openDetails(movie, movie.getTorrents());
             }
+        }
+    }
+
+    @Override
+    public void downloadError(int id) {
+        if (view != null && id == downloadId) {
+            downloadEnded();
+            view.showUpdateErrorSnackBar();
+        }
+    }
+
+    @Override
+    public void downloadComplete(int id) {
+        if (view != null && id == downloadId) {
+            downloadEnded();
+            view.showInstallDialog(view.getApkPath(downloadStartTime));
+        }
+    }
+
+    @Override
+    public void downloadProgress(int id, long downloadedBytes, long fileSize) {
+        Timber.i("id: %d.\ndownloadId: %d.", id, downloadId);
+        if (view != null && id == downloadId) {
+            Timber.i("downloadedBytes: %d.\nfileSize: %d.", downloadedBytes, fileSize);
+            view.setDownloadMaxSize((int) (fileSize / 1024));
+            view.setDownloadProgress((int) (downloadedBytes / 1024));
         }
     }
 
@@ -425,6 +535,18 @@ public class MainPresenter implements MainMVP.Presenter {
 
         if (moviesDisposable != null && !moviesDisposable.isDisposed()) {
             moviesDisposable.dispose();
+        }
+
+        if (checkUpdateDisposable != null && !checkUpdateDisposable.isDisposed()) {
+            checkUpdateDisposable.dispose();
+        }
+
+        if (downloadDisposable != null && !downloadDisposable.isDisposed()) {
+            downloadDisposable.dispose();
+        }
+
+        if (enqueueDisposable != null && !enqueueDisposable.isDisposed()) {
+            enqueueDisposable.dispose();
         }
 
         model.rxUnsubscribe();
@@ -669,6 +791,78 @@ public class MainPresenter implements MainMVP.Presenter {
             } else {
                 view.showGetMoviesErrorSnackBar();
             }
+        }
+    }
+
+    private void handleCheckUpdateResponse(UpdateResponse updateResponse) {
+        if (view != null) {
+            view.cancelCheckingUpdatesDialog();
+
+            if (updateResponse.getSuccess()) {
+                if (updateResponse.getVersion() > view.getVersionCode()) {
+                    model.saveUpdateAvailable(view.getSharedPreferences(), true);
+
+                    if (view.isStoragePermissionGranted()) {
+                        view.showDownloadConfirmDialog();
+                    } else {
+                        view.requestStoragePermission();
+                    }
+                } else {
+                    model.saveUpdateAvailable(view.getSharedPreferences(), false);
+                    view.showNoUpdateSnackBar();
+                }
+            } else {
+                view.showUpdateErrorSnackBar();
+            }
+        }
+    }
+
+    private void handleCheckUpdateError(Throwable throwable) {
+        Timber.e(throwable);
+
+        if (view != null) {
+            view.cancelCheckingUpdatesDialog();
+            view.showUpdateErrorSnackBar();
+        }
+    }
+
+    private void downloadEnded() {
+        if (view != null) {
+            downloadId = -1;
+            view.getRxFetch().cancelAll();
+            view.removeFetchListener(view.getFetchListener());
+            view.getRxFetch().close();
+            view.cancelDownloadDialog();
+
+            if (downloadDisposable != null &&
+                    !downloadDisposable.isDisposed()) {
+                downloadDisposable.dispose();
+            }
+
+            if (enqueueDisposable != null && !enqueueDisposable.isDisposed()) {
+                enqueueDisposable.dispose();
+            }
+        }
+    }
+
+    private void deleteFileAndContents(File file) throws Exception {
+        if (file == null) {
+            return;
+        }
+
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                File[] contents = file.listFiles();
+
+                if (contents != null) {
+                    for (File content : contents) {
+                        deleteFileAndContents(content);
+                    }
+                }
+            }
+
+            boolean deleted = file.delete();
+            Timber.i("Delete result: %s.", String.valueOf(deleted));
         }
     }
 }

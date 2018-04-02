@@ -34,4 +34,8 @@ public class MySharedPreferences {
     public long getLong(String key) {
         return mSharedPreferences.getLong(key, 0);
     }
+
+    public long getLong(String key, long defaultValue) {
+        return mSharedPreferences.getLong(key, defaultValue);
+    }
 }

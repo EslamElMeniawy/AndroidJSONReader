@@ -1,5 +1,8 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2rx.RxFetch;
+
 import java.util.List;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
@@ -8,6 +11,7 @@ import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
@@ -41,6 +45,8 @@ public interface Repository {
 
     void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
 
+    void saveUpdateAvailable(MySharedPreferences sharedPreferences, Boolean available);
+
     Observable<Movie> getMovies(long timestamp, int firstPage);
 
     void saveMovies(ApplicationDatabase database, MySharedPreferences sharedPreferences,
@@ -50,11 +56,15 @@ public interface Repository {
 
     Maybe<List<TorrentEntity>> getMovieOfflineTorrents(ApplicationDatabase database, Long movieId);
 
-    Observable<UpdateResponse> checkUpdateAvailable();
+    Observable<UpdateResponse> checkUpdateAvailable(long currentTime);
 
-    void downloadApk();
+    Flowable<List<Download>> downloadApk(RxFetch rxFetch);
 
     void rxUnsubscribe();
 
     boolean isUpToDate(long time);
+
+    void saveDownloadId(MySharedPreferences sharedPreferences, long id);
+
+    long getDownloadId(MySharedPreferences sharedPreferences);
 }

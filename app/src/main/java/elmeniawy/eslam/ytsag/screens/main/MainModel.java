@@ -1,5 +1,8 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2rx.RxFetch;
+
 import java.util.List;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
@@ -8,6 +11,7 @@ import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
@@ -81,6 +85,11 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
+    public void saveUpdateAvailable(MySharedPreferences sharedPreferences, Boolean available) {
+        repository.saveUpdateAvailable(sharedPreferences, available);
+    }
+
+    @Override
     public Observable<Movie> getMovies(long timestamp, int firstPage) {
 
         return repository.getMovies(timestamp, firstPage);
@@ -104,13 +113,13 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
-    public Observable<UpdateResponse> checkUpdateAvailable() {
-        return null;
+    public Observable<UpdateResponse> checkUpdateAvailable(long currentTime) {
+        return repository.checkUpdateAvailable(currentTime);
     }
 
     @Override
-    public void downloadApk() {
-        repository.downloadApk();
+    public Flowable<List<Download>> downloadApk(RxFetch rxFetch) {
+        return repository.downloadApk(rxFetch);
     }
 
     @Override
@@ -121,5 +130,15 @@ public class MainModel implements MainMVP.Model {
     @Override
     public boolean isUpToDate(long time) {
         return repository.isUpToDate(time);
+    }
+
+    @Override
+    public void saveDownloadId(MySharedPreferences sharedPreferences, long id) {
+        repository.saveDownloadId(sharedPreferences, id);
+    }
+
+    @Override
+    public long getDownloadId(MySharedPreferences sharedPreferences) {
+        return repository.getDownloadId(sharedPreferences);
     }
 }

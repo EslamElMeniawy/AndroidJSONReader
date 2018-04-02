@@ -3,7 +3,6 @@ package elmeniawy.eslam.ytsag.api;
 import elmeniawy.eslam.ytsag.api.model.MovieResponse;
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -21,6 +20,6 @@ public interface MoviesApiService {
     Observable<MovieResponse> searchMovies(@Query("query_term") String queryTerm,
                                            @Query("page") Integer page);
 
-    @GET("list_movies.json?limit=1&page=1#{current_time}")
-    Observable<MovieResponse> getLatestMovie(@Path("current_time") long currentTime);
+    @GET("list_movies.json?limit=1&page=1")
+    Observable<MovieResponse> getLatestMovie(@Query("current_time") long currentTime);
 }

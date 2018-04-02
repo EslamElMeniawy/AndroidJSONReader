@@ -14,8 +14,10 @@ import android.net.NetworkInfo;
 public class NetworkUtils {
     public static final String MOVIES_API_BASE_URL = "https://yts.am/api/v2/";
 
-    public static final String Update_API_BASE_URL =
+    public static final String UPDATE_API_BASE_URL =
             "https://raw.githubusercontent.com/EslamElMeniawy/AndroidJSONReader/master/";
+
+    public static final String APK_URL = UPDATE_API_BASE_URL + "app/app-release.apk#";
 
     /**
      * Check if device connected to Internet or not.

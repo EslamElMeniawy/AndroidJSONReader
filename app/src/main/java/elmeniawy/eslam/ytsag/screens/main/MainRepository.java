@@ -1,6 +1,8 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
 import com.google.gson.Gson;
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2rx.RxFetch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +19,10 @@ import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
 import elmeniawy.eslam.ytsag.utils.PreferencesUtils;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -104,6 +108,11 @@ public class MainRepository implements Repository {
     @Override
     public void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time) {
         sharedPreferences.putLong(PreferencesUtils.KEY_UPDATE_LAST_CHECK, time);
+    }
+
+    @Override
+    public void saveUpdateAvailable(MySharedPreferences sharedPreferences, Boolean available) {
+        sharedPreferences.putBoolean(PreferencesUtils.KEY_UPDATE_AVAILABLE, available);
     }
 
     private Observable<Movie> getMoviesOnline(int firstPage) {
@@ -233,13 +242,18 @@ public class MainRepository implements Repository {
     }
 
     @Override
-    public Observable<UpdateResponse> checkUpdateAvailable() {
-        return null;
+    public Observable<UpdateResponse> checkUpdateAvailable(long currentTime) {
+        return updateApiService
+                .checkUpdate(currentTime)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public void downloadApk() {
-
+    public Flowable<List<Download>> downloadApk(RxFetch rxFetch) {
+        return rxFetch
+                .getDownloads()
+                .asFlowable();
     }
 
     @Override
@@ -261,6 +275,16 @@ public class MainRepository implements Repository {
     public boolean isUpToDate(long timestamp) {
         Timber.i("Last movies fetch time: %d.", timestamp);
         return timestamp != 0 && System.currentTimeMillis() - timestamp < STALE_MS;
+    }
+
+    @Override
+    public void saveDownloadId(MySharedPreferences sharedPreferences, long id) {
+        sharedPreferences.putLong(PreferencesUtils.KEY_DOWNLOAD_ID, id);
+    }
+
+    @Override
+    public long getDownloadId(MySharedPreferences sharedPreferences) {
+        return sharedPreferences.getLong(PreferencesUtils.KEY_DOWNLOAD_ID, -1);
     }
 
     private void deleteMovies(ApplicationDatabase database,

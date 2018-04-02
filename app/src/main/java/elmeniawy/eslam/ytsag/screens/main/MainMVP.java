@@ -1,5 +1,9 @@
 package elmeniawy.eslam.ytsag.screens.main;
 
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2.FetchListener;
+import com.tonyodev.fetch2rx.RxFetch;
+
 import java.util.List;
 
 import elmeniawy.eslam.ytsag.api.model.Movie;
@@ -8,6 +12,7 @@ import elmeniawy.eslam.ytsag.storage.database.ApplicationDatabase;
 import elmeniawy.eslam.ytsag.storage.database.entities.MovieEntity;
 import elmeniawy.eslam.ytsag.storage.database.entities.TorrentEntity;
 import elmeniawy.eslam.ytsag.storage.preferences.MySharedPreferences;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
@@ -66,6 +71,10 @@ public interface MainMVP {
 
         void showPermissionErrorSnackBar();
 
+        void showUpdateErrorSnackBar();
+
+        void showNoUpdateSnackBar();
+
         void setMainPadding(int bottom);
 
         void showAdView();
@@ -90,6 +99,8 @@ public interface MainMVP {
 
         void showCheckingUpdatesDialog();
 
+        void cancelCheckingUpdatesDialog();
+
         void showDownloadConfirmDialog();
 
         void showDownloadingDialog();
@@ -100,7 +111,7 @@ public interface MainMVP {
 
         void cancelDownloadDialog();
 
-        void showInstallDialog();
+        void showInstallDialog(String path);
 
         boolean getInterstitialLoaded();
 
@@ -115,6 +126,20 @@ public interface MainMVP {
         void startBootReceiver();
 
         void stopBootReceiver();
+
+        int getVersionCode();
+
+        RxFetch getRxFetch();
+
+        FetchListener getFetchListener();
+
+        void addFetchListener(FetchListener fetchListener);
+
+        void removeFetchListener(FetchListener fetchListener);
+
+        String getApkDirectoryPath();
+
+        String getApkPath(long downloadStartTime);
     }
 
     interface Presenter {
@@ -137,6 +162,12 @@ public interface MainMVP {
         void setSchedulers();
 
         void checkUpdate();
+
+        void downloadConfirmed();
+
+        void downloadRefused();
+
+        void downloadCanceled();
 
         void recyclerScrolled(int mOnScreenItems, int mTotalItemsInList, int mFirstVisibleItem);
 
@@ -163,6 +194,12 @@ public interface MainMVP {
         void onDestroyed();
 
         void movieClicked(MovieViewModel movie);
+
+        void downloadError(int id);
+
+        void downloadComplete(int id);
+
+        void downloadProgress(int id, long downloadedBytes, long fileSize);
     }
 
     interface Model {
@@ -188,6 +225,8 @@ public interface MainMVP {
 
         void saveLastCheckUpdateTime(MySharedPreferences sharedPreferences, long time);
 
+        void saveUpdateAvailable(MySharedPreferences sharedPreferences, Boolean available);
+
         Observable<Movie> getMovies(long timestamp, int firstPage);
 
         void saveMovies(ApplicationDatabase database, MySharedPreferences sharedPreferences,
@@ -198,12 +237,16 @@ public interface MainMVP {
         Maybe<List<TorrentEntity>> getMovieOfflineTorrents(ApplicationDatabase database,
                                                            Long movieId);
 
-        Observable<UpdateResponse> checkUpdateAvailable();
+        Observable<UpdateResponse> checkUpdateAvailable(long currentTime);
 
-        void downloadApk();
+        Flowable<List<Download>> downloadApk(RxFetch rxFetch);
 
         void rxUnsubscribe();
 
         boolean isUpToDate(long time);
+
+        void saveDownloadId(MySharedPreferences sharedPreferences, long id);
+
+        long getDownloadId(MySharedPreferences sharedPreferences);
     }
 }

@@ -63,7 +63,7 @@ public class UpdateApiModule {
     @Provides
     @Singleton
     UpdateApiService provideApiService() {
-        return provideRetrofit(NetworkUtils.Update_API_BASE_URL, provideClient())
+        return provideRetrofit(NetworkUtils.UPDATE_API_BASE_URL, provideClient())
                 .create(UpdateApiService.class);
     }
 }
