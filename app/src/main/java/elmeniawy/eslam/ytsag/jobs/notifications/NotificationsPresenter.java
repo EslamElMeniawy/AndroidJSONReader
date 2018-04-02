@@ -40,11 +40,11 @@ public class NotificationsPresenter implements NotificationsMVP.Presenter {
 
     @Override
     public void rxUnsubscribe() {
-        if (onlineDisposable != null && onlineDisposable.isDisposed()) {
+        if (onlineDisposable != null && !onlineDisposable.isDisposed()) {
             onlineDisposable.dispose();
         }
 
-        if (databaseDisposable != null && databaseDisposable.isDisposed()) {
+        if (databaseDisposable != null && !databaseDisposable.isDisposed()) {
             databaseDisposable.dispose();
         }
     }

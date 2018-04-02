@@ -411,19 +411,19 @@ public class MainPresenter implements MainMVP.Presenter {
     }
 
     private void rxUnsubscribe() {
-        if (moviesOnlineDisposable != null && moviesOnlineDisposable.isDisposed()) {
+        if (moviesOnlineDisposable != null && !moviesOnlineDisposable.isDisposed()) {
             moviesOnlineDisposable.dispose();
         }
 
-        if (moviesOfflineDisposable != null && moviesOfflineDisposable.isDisposed()) {
+        if (moviesOfflineDisposable != null && !moviesOfflineDisposable.isDisposed()) {
             moviesOfflineDisposable.dispose();
         }
 
-        if (torrentsDisposable != null && torrentsDisposable.isDisposed()) {
+        if (torrentsDisposable != null && !torrentsDisposable.isDisposed()) {
             torrentsDisposable.dispose();
         }
 
-        if (moviesDisposable != null && moviesDisposable.isDisposed()) {
+        if (moviesDisposable != null && !moviesDisposable.isDisposed()) {
             moviesDisposable.dispose();
         }
 

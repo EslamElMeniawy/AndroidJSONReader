@@ -209,7 +209,7 @@ public class SearchPresenter implements SearchMVP.Presenter {
     }
 
     private void rxUnsubscribe() {
-        if (moviesOnlineDisposable != null && moviesOnlineDisposable.isDisposed()) {
+        if (moviesOnlineDisposable != null && !moviesOnlineDisposable.isDisposed()) {
             moviesOnlineDisposable.dispose();
         }
     }

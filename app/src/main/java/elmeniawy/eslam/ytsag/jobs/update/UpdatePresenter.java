@@ -38,7 +38,7 @@ public class UpdatePresenter implements UpdateMVP.Presenter {
 
     @Override
     public void rxUnsubscribe() {
-        if (disposable != null && disposable.isDisposed()) {
+        if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
         }
     }

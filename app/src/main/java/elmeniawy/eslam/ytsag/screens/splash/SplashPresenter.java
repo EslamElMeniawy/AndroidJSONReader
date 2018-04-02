@@ -35,7 +35,7 @@ public class SplashPresenter implements SplashMVP.Presenter {
 
     @Override
     public void rxUnsubscribe() {
-        if (disposable != null && disposable.isDisposed()) {
+        if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
         }
     }

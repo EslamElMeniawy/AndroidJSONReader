@@ -244,15 +244,15 @@ public class MainRepository implements Repository {
 
     @Override
     public void rxUnsubscribe() {
-        if (disposableGetMovies != null && disposableGetMovies.isDisposed()) {
+        if (disposableGetMovies != null && !disposableGetMovies.isDisposed()) {
             disposableGetMovies.dispose();
         }
 
-        if (disposableDeleteMovies != null && disposableDeleteMovies.isDisposed()) {
+        if (disposableDeleteMovies != null && !disposableDeleteMovies.isDisposed()) {
             disposableDeleteMovies.dispose();
         }
 
-        if (disposableInsertMovies != null && disposableInsertMovies.isDisposed()) {
+        if (disposableInsertMovies != null && !disposableInsertMovies.isDisposed()) {
             disposableInsertMovies.dispose();
         }
     }
