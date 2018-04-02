@@ -12,9 +12,30 @@
     <string name="about">About</string>
     <string name="developer">Developer</string>
     <string name="app_about">About Application</string>
-    <string name="app_about_details">YTS version 6.0.0\n\nHere you will be able to browse and download movies in excellent 720p, 1080p and 3D quality, all at the smallest file size.\n\nGet notified about new movies available for download by enabling the notifications.\n\nSearch Movies.\n\nUpdate app within itself.\n\nNew in this version:\n\t\u2022\tClear cached data on new movies arrive.\n\nAdded in older versions:\n\t\u2022\tEnhance UI.\n\t\u2022\tEnhance application update.\n\t\u2022\tSupport Android 6 \"Marshmallow\" runtime permissions.</string>
+    <string name="app_about_details">"YTS version 6.0.0\n\n"
+
+        "Here you will be able to browse and download movies in excellent 720p, 1080p and 3D quality, all at the smallest file size.\n\n"
+
+        "Get notified about new movies available for download by enabling the notifications.\n\n"
+
+        "Search Movies.\n\n"
+
+        "Update app within itself.\n\n"
+
+        "New in this version:\n"
+        "\t\u2022\tIncrease cashed offline movies.\n"
+        "\t\u2022\tEnhance performance.\n\n"
+
+        "Added in older versions:\n"
+        "\t\u2022\tClear cached data on new movies arrive.\n"
+        "\t\u2022\tEnhance UI.\n"
+        "\t\u2022\tEnhance application update.\n"
+        "\t\u2022\tSupport Android 6 \"Marshmallow\" runtime permissions."</string>
     <string name="developer_about">About Developer</string>
-    <string name="developer_about_details">Hi\nMy name is Eslam El-Meniawy.\n\nI am an engineer who like to make the world more simpler with the help of technologies I know.</string>
+    <string name="developer_about_details">"Hi\n"
+        "My name is Eslam El-Meniawy.\n\n"
+
+        "I am an engineer who like to make the world more simpler with the help of technologies I know."</string>
     <string name="social">Social Accounts</string>
     <string name="website">Website</string>
     <string name="linkedin">Linkedin</string>
@@ -22,9 +43,15 @@
     <string name="twitter">Twitter</string>
     <string name="facebook">Facebook</string>
     <string name="google_plus">Google Plus</string>
-    <string name="no_internet_error">No Internet connection!\n\n\nTab to refresh</string>
+    <string name="no_internet_error">"No Internet connection!\n\n\n"
+
+
+        "Tab to refresh"</string>
     <string name="no_internet">No Internet connection!</string>
-    <string name="get_movies_json_error">Oops, something went wrong while getting movies list!\n\n\nTab to refresh</string>
+    <string name="get_movies_json_error">"Oops, something went wrong while getting movies list!\n\n\n"
+
+
+        "Tab to refresh"</string>
     <string name="get_movies_error">Oops, something went wrong while getting movies list!</string>
 
     <string name="title_activity_details">Movie Details</string>
@@ -32,9 +59,11 @@
     <string name="get_movie_json_error">Oops, something went wrong while getting movie details!</string>
 
     <string name="notification_alert_title">New movies available</string>
-    <string name="notification_alert_msg">New movies available for download.\nClick to view them.</string>
+    <string name="notification_alert_msg">"New movies available for download.\n"
+        "Click to view them."</string>
     <string name="update_notification_alert_title">Update available</string>
-    <string name="update_notification_alert_msg">New version available.\nClick to download.</string>
+    <string name="update_notification_alert_msg">"New version available.\n"
+        "Click to download."</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-3911224529986415/5640802486</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3911224529986415/6977934885</string>
