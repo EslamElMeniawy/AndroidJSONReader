@@ -118,7 +118,7 @@ public class MainPresenter implements MainMVP.Presenter {
             if (view.getDrawerOpened()) {
                 view.closeDrawer();
             }
-            
+
             boolean isUpdateAvailable = model.getUpdateAvailable(view.getSharedPreferences());
             Timber.i("Update available: %s.", String.valueOf(isUpdateAvailable));
 
@@ -849,7 +849,7 @@ public class MainPresenter implements MainMVP.Presenter {
         }
     }
 
-    private void deleteFileAndContents(File file) throws Exception {
+    private void deleteFileAndContents(File file) {
         if (file == null) {
             return;
         }
