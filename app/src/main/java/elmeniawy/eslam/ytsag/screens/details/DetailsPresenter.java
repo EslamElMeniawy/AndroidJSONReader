@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import elmeniawy.eslam.ytsag.screens.main.MovieViewModel;
 import elmeniawy.eslam.ytsag.screens.main.TorrentViewModel;
@@ -47,7 +48,13 @@ public class DetailsPresenter implements DetailsMVP.Presenter {
             } else {
                 view.setTitle(movie.getTitle());
                 view.setYear(String.valueOf(movie.getYear()));
-                view.setGenres(TextUtils.join("\t", movie.getGenres()));
+
+                if (movie.getGenres() != null && movie.getGenres().size() > 0) {
+                    view.setGenres(TextUtils.join("    ", movie.getGenres()));
+                }
+
+                view.setRate(String.format(Locale.getDefault(), "%.1f/10",
+                        movie.getRating()));
 
                 if (torrents.size() > 0) {
                     view.setTorrents(torrents);

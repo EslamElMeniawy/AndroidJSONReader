@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,8 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Vi
             super(itemView);
             ButterKnife.bind(this, itemView);
             movieTitle.setHeight(movieTitle.getLineHeight() * 3);
+            movieTitle.setMaxLines(2);
+            movieTitle.setEllipsize(TextUtils.TruncateAt.END);
         }
 
         @OnClick

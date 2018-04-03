@@ -16,8 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/movie_image"
-        android:ellipsize="end"
-        android:maxLines="2"
         android:paddingTop="@dimen/drawer_image_padding" />
 
     <android.support.v7.widget.LinearLayoutCompat

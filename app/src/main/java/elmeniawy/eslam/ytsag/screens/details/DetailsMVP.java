@@ -26,6 +26,8 @@ public interface DetailsMVP {
 
         void setGenres(String genres);
 
+        void setRate(String rate);
+
         void setTorrents(List<TorrentViewModel> torrents);
 
         void setSynopsis(String synopsis);

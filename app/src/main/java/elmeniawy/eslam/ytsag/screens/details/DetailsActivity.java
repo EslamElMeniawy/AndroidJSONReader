@@ -254,6 +254,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsMVP.Vie
     }
 
     @Override
+    public void setRate(String rate) {
+        this.rate.setText(rate);
+    }
+
+    @Override
     public void setTorrents(List<TorrentViewModel> torrents) {
         this.torrents.setAdapter(new TorrentsAdapter(this, torrents));
 
