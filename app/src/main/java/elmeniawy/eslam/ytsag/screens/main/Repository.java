@@ -27,6 +27,8 @@ public interface Repository {
 
     boolean getFromNotification(MySharedPreferences sharedPreferences);
 
+    void saveFromNotification(MySharedPreferences sharedPreferences, Boolean fromNotification);
+
     boolean getUpdateAvailable(MySharedPreferences sharedPreferences);
 
     long getLastCheckUpdateTime(MySharedPreferences sharedPreferences);

@@ -220,6 +220,10 @@ public class MainPresenter implements MainMVP.Presenter {
                     model.getLastCheckUpdateTime(view.getSharedPreferences())
                     >= (24 * 60 * 60 * 1000))
                     || model.getFromNotification(view.getSharedPreferences()))) {
+                if (model.getFromNotification(view.getSharedPreferences())) {
+                    model.saveFromNotification(view.getSharedPreferences(), false);
+                }
+
                 if (view.isStoragePermissionGranted()) {
                     view.showDownloadConfirmDialog();
                 } else {
@@ -460,8 +464,9 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void downloadComplete(int id) {
         if (view != null && id == downloadId) {
-            downloadEnded();
+            model.saveLastCheckUpdateTime(view.getSharedPreferences(), new Date().getTime());
             model.saveUpdateAvailable(view.getSharedPreferences(), false);
+            downloadEnded();
             view.showInstallDialog(view.getApkPath(downloadStartTime));
         }
     }

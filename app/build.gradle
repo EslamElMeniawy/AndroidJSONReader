@@ -34,8 +34,8 @@ android {
         applicationId "elmeniawy.eslam.ytsag"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 1414602
-        versionName '6.0.2'
+        versionCode 1414603
+        versionName '6.0.3'
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {
             annotationProcessorOptions {

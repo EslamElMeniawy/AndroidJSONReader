@@ -66,6 +66,11 @@ public class MainRepository implements Repository {
     }
 
     @Override
+    public void saveFromNotification(MySharedPreferences sharedPreferences, Boolean fromNotification) {
+        sharedPreferences.putBoolean(PreferencesUtils.KEY_FROM_NOTIFICATION, fromNotification);
+    }
+
+    @Override
     public boolean getUpdateAvailable(MySharedPreferences sharedPreferences) {
         return sharedPreferences.getBoolean(PreferencesUtils.KEY_UPDATE_AVAILABLE);
     }

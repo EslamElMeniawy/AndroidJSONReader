@@ -40,6 +40,12 @@ public class MainModel implements MainMVP.Model {
     }
 
     @Override
+    public void saveFromNotification(MySharedPreferences sharedPreferences,
+                                     Boolean fromNotification) {
+        repository.saveFromNotification(sharedPreferences, fromNotification);
+    }
+
+    @Override
     public boolean getUpdateAvailable(MySharedPreferences sharedPreferences) {
         return repository.getUpdateAvailable(sharedPreferences);
     }
