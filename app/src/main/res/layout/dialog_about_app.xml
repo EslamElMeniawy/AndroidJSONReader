@@ -17,8 +17,8 @@
             style="@style/DialogAboutHeaderImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_info_black_24dp"
             android:tint="@color/headingsText"
+            app:srcCompat="@drawable/ic_info_black_24dp"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -33,10 +33,15 @@
         android:layout_height="2dp"
         android:background="@color/colorAccent" />
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:text="@string/app_about_details"
-        android:textColor="@color/normalText" />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="@string/app_about_details"
+            android:textColor="@color/normalText" />
+    </ScrollView>
 </LinearLayout>
