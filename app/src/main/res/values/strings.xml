@@ -12,7 +12,7 @@
     <string name="about">About</string>
     <string name="developer">Developer</string>
     <string name="app_about">About Application</string>
-    <string name="app_about_details">"YTS version 6.0.1\n\n"
+    <string name="app_about_details">"YTS version 6.0.2\n\n"
 
         "Here you will be able to browse and download movies in excellent 720p, 1080p and 3D quality, all at the smallest file size.\n\n"
 
@@ -23,10 +23,11 @@
         "Update app within itself.\n\n"
 
         "New in this version:\n"
-        "\t\u2022\tEnhance details page.\n"
-        "\t\u2022\tDecrease app size.\n\n"
+        "\t\u2022\tDownload update over wifi only.\n\n"
 
         "Added in older versions:\n"
+        "\t\u2022\tEnhance details page.\n"
+        "\t\u2022\tDecrease app size.\n"
         "\t\u2022\tIncrease cashed offline movies.\n"
         "\t\u2022\tEnhance performance.\n"
         "\t\u2022\tClear cached data on new movies arrive.\n"

@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.evernote.android.job.JobManager;
 import com.google.gson.Gson;
+import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2.Request;
 
 import java.io.File;
@@ -255,6 +256,7 @@ public class MainPresenter implements MainMVP.Presenter {
 
             String downloadUrl = NetworkUtils.APK_URL + downloadStartTime;
             Request request = new Request(downloadUrl, view.getApkPath(downloadStartTime));
+            request.setNetworkType(NetworkType.WIFI_ONLY);
 
             enqueueDisposable = view
                     .getRxFetch()
@@ -459,6 +461,7 @@ public class MainPresenter implements MainMVP.Presenter {
     public void downloadComplete(int id) {
         if (view != null && id == downloadId) {
             downloadEnded();
+            model.saveUpdateAvailable(view.getSharedPreferences(), false);
             view.showInstallDialog(view.getApkPath(downloadStartTime));
         }
     }
