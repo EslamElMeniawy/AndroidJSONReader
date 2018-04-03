@@ -115,6 +115,10 @@ public class MainPresenter implements MainMVP.Presenter {
     @Override
     public void checkUpdateClicked() {
         if (view != null) {
+            if (view.getDrawerOpened()) {
+                view.closeDrawer();
+            }
+            
             boolean isUpdateAvailable = model.getUpdateAvailable(view.getSharedPreferences());
             Timber.i("Update available: %s.", String.valueOf(isUpdateAvailable));
 
